@@ -2,3 +2,15 @@
 !*.org
 !*.org_archive
 !.gitignore
+!*.css
+!*.html
+!programas
+!programas/*.py
+!*.tab
+!*/*.fits
+!*/*.png
+!*/*.reg
+!*/*.json
+!*.reg
+!*.org
+!*/*.png

@@ -1,0 +1,1662 @@
+* OSF 2014 Conference
+** Resumen de Luis
+Catalog of stationary bowshock arcs in the Orion Nebula
+
+Presentamos una lista completa de todos los choques estacionarios asociados a estrellas jóvenes (objetos LL) que se han descubierto en la Nebulosa de Orión. Hemos identificado en las imágenes de Bally los arcos de emisión circunestelar. Estas imágenes fueron tomadas con la cámara ASC del Telescopio Espacial Hubble y son emisiones de Ha y NII debido a que contiene el filtro f658n. Se han separado las emisiones de Ha y NII utilizando las imágenes de Robberto, puesto que estas se tomaron con la cámara WFPC2 y cómo contiene el filtro f656n sólo admite las líneas de Ha. Con el objetivo de caracterizar los objetos LL hemos trazado la forma de los arcos para estimar los radios de curvatura Rc tanto del borde externo como del interno de los choques estacionarios, de la misma forma también se ha calculado  la distancia Ro de los arcos a la estrella jóven. Utilizando la forma de los arcos se ha medido el brillo superficial de Ha y con este parámetro hemos estimado el producto MV de todos los Objetos LL.
+** Version in English
+Catalog of stationary bowshock arcs in the Orion Nebula
+
+We present a complete catalog of all the stationary emission line arcs (LL objects and proplyd bowshocks) found in archival HST imaging of the Orion Nebula.   The total number of objects detected is 73, of which 20 have not previously been reported in the literature.  We classify the shapes of emission line arcs by fitting conic sections to the inner and outer shell boundaries and calculate the background corrected H alpha surface brightness of each object.   We find significant differences in the shell shapes between the objects closest to the ionizing stars and those farther away.  The closer group, which all represent proplyd interactions with the hypersonic stellar wind, have relatively closed shapes, while the farther group, which are due to interactions with the transonic ionized champagne flow in the nebula, are more open and hyperbolic.  Although some of the latter group are also known proplyds, many are not, and the largest and brighest arcs tend to be associated with particularly luminous young stars, suggesting that the intrinsic T Tauri disk wind may play a role.  The orientations of the arcs, together with the stagnation pressures estimated from the surface brightness, allow the internal velocity field of the H II region to be probed.  We find that approximately radial flows from the core of the nebula dominate over disordered, turbulent flows.
+* Tasks to finish before OSSF 2014 conference
+** Finish brightness calibration
+*** Correct for [N II] contamination
+** Shell pressure
++ Check that this is done properly
++ Calculate pre-shock density - compare with H II region density
+** Prune objects from the list for the statistics
+*** inter-proplyd shocks
+*** objects lacking an outer arc
+*** anything else where the data is low-quality
+** Look at correlations
+:PROPERTIES:
+:dir:      luis-programas
+:END:
+
+#+BEGIN_SRC python :return figlist :results list
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from  astropy.table import Table
+
+  tab = Table.read("arcs-summary.tab", format="ascii.commented_header", delimiter="\t",
+                   fill_values=('-', np.nan) )
+
+  with open("problem-sources.txt") as f:
+      problem_sources = f.read().split('\n')
+
+  m = np.isfinite(tab['R_out']) & np.isfinite(tab['R_in']) & (tab['R_out'] > tab['R_in'])
+  m = m & np.array([not source in problem_sources for source in tab['Object']])
+  A = tab['Rc_out']/tab['R_out']
+  Ain = tab['Rc_in']/tab['R_in']
+  H = (tab['R_out'] - tab['R_in'])/tab['R_out']
+  D60 = tab['D']/60
+  contrast = tab['Dif_Bally']/tab['Value_bg_Bally']
+  q = tab['R_out']/tab['D']
+
+  figlist = []
+
+  pltfile = 'will-A-vs-q.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.scatter(q[m], A[m], s=20*tab['R_out'][m], c=D60[m], vmin=0.0, cmap=plt.cm.hot, alpha=0.6)
+  cb = plt.colorbar()
+  cb.set_label('Distance from th1C, D / arcmin')
+  plt.xlabel('Bowshock fractional size, q = r0/D')
+  plt.ylabel('Bowshock openness, A = Rc/r0')
+  ax.set_xscale('log')
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+  pltfile = 'will-H-vs-A.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.scatter(A[m], H[m], s=20*tab['R_out'][m], c=contrast[m], vmin=0.0, vmax=0.2, cmap=plt.cm.hot, alpha=0.6)
+  # plt.scatter(0.5*(Ain[m] + A[m]), H[m], c=tab['D'][m]/60, vmin=0.0, cmap=plt.cm.hot_r)
+  cb = plt.colorbar()
+  cb.set_label('Shell/background brightness contrast')
+  plt.xlabel('Bowshock openness, A = Rc/r0')
+  plt.ylabel('Shell relative thickness, H = h/r0')
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+  
+
+#+END_SRC
+
+#+RESULTS:
+- [[file:luis-programas/will-A-vs-q.pdf][will-A-vs-q.pdf]]
+- [[file:luis-programas/will-H-vs-A.pdf][will-H-vs-A.pdf]]
+
+
+* Objetos LL
+:LOGBOOK:
+- Note taken on [2013-08-17 Sat 18:48] \\
+  Moved material to here from [[file:jorge-project.org][file:~/Dropbox/jorgebowshocks/jorge-project.org]]
+:END:
+
+** Encontrar lista completa de todos los objetos
++ Hay varios artículos de Bally que listan estos objetos.  Sin embargo, no hay ninguna lista completa de todos publicado.  
+
++ Algunos están en BOM2000 - ver figura 2. Son los objetos con designación que empieza con "w". Por ejemplo, w069-600
++ Algunos otros están en BR2001 - ver figura 1.  Se llaman LL3, LL4, etc
++ Algunos otros están en BLSW2006 - ver Tabla 2.  Los que se llaman LL4, LL5, etc son iguales a en BR2001, pero hay otros que se llaman algo como "LL 344-3020" y creo que son nuevos.
+*** DONE Get the GO-9825 data 
+CLOSED: [2013-08-27 Tue 09:33]
++ GO 9825 (Cycle 12)  is a Bally program that covers much of Orion with ACS in just f658n
+  + It is not quite as wide a field as the Robberto program, but almost
++ There is also GO 9460 (Cycle 11) which uses both f658n and f660n, and also f502n and f550m
+  + The latter is useful since it passes only [N II]
+  + However, this is only 4 pointings:
+    1. HH 502 - this may cover some LL objects
+    2. HH 505 - LL 2
+    3. M43-West
+    4. OMC-2
+*** Other new detections
+:LOGBOOK:
+CLOCK: [2013-09-03 Tue 10:04]--[2013-09-03 Tue 13:45] =>  3:41
+:END:
++ [X] 362-3137
+  + in Bally field, just below the LL6 group
+  + weak but totally believable
+    + background 0.8
+    + excess 0.05
+  + not listed as a proplyd in Ricci
+  + But in Da Rio 2009 as star
+  + And #921 in Hillenbrand 1997
++ [X] 119-3155
+  + In Bally field 14 and Robberto field 7L
+  + To the south of 136-3057 in a region with many bowshocks and jets
+  + 5:35:11.876 -5:31:55.40
+  + Has a faint arc to the N and another one to the E, but the E one may be unrelated
++ [X] 203-3039 or MY Ori
+  + 5:35:20.297 -5:30:39.37
+  + In Bally field 14 and Robberto field 2L
+  + Faint arc to N and jet pointing to E
+  + The jet and bowshocks are described in Bally (2006) Fig 14 but they didn't seem to notice the stellar bowshock
++ [X] 109-246
+  + Near to HH 202
+  + Disk detected in [O III] absorption by BOM2000 (they give 109-247)
+  + Has wonderful open outer bow shock
+  + Complicated inner shock
+  + Probable jet going to SSW
+  + Star seems off-center wrt proplyd
++ [X] 106-245
+  + Much smaller arc just behind 109-246
+  + Both are immeresd in a shock that goes the other way
++ [X] 138-3024
+  + 5:35:13.801 -5:30:24.34
+  + This is a star in the wispy gray filaments to the S of LP Ori reflection nebula
+  + The arc is  seen in blue continuum where it is just a hole really
+  + But it is also seen in Ha, and looks more like a shell
++ [ ] There are many other stars like 138-3024 in the same zone that seem to have slightly dark regions around them
+  + Each one is probably not significant, but maybe between them they could add up to something
++ [ ] LP Ori
++ [X] 065-502
+  + 5:35:06.534 -5:25:01.53
+  + Not listed as proplyd but clearly is one
+  + Very weak but quite clear bowshock
+  + In front of LL1
++ [X] 083-435
+  + 5:35:08.289 -5:24:34.84
+  + Another not listed as proplyd but maybe one
+  + Similar to  065-502 but far far weaker - may not be real
+  + Between  LL1 and giant shadow disk
+
+    
+*** TODO Looking for new proplyd bowshocks in the Ricci 2008 data
+:LOGBOOK:
+CLOCK: [2013-08-27 Tue 09:34]--[2013-08-27 Tue 10:04] =>  0:30
+:END:
+**** [3/16] Fields checked
+1. [X] [2013-10-25 Fri]
+2. [X] [2013-10-26 Sat]
+3. [ ] 
+4. [ ] 
+5. [ ] 
+6. [X] [2013-10-25 Fri]
+7. [ ] 
+8. [ ] 
+9. [ ] 
+10. [ ] 
+11. [ ] 
+12. [ ] 
+13. [ ] 
+14. [ ] 
+15. [ ] 
+16. [ ] 
+
+**** Not yet in our list - only candidates so far
++ [X] 038-627 - goes outside the Ricci box
+  + 5:35:04.19 -5:26:27.89
+  + Turns out that we already had it as 042-628!
+  + [X] need to check it is real - yes it is!
+    + another one of the LL1 family
+    + bright in continuum
++ [X] 074-229 - small faint arc
+  + [2013-11-12 Tue] Spotted while looking at the image of 073-227
+  + Not listed as a proplyd, but in Da Rio catalog
+  + 5:35:07.381 -5:22:28.92 
++ [X] 066-3251 - shell weak in Ha but strong in continuum
+  + [X] why is that? might be a globule rather than a shell
+  + 5:35:06.57 -5:32:51.49
++ 109-246 - this has a spectacular-looking bow, but it is superimposed on the complicated shocks to the NW of HH 202
+  + I am pretty sure it is real, but it will be hard to measure anything
++ [X] 117-421 - small proplyd near the giant silhouette disk
+  + 5:35:11.65 -5:24:21.50
+  + it looks like it has a small cavity around the star - best seen in color images - also hint of an outer shock
++ [X] 121-434 - also near the giant silhouette disk
+  + 5:35:12.12 -5:24:33.80
+  + [X] seems to have a shell - but quite faint
++ [X] 131-046 - Northern proplyd
+  + 05:35:13.05 -05:20:45.79
+  + Bally field 02
+  + very fat shell,
++ [X] 132-053
+  + 5:35:13.204 -5:20:52.61
+  + Bally field 02
+  + not classified as proplyd, but might be one
+  + very small and faint shell
++ [X] 142-301 - dusty, flat-headed proplyd - weak shell
+  + 05:35:14.15  -05:23:00.91
++ [X] 154-240 - bright Northern proplyd - well-defined inner edge, but hard to see if there is an outer edge to the shell
+  + 05:35:15.38 -05:22:39.85
+  + May be interacting with the large-scale wind-blown shell of the nebula
++ [X] 163-222 - Northern proplyd with nice internal disk
+  + 05:35:16.30 -05:22:21.50
+  + very weak shell, but well defined inner and outer edges
++ [X] 154-225 - Northern proplyd
+  + 05:35:15.37 -05:22:25.35
+  + very weak and lumpy shell
++ [X] 159- 221 - Northern proplyd
+  + 05:35:15.93 -05:22:21.05
+  + very weak shell without clear outer boundary
++ [X] 161-324 - LV4
+  + 05:35:16.05 -05:23:24.35
++ [X] 158-323 - LV5
+  + 05:35:15.83 -05:23:22.59
++ [X] 159-326
+  + 05:35:15.81 -05:23:25.51
+  + There is a faint arc a long way in front of it, almost touching the tail of LV4
+  + Only seen on the SE flank, not at all on the N flank
+  + It it related?  We should check for proper motions
++ [X] 163-317 - LV3
+  + 05:35:16.27 -05:23:16.51
++ [X] 166-316
+  + 05:35:16.61 -05:23:16.19
+  + small proplyd next to LV2
++ [X] 167-317 - LV2
+  + 05:35:16.74 -05:23:16.51
++ [X] 168-326 - LV1
+  + 05:35:16.83 -05:23:25.91
+  + shock with stellar wind
+  + note that eastern end has high proper motion and may be unrelated
++ [X] 168-326a and 168-326b - LV1ab
+  + 05:35:16.83 -05:23:25.91
+  + interproplyd shock
++ [X] 168-328
+  + 05:35:16.77 -05:23:28.06
+  + small proplyd next to LV1
++ [X] 169-338 - very small faint proplyd next to 170-331, with faint but well-defined shell
+  + 05:35:16.88 -05:23:38.10
++ [X] 165-235 - Northern proplyd
+  + 05:35:16.48 -05:22:35.16
+  + well-defined arc, but may be affected by confusion with other shells nearby
+  + check proper motions
++ [X] 170-249 - another bright Northern proplyd - well-defined inner and outer borders but rather faint
+  + 05:35:16.96 -05:22:48.51
++ [X] 173-236 - Northern proplyd with clearish shell, somewhat pinched
+  + 05:35:17.34 -05:22:35.81
++ [X] 175-321 (5:35:17.458 -5:23:20.96) - not necessarily a proplyd, but seems to show a shock oriented towards th1D, which it is very close to
++ [X] 177-341W - HST1
+  + 05:35:17.66 -05:23:41.00
++ [X] 173-342 - interproplyd shock with HST1?
+  + 5:35:17.277 -5:23:41.97
++ Does not point at th1C
++ [X] 178-258 - big floppy proplyd with a nice shock in front of it
+  + 05:35:17.84 -05:22:58.15
++ [X] 180-331 - proplyd
+  + 05:35:18.03 -05:23:30.80
++ [X] 189-329 - very faint proplyd with diffuse faint shell, just to East of fast-moving shock behind 180-331
++ [X] 205-230 - another interproplyd shock from a visual binary
+  + 05:35:20.45 -05:23:29.96
+  + very similar to LV1
++ [X] 206-043 - not obviously a proplyd
+  + 5:35:20.562 -5:20:43.06
+  + Bally field 02
+  + Very faint, but quite narrow arc
+  + [X] 212-400 - SE proplyd
+  + 05:35:21.19 -05:24:00.20
+  + very weak shell
+  + may not be real
+**** Already in our list
++ 4468-605 - very weak
++ 4596-400 - aka 000-400 - two shell structure
++ 4582-635
++ 005-514
++ 044-527
++ 049-143
++ 069-601
++ 072-135 - aka 072-134
++ 073-227
++ 102-233 - aka 101-233
+
+  
+**** Rejected objects
+Ones that might be salvageable are marked with checkboxes
++ 017-636 - HH 878 jet
+  + 5:35:01.664 -5:26:36.16
+  + See Bally 2006 Fig 15
+  + This is an important object because it is a bare bent jet, like the southern jet in LL2, but /without/ a stellar bowshock
++ [X] 061-401 - possibly a bowshock - *but almost certainly not*
+  + 5:35:06.09 -5:24:00.60
+  + Colour image in Evernote
+  + Bally field 01 and WFC3 field
+  + Certainly has a jet - not spotted by Ricci 2008, nor Bally 2006
++ 099-339 - slight evidence for a large bow but it is very diffuse and is superimposed on HH269
+  + so probably not real
++ 057-419 - very thin and close-in filament
+  + 5:35:05.73 -5:24:18.5
+  + [X] what is it? 
+    + Not sure, but the filament is only clearly visible in the broad-band filters - may be a jet
+    + I am pretty certain it is not a bowshock
++ 106-417 - this has a bow nearby, but it is pointing the wrong way and looks to be high Mach number
+  + seems to be caused by an unrelated jet coming from the east
+  + this must be catalogued somewhere
++ 109-327 - the Narwhal proplyd
+  + this has a jet coming out of its nose
+  + and it is just to the west of the Trilobyte thingy
++ 131-046 - up near the Orion fingers zone
+  + has a broad shell in front of it, but it looks too big to be associated
++ 132-042 - this is an amazing object, looking like a proplyd that is pointing the wrong way
+  + [ ] It has a jet that goes straight back into the heart of the nebula
+    + I think I can see some knots to the south
++ 159-729 or thereabouts
+  + [ ] might be a very flat LL-type arc, but without an inner edge
+  + more likely just a chance superposition of something else
++ 205-421
+  + [ ] has a complex, clumpy shell structure all around it, but it looks too thin to be a stand-off bowshock - perhaps it has a bipolar jet
++ 
+
+  
+*** Tabla de objetos LL
+:PROPERTIES:
+:ID:       B35A749C-92D8-4A89-8821-A6A03CE75A4D
+:END:
+Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]] 
+
+#+name: orion-ll-objects
+| Bally name |      OW name | Star     |           RA |          Dec | Ref          | Bally field | Notes                 | Arc |
+|------------+--------------+----------+--------------+--------------+--------------+-------------+-----------------------+-----|
+| LL2        |              | IX Ori   |   5:34:40.86 |   -5:22:42.2 | BR01         |          18 |                       | x   |
+| LL3        |              |          |  5:34:40.807 |   -5:26:38.6 | BR01         |          17 |                       | x   |
+| LL4        |  LL 4427-838 |          |  5:34:42.724 |  -5:28:37.38 | BR01         |          24 |                       | x   |
+|            | LLP 4468-605 |          |  5:34:46.765 |  -5:26:04.74 | BLSW06       |          17 | proplyd - axial jet   | x   |
+|            |  LL 4578-251 |          |   5:34:57.79 |   -5:22:51.1 | WJH          |          09 |                       | x   |
+|            | LLP 4582-635 |          |   5:34:58.17 |   -5:26:35.1 | WJH          |          16 | proplyd - very faint  | x   |
+|            |     w000-400 |          |   5:34:59.57 |   -5:24:00.4 | BOM00        |          09 | proplyd? 4596-400     | x   |
+|            |     w005-514 |          |  5:35:00.463 |  -5:25:14.22 | BOM00        |      01, 16 | proplyd               | xx  |
+|            |     w012-407 |          |  5:35:01.175 |  -5:24:06.68 | BOM00        |          01 |                       | x   |
+|            |     w014-414 |          |  5:35:01.373 |  -5:24:13.42 | BOM00        |          01 |                       | x   |
+|            |   LL 022-635 |          |   5:35:02.20 |   -5:26:35.3 | WJH          |          16 |                       | x   |
+|            |     w030-524 |          |  5:35:03.001 |  -5:25:24.35 | BOM00        |          01 |                       | x   |
+|            |   LL 041-637 |          |   5:35:04.05 |   -5:26:37.3 | WJH          |          16 |                       | x?  |
+|            |  LLP 042-628 |          |   5:35:04.19 |   -5:26:27.7 | WJH          |          16 | proplyd 038-627       | x   |
+|            |     w044-527 |          |  5:35:04.422 |  -5:25:27.39 | BOM00        |          01 |                       | x   |
+|            |  LLP 049-143 |          |   5:35:04.95 |   -5:21:42.9 | WJH          |          09 | proplyd               | x   |
+|            |  LLP 051-024 |          |   5:35:05.13 |   -5:20:24.3 | WJH          |          09 | proplyd               | x   |
+| LL1        |     w056-519 | LL Ori   |   5:35:05.64 |   -5:25:19.4 | BR01, BOM00  |          01 |                       | x   |
+|            |      065-502 |          |  5:35:06.534 |  -5:25:01.53 | WJH          |          01 | proplyd?              | x   |
+|            |     066-3251 |          |   5:35:06.57 |  -5:32:51.49 | WJH (R08)    |          14 | proplyd?, globule?    | x   |
+|            |     w069-601 |          |   5:35:06.91 |   -5:26:00.6 | BOM00        |          01 |                       | x   |
+|            |  LLP 072-134 |          |   5:35:07.20 |   -5:21:34.3 | WJH          |          09 | proplyd - thin shell  | x   |
+|            |     w073-227 |          |   5:35:07.27 |   -5:22:26.6 | BOM00        |          01 | proplyd               | x   |
+|            |      074-229 |          |  5:35:07.381 |  -5:22:28.92 | WJH          |          01 | very faint            |     |
+|            |      083-435 |          |  5:35:08.289 |  -5:24:34.84 | WJH          |          01 | proplyd?, very faint  | x   |
+|            |  LLP 101-233 |          |   5:35:10.14 |   -5:22:32.6 | WJH          |          01 | proplyd               | x   |
+|            |   LL 102-157 |          |  5:35:10.252 |  -5:21:57.06 | WJH          |          01 | very faint            | x   |
+|            |      106-245 |          |  5:35:10.577 |  -5:22:44.69 | WJH          |          01 | proplyd?              | x   |
+|            |      109-246 |          |   5:35:10.90 |  -5:22:46.36 | BOM00        |          01 | proplyd 109-247, jet? | x   |
+|            | LLP 116-3101 | V488 Ori |  5:35:11.653 |  -5:31:01.04 | BLSW06       |          14 | proplyd               | x   |
+|            |      117-421 |          |   5:35:11.65 |  -5:24:21.50 | WJH (OW96)   |          01 | proplyd, large bow    | x   |
+|            |     119-3155 |          |  5:35:11.876 |  -5:31:55.40 | WJH          |          14 |                       | x   |
+|            |      121-434 |          |   5:35:12.12 |  -5:24:33.80 | WJH (R08)    |          01 | proplyd               | x   |
+|            |      131-046 |          |  05:35:13.05 | -05:20:45.79 |              |          02 | proplyd               |     |
+|            |      132-053 |          |  5:35:13.204 |  -5:20:52.61 |              |          02 | proplyd?              |     |
+|            |  LL 136-3057 |          |   5:35:13.60 |   -5:30:57.4 | WJH          |          14 | faint XX              | x   |
+|            |   B 138-3024 |          |  5:35:13.801 |  -5:30:24.34 | WJH          |          15 | B-band hole           | x   |
+|            |      142-301 |          |  05:35:14.15 | -05:23:00.91 |              |          01 | proplyd               |     |
+|            |      154-225 |          |  05:35:15.37 | -05:22:25.35 |              |          01 | proplyd               | x   |
+|            |      154-240 |          |  05:35:15.38 | -05:22:39.85 |              |          01 | proplyd, inner only   | x   |
+| LV5        |      158-323 |          |  05:35:15.83 | -05:23:22.59 |              |          01 | proplyd, Jorge        |     |
+|            |      159-221 |          |  05:35:15.93 | -05:22:21.05 |              |          01 | proplyd, inner only   | x   |
+| LV4        |      161-324 |          |  05:35:16.06 | -05:23:24.29 |              |          01 | proplyd, Jorge        | x   |
+|            |      163-222 |          |  05:35:16.30 | -05:22:21.50 |              |          01 | proplyd               | x   |
+| LV3        |      163-317 |          |  05:35:16.28 | -05:23:16.59 |              |          01 | proplyd, Jorge        |     |
+|            |      165-235 |          |  05:35:16.48 | -05:22:35.16 |              |          01 | proplyd               |     |
+| LV2b       |      166-316 |          |  05:35:16.61 | -05:23:16.19 |              |          01 | proplyd, Jorge        |     |
+| LV2        |      167-317 |          |  05:35:16.74 | -05:23:16.51 |              |          01 | proplyd, Jorge        |     |
+| LV1        |      168-326 |          | 05:35:16.839 | -05:23:26.16 |              |          01 | proplyd, Jorge        |     |
+|            |     168-326N |          |  05:35:16.83 | -05:23:25.92 |              |          01 | interproplyd          |     |
+|            |      168-328 |          |  05:35:16.77 | -05:23:28.06 |              |          01 | proplyd, Jorge        |     |
+|            |      169-338 |          |  05:35:16.88 | -05:23:38.10 |              |          01 | proplyd, Jorge        |     |
+|            |      170-249 |          |  05:35:16.96 | -05:22:48.51 |              |          01 | proplyd               |     |
+|            |      173-236 |          | 05:35:17.344 | -05:22:35.65 |              |          01 | proplyd               |     |
+|            |      175-321 |          |  5:35:17.458 |  -5:23:20.96 | WJH          |          01 | near th1D             | x   |
+| HST1       |      177-341 |          |  05:35:17.66 | -05:23:41.00 |              |          01 | proplyd, Jorge        |     |
+|            |      173-342 |          |  5:35:17.321 |  -5:23:41.33 |              |          01 | interproplyd          |     |
+|            |      178-258 |          |  5:35:17.834 |  -5:22:58.10 | WJH (R08)    |          01 | proplyd               | x   |
+|            |      180-331 |          | 05:35:18.037 | -05:23:30.63 |              |          01 | proplyd               |     |
+|            |      189-329 |          |   5:35:18.87 |  -5:23:28.85 | WJH (OW96)   |          01 | proplyd               | x   |
+|            |     203-3039 | MY Ori   |  5:35:20.297 |  -5:30:39.37 | WJH (BLSW06) |          14 | jet                   | x   |
+|            |      205-230 |          |  05:35:20.45 | -05:23:29.96 |              |          06 | interproplyd          |     |
+|            |      206-043 |          |  5:35:20.562 |  -5:20:43.06 |              |          02 |                       |     |
+|            |      212-400 |          |  05:35:21.19 | -05:24:00.20 |              |          06 | proplyd               |     |
+|            |  LL 261-3018 |          |  5:35:26.171 |  -5:30:18.02 | WJH (BLSW06) |          07 |                       | x   |
+|            |     w266-558 |          |   5:35:26.62 |   -5:25:58.4 | BOM00        |          06 |                       | x   |
+|            |   LL 305-811 |          |  5:35:30.447 |  -5:28:11.27 | BLSW06       |          07 |                       | x   |
+|            |  LL 308-3036 |          |    5:35:30.8 |     -5:30:36 | BLSW06       |          08 |                       | x   |
+| LL5        |  LLP 315-816 |          |  5:35:31.403 |  -5:28:16.38 | BR01         |          07 | proplyd 314-816       | x   |
+| LL6        |  LL 329-3021 |          |   5:35:32.85 |   -5:30:21.6 | BR01         |          08 |                       | x   |
+|            |  LL 344-3020 |          |  5:35:34.362 |  -5:30:20.43 | BLSW06       |          08 |                       | x?  |
+| LL7        |  LL 351-3349 |          |  5:35:35.129 |  -5:33:49.12 | BR01         |           - | proplyd               |     |
+|            |  LL 362-3137 |          |   5:35:36.35 |   -5:31:37.9 | WJH          |          08 | faint, proplyd?       |     |
+
+ 
++ "Arc" column is for noting which objects have had the arcs measured by Luis Angel
+  + 005-514 has been measured twice!
+  + A "?" is for objects that still have issues
+**** New rejections
+These are sources that, on reflection, we have decided should not be in the catalog
++ 159-326
+  + the arc is only visible in low-ionization lines such as [N II]
+  + it is completely invisible in [O III], despite this being an inner proplyd
+**** Map of the LL objects
+:LOGBOOK:
+- Note taken on [2013-08-17 Sat 18:51] \\
+  Copied from [[id:A0F1F456-E918-4AB5-A97D-951E4BC82952][llobjects.org]]
+:END:
+
+#+BEGIN_SRC python :results output
+  import sys
+  print sys.path
+  
+#+END_SRC
+
+#+RESULTS:
+: ['', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/pip-1.3.1-py2.7.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/scikit_image-0.9dev-py2.7-macosx-10.6-x86_64.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/pyregion-1.1.1-py2.7-macosx-10.6-x86_64.egg', '/Users/will/Source/src/odelab', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/adsbibdesk-3.1.1-py2.7.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/Astropysics-0.1.dev_r1180-py2.7.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/astroquery-0.2.dev1248-py2.7.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/astropy-0.3.dev5708-py2.7-macosx-10.6-x86_64.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/APLpy-0.9.10.dev574-py2.7.egg', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/pywcsgrid2-1.0.dev151-py2.7.egg', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python27.zip', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/plat-darwin', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/plat-mac', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/plat-mac/lib-scriptpackages', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/lib-tk', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/lib-old', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/lib-dynload', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages', '/Users/will/Library/Enthought/Canopy_64bit/User/lib/python2.7/site-packages/PIL', '/Users/will/Library/Enthought/Canopy_64bit/System/lib/python2.7/site-packages', '/Users/will/Library/Enthought/Canopy_64bit/System/lib/python2.7/site-packages/PIL', '/Applications/Canopy.app/appdata/canopy-1.0.0.1160.macosx-x86_64/Canopy.app/Contents/lib/python2.7/site-packages']
+: 
+#+BEGIN_SRC sh
+which python
+#+END_SRC
+
+#+RESULTS:
+: /Users/will/Library/Enthought/Canopy_64bit/User/bin/python
+
+#+header: :var table=orion-ll-objects :var ptable=ricci-proplyd-table
+#+BEGIN_SRC python :results output
+  import astropysics
+  from astropysics import coords
+  import numpy as np
+  import matplotlib.pyplot as plt
+  import json
+  import os
+  
+  def find(name, path):
+      """
+      Original from http://stackoverflow.com/questions/1724693/find-a-file-in-python
+      """
+      for root, dirs, files in os.walk(path):
+          if name in files:
+              return os.path.join(root, name)
+      return None
+              
+  
+  names, RAs, Decs, Fields = list(), list(), list(), list()
+  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc in table:
+      names.append(bname or oname or sname)
+      RAs.append(RA)
+      Decs.append(Dec)
+      Fields.append(Bally)
+  
+  [x0], [y0] = coords.radec_str_to_decimal(["05:35:16.463"], ["-05:23:23.18"])
+  x, y = coords.radec_str_to_decimal(RAs, Decs) 
+  x = -(x - x0)*3600.0
+  y = (y - y0)*3600.0
+  plt.plot(x, y, "o", alpha=0.2)
+  for label, xx, yy, field_list in zip(names, x, y, Fields):
+      plt.annotate(label, (xx, yy), alpha=0.8, size=5,
+                   xytext=(-2,2), textcoords='offset points', ha='right', va='bottom',)
+      #
+      # Try and draw the inner and outer arcs
+      #
+  
+      # First, work out where the JSON file is...
+      try:
+          field = "{:02d}".format(field_list)
+      except:
+          try:
+              field = field_list[:2]
+          except:
+              print "failed"
+              continue
+  
+      # folder = "j8oc{}010_drz".format(field)
+      jsonfile = "{}-xy.json".format(label.split()[-1])
+      jsoncfile = "{}-xyc.json".format(label.split()[-1])
+      found = find(jsoncfile, "..")
+      if found is not None:
+          f = open(found)
+      else:
+          found = find(jsonfile, "..")
+          if found is not None:
+              f = open(found)
+          else:
+              print "Could not open ", jsonfile
+              continue
+      # try:
+      #     f = open(jsoncfile)
+      # except IOError:
+      #     try: 
+      #         f = open(jsonfile)
+      #     except IOError:
+      #         print "Could not open ", jsonfile
+      #         continue
+  
+      # Second, load in the data and draw the arcs
+      arc_data = json.load(f)
+      for arc, color in ["inner", "m"], ["outer", "g"]:
+          if arc in arc_data:
+              dx = np.array(arc_data[arc]["x"])
+              dy = np.array(arc_data[arc]["y"])
+              plt.plot(xx - dx, yy + dy, "-" + color, lw=1.0, alpha=0.6)
+              print "Plotted {} arc for {}".format(arc, found)
+              # Now try and draw arrows for the arc axes too
+              R0 = arc_data[arc]["R0"]
+              PA = np.radians(arc_data[arc]["PA0"])
+              ax = -R0*np.sin(PA)
+              ay = R0*np.cos(PA)
+              plt.arrow(xx, yy, 4*ax, 4*ay, fc='none', ec=color, 
+                        width=0.0003, alpha=0.6, lw=0.5,
+                        head_width=2.0, head_length=4.0,
+              )
+              if "Rc" in arc_data[arc]:
+                  xc = arc_data[arc]["xc"]
+                  yc = arc_data[arc]["yc"]
+                  Rc = arc_data[arc]["Rc"]
+                  PAc = np.radians(arc_data[arc]["PAc"])
+                  # Plot the fitted circle if present
+                  plt.plot(xx - xc, yy + yc, "+k", ms=2.0)
+                  c = plt.Circle((xx - xc, yy + yc), radius=Rc, fc='none', ec="k", alpha=0.2, lw=0.2)
+                  plt.gca().add_patch(c)
+                  ax = -0.5*Rc*np.sin(PAc)
+                  ay = 0.5*Rc*np.cos(PAc)
+                  plt.arrow(xx-xc, yy+yc, 4*ax, 4*ay, fc='none', ec=color, 
+                            width=0.0003, alpha=0.3, lw=0.3,
+                            head_width=2.0, head_length=4.0,
+                        )
+  
+  pColor_from_Type = {
+      "i": "r", "d": "k", "rn": "c", "j": "g",
+  }
+  pSize_from_Type = {
+      "i": 1.0, "d": 2.0, "rn": 0.7, "j": 0.7,
+  }
+  pRAs, pDecs, pColors, pSizes = list(), list(), list(), list()
+  for name, RA, Dec, OW, Type, Note in ptable[2:]:
+      pRAs.append(RA.replace(" ", ":"))
+      pDecs.append(Dec.replace(" ", ":"))
+      pColors.append(pColor_from_Type[Type])
+      pSizes.append(pSize_from_Type[Type])
+  x, y = coords.radec_str_to_decimal(pRAs, pDecs)
+  pSizes = np.array(pSizes)*15.0
+  x = -(x - x0)*3600.0
+  y = (y - y0)*3600.0
+  plt.scatter(x, y, c=pColors, s=pSizes, faceted=False, alpha=0.5, zorder=100)
+  
+  plt.axis("equal")
+  plt.xlim(-400, 600)
+  plt.ylim(-700, 200)
+  plt.xlabel("RA offset, arcsec")
+  plt.ylabel("Dec offset, arcsec")
+  plt.title("Positions of LL objects in the Orion Nebula")
+  plt.grid()
+  plt.gcf().set_size_inches( (20, 20) )
+  figname = "ll-positions.pdf"
+  plt.savefig(figname)
+  #return figname
+  # return x.min(), x.max(), y.min(), y.max()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Plotted inner arc for ../LuisLL/j8oc18010_drz/LL2-xyc.json
+Plotted outer arc for ../LuisLL/j8oc18010_drz/LL2-xyc.json
+Plotted inner arc for ../LuisLL/j8oc17010_drz/LL3-xyc.json
+Plotted outer arc for ../LuisLL/j8oc17010_drz/LL3-xyc.json
+Plotted inner arc for ../LuisLL/j8oc24010_drz/LL4-xyc.json
+Plotted outer arc for ../LuisLL/j8oc24010_drz/LL4-xyc.json
+Plotted inner arc for ../LuisLL/j8oc17010_drz/4468-605-xyc.json
+Plotted outer arc for ../LuisLL/j8oc17010_drz/4468-605-xyc.json
+Plotted inner arc for ../LuisLL/j8oc09010_drz/4578-251-xyc.json
+Plotted outer arc for ../LuisLL/j8oc09010_drz/4578-251-xyc.json
+Plotted inner arc for ../LuisLL/j8oc16010_drz/4582-635-xyc.json
+Plotted outer arc for ../LuisLL/j8oc16010_drz/4582-635-xyc.json
+Plotted inner arc for ../LuisLL/j8oc09010_drz/w000-400-xyc.json
+Plotted outer arc for ../LuisLL/j8oc09010_drz/w000-400-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w005-514-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w005-514-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w012-407-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w012-407-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w014-414-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w014-414-xyc.json
+Plotted inner arc for ../LuisLL/j8oc16010_drz/022-635-xyc.json
+Plotted outer arc for ../LuisLL/j8oc16010_drz/022-635-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w030-524-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w030-524-xyc.json
+Plotted inner arc for ../LuisLL/j8oc16010_drz/041-637-xyc.json
+Plotted outer arc for ../LuisLL/j8oc16010_drz/041-637-xyc.json
+Plotted inner arc for ../LuisLL/j8oc16010_drz/042-628-xyc.json
+Plotted outer arc for ../LuisLL/j8oc16010_drz/042-628-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w044-527-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w044-527-xyc.json
+Plotted inner arc for ../LuisLL/j8oc09010_drz/049-143-xyc.json
+Plotted outer arc for ../LuisLL/j8oc09010_drz/049-143-xyc.json
+Plotted inner arc for ../LuisLL/j8oc09010_drz/051-024-xyc.json
+Plotted outer arc for ../LuisLL/j8oc09010_drz/051-024-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/LL1-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/LL1-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/065-502-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/065-502-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/066-3251-xy.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w069-601-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w069-601-xyc.json
+Plotted inner arc for ../LuisLL/j8oc09010_drz/072-134-xyc.json
+Plotted outer arc for ../LuisLL/j8oc09010_drz/072-134-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/w073-227-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/w073-227-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/083-435-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/083-435-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/101-233-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/101-233-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/102-157-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/102-157-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/106-245-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/106-245-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/109-246-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/109-246-xyc.json
+Plotted inner arc for ../LuisLL/j8oc14010_drz/116-3101-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/116-3101-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/117-421-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/117-421-xyc.json
+Plotted inner arc for ../LuisLL/j8oc14010_drz/119-3155-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/119-3155-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/121-434-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/121-434-xyc.json
+Plotted inner arc for ../LuisLL/j8oc02010_drz/131-046-xyc.json
+Plotted outer arc for ../LuisLL/j8oc02010_drz/131-046-xyc.json
+Plotted inner arc for ../LuisLL/j8oc02010_drz/132-053-xyc.json
+Plotted outer arc for ../LuisLL/j8oc02010_drz/132-053-xyc.json
+Plotted inner arc for ../LuisLL/j8oc14010_drz/136-3057-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/136-3057-xyc.json
+Plotted inner arc for ../LuisLL/j8oc14010_drz/138-3024-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/138-3024-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/142-301-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/142-301-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/154-225-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/154-225-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/154-240-xy.json
+Plotted inner arc for ../Jorge_prop/LV5/LV5-xyc.json
+Plotted outer arc for ../Jorge_prop/LV5/LV5-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/159-221-xy.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/159-326-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/159-326-xyc.json
+Plotted inner arc for ../Jorge_prop/LV4/LV4-xyc.json
+Plotted outer arc for ../Jorge_prop/LV4/LV4-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/163-222-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/163-222-xyc.json
+Plotted inner arc for ../Jorge_prop/LV3/LV3-xyc.json
+Plotted outer arc for ../Jorge_prop/LV3/LV3-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/165-235-xy.json
+Plotted inner arc for ../Jorge_prop/LV2b/LV2b-xyc.json
+Plotted outer arc for ../Jorge_prop/LV2b/LV2b-xyc.json
+Plotted inner arc for ../Jorge_prop/LV2/LV2-xyc.json
+Plotted outer arc for ../Jorge_prop/LV2/LV2-xyc.json
+Could not open  LV1-xy.json
+Could not open  168-326N-xy.json
+Could not open  168-328-xy.json
+Plotted inner arc for ../Jorge_prop/169-338/169-338-xyc.json
+Plotted outer arc for ../Jorge_prop/169-338/169-338-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/170-249-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/170-249-xyc.json
+Could not open  173-236-xy.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/175-321-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/175-321-xyc.json
+Plotted inner arc for ../Jorge_prop/HST1/HST1-xyc.json
+Plotted outer arc for ../Jorge_prop/HST1/HST1-xyc.json
+Could not open  173-342-xy.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/178-258-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/178-258-xyc.json
+Plotted inner arc for ../Jorge_prop/180-331/180-331-xyc.json
+Plotted outer arc for ../Jorge_prop/180-331/180-331-xyc.json
+Plotted inner arc for ../LuisLL/j8oc01010_drz/189-329-xyc.json
+Plotted outer arc for ../LuisLL/j8oc01010_drz/189-329-xyc.json
+Plotted inner arc for ../LuisLL/j8oc14010_drz/203-3039-xyc.json
+Plotted outer arc for ../LuisLL/j8oc14010_drz/203-3039-xyc.json
+Could not open  205-230-xy.json
+Plotted inner arc for ../LuisLL/j8oc02010_drz/206-043-xyc.json
+Plotted outer arc for ../LuisLL/j8oc02010_drz/206-043-xyc.json
+Could not open  212-400-xy.json
+Plotted inner arc for ../LuisLL/j8oc07010_drz/261-3018-xyc.json
+Plotted outer arc for ../LuisLL/j8oc07010_drz/261-3018-xyc.json
+Could not open  w266-558-xy.json
+Plotted inner arc for ../LuisLL/j8oc07010_drz/305-811-xyc.json
+Plotted outer arc for ../LuisLL/j8oc07010_drz/305-811-xyc.json
+Plotted inner arc for ../LuisLL/j8oc08010_drz/308-3036-xyc.json
+Plotted outer arc for ../LuisLL/j8oc08010_drz/308-3036-xyc.json
+Plotted inner arc for ../LuisLL/j8oc07010_drz/LL5-xyc.json
+Plotted outer arc for ../LuisLL/j8oc07010_drz/LL5-xyc.json
+Plotted inner arc for ../LuisLL/j8oc08010_drz/LL6-xyc.json
+Plotted outer arc for ../LuisLL/j8oc08010_drz/LL6-xyc.json
+Plotted inner arc for ../LuisLL/j8oc08010_drz/344-3020-xyc.json
+Plotted outer arc for ../LuisLL/j8oc08010_drz/344-3020-xyc.json
+Could not open  LL7-xy.json
+Plotted inner arc for ../LuisLL/j8oc08010_drz/362-3137-xyc.json
+Plotted outer arc for ../LuisLL/j8oc08010_drz/362-3137-xyc.json
+#+end_example
+
+
+**** Write tables to JSON files
+:LOGBOOK:
+CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
+:END:
++ This is to minimise the amount of work that is done inside the org-mode file
++ Write both JSON and TOML versions of the files
+  + [[https://github.com/mojombo/toml][TOML spec]]
+  + [[https://github.com/uiri/toml/blob/master/toml.py][TOML python parser/writer]]
+    + [ ] The writer needs improving
+      + blank lines between dicts
+      + indentation 
+
+***** LL object database
+#+header: :var table=orion-ll-objects
+#+BEGIN_SRC python :results file
+  import json
+  import toml
+  db = {}
+  dbfile = "ll-data.json"
+  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc in table:
+      key = bname or oname or sname
+      if key == oname:
+          key = key.split()[-1]
+      db[key] = dict(bname=bname, oname=oname, sname=sname, RA=RA,
+                     Dec=Dec, Ref=Ref, Bally=Bally, Notes=Notes, Arc=Arc)
+      with open(dbfile, "w") as f:
+          json.dump(db, f, indent=2)
+      with open(dbfile.replace(".json", ".tml"), "w") as f:
+          toml.dump(db, f)
+  return dbfile
+#+END_SRC
+
+#+RESULTS:
+[[file:ll-data.json]]
+
+
+***** Proplyd database
+#+header: :var table=ricci-proplyd-table
+#+BEGIN_SRC python :results file
+  import json
+  import toml
+  db = {}
+  dbfile = "ricci-data.json"
+  for name, RA, Dec, OW, Type, Note in table[2:]:
+      RA = RA.replace(" ", ":")
+      Dec = Dec.replace(" ", ":")
+      key = name
+      db[key] = dict(RA=RA, Dec=Dec, Type=Type)
+      if OW:
+          db[key].update(OW=OW)
+      if Note:
+          db[key].update(Note=Note)
+  
+      with open(dbfile, "w") as f:
+          json.dump(db, f, indent=2)
+      with open(dbfile.replace(".json", ".tml"), "w") as f:
+          toml.dump(db, f)
+  return dbfile
+#+END_SRC
+
+#+RESULTS:
+[[file:ricci-data.json]]
+
+**** Write ds9 region file for the LL objects
+#+header: :var table=orion-ll-objects
+#+BEGIN_SRC python :results file
+  region_hdr_lines = [
+      "# Region file format: DS9 version 4.1",
+      "global color=red dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1",
+      "fk5",
+      ]
+  
+  def region_box_to_string(ra="5:34:40.800", dec="-5:22:43.00",
+                           width=50, height=50, angle=0.0, text="LL2"):
+      return "box({},{},{}\",{}\",{}) # text={{{}}}".format(ra, dec, width, height, angle, text)
+  
+  boxes = []
+  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc in table:
+      if "LL" in bname:
+          size = 30.0
+      else:
+          size = 15.0
+      if bname.startswith("LL"):
+          name = bname
+      else:
+          name = oname.split()[-1]
+      boxes.append(region_box_to_string(RA, Dec, size, size, text=name))
+  
+  region_file = "ll-boxes-new.reg"
+  with open(region_file, "w") as f:
+      f.writelines([s + "\n" for s in region_hdr_lines + boxes])
+  return region_file
+#+END_SRC
+
+#+RESULTS:
+[[file:ll-boxes-new.reg]]
+
+
+
+
+**** Proplyd catalog from Ricci et al 2008
+This is Table 3 from their paper, but with extraneous columns removed
+#+name: ricci-proplyd-table
+|     Name | RAJ2000     | DEJ2000      |   [OW94] | Type | Note   |
+|          | "h:m:s"     | "d:m:s"      |          |      |        |
+|----------+-------------+--------------+----------+------+--------|
+| 4364-146 | 05 34 36.44 | -05 21 45.95 |          | j    | J      |
+| 4466-324 | 05 34 46.59 | -05 23 24.19 |          | j    | J,B    |
+| 4468-605 | 05 34 46.76 | -05 26 04.79 |          | i    | J      |
+| 4538-311 | 05 34 53.79 | -05 23 10.73 |          | rn   |        |
+| 4596-400 | 05 34 59.56 | -05 24 00.19 | 4596-400 | i    |        |
+| 4582-635 | 05 34 58.16 | -05 26 35.13 |          | i    |        |
+|  005-514 | 05 35 00.47 | -05 25 14.34 |  005-514 | i    |        |
+|  006-439 | 05 35 00.58 | -05 24 38.79 |          | j    | J      |
+|  016-149 | 05 35 01.60 | -05 21 49.35 |          | rn   |        |
+|  038-627 | 05 35 04.19 | -05 26 27.89 |  038-627 | i    |        |
+|  044-527 | 05 35 04.42 | -05 25 27.40 |  044-527 | i    |        |
+| 046-3838 | 05 35 04.61 | -05 38 38.00 |          | rn   |        |
+|  046-245 | 05 35 04.63 | -05 22 44.85 |          | i    |        |
+|  049-143 | 05 35 04.94 | -05 21 42.99 |          | i    |        |
+| 051-3541 | 05 35 05.05 | -05 35 40.84 |          | rn   | EO     |
+|  053-717 | 05 35 05.40 | -05 27 16.99 |          | d    |        |
+|  057-419 | 05 35 05.73 | -05 24 18.55 |  057-419 | i    |        |
+|  061-401 | 05 35 06.09 | -05 24 00.60 |  061-401 | i    |        |
+| 064-3335 | 05 35 06.44 | -05 33 35.25 |          | i    |        |
+| 066-3251 | 05 35 06.57 | -05 32 51.49 |          | i    |        |
+|  066-652 | 05 35 06.59 | -05 26 51.99 |  066-652 | i    | B      |
+|  069-601 | 05 35 06.91 | -05 26 00.60 |  069-601 | i    |        |
+|  072-135 | 05 35 07.21 | -05 21 34.43 |  072-135 | i    | EO     |
+|  073-227 | 05 35 07.27 | -05 22 26.56 |  073-227 | i    |        |
+| 078-3658 | 05 35 07.84 | -05 36 58.15 |          | j    | J,B    |
+|  090-326 | 05 35 09.02 | -05 23 26.20 |          | d    |        |
+|  093-822 | 05 35 09.59 | -05 28 22.92 |  093-822 | i    |        |
+|  099-339 | 05 35 09.89 | -05 23 38.50 |          | i    | J      |
+|  102-233 | 05 35 10.13 | -05 22 32.74 |  102-233 | i    |        |
+|  102-021 | 05 35 10.19 | -05 20 20.99 |  102-021 | i    |        |
+|  102-322 | 05 35 10.20 | -05 23 21.56 |  102-322 | i    |        |
+|  106-417 | 05 35 10.54 | -05 24 16.70 |  106-417 | i    |        |
+|  106-156 | 05 35 10.58 | -05 21 56.24 |  106-156 | i    |        |
+|  109-246 | 05 35 10.90 | -05 22 46.36 |  109-246 | i    |        |
+|  109-327 | 05 35 10.95 | -05 23 26.45 |  109-327 | i    | J      |
+| 110-3035 | 05 35 10.98 | -05 30 35.23 |          | rn   | J      |
+|  114-426 | 05 35 11.30 | -05 24 26.50 |  114-426 | d    | EO,RN  |
+|  117-421 | 05 35 11.65 | -05 24 21.50 |  117-421 | i    |        |
+|  117-352 | 05 35 11.73 | -05 23 51.70 |          | i    |        |
+|  119-340 | 05 35 11.90 | -05 23 39.70 |  119-340 | i    |        |
+| 121-1925 | 05 35 12.09 | -05 19 24.80 | 121-1925 | d    |        |
+|  121-434 | 05 35 12.12 | -05 24 33.80 |  121-434 | i    |        |
+|  124-132 | 05 35 12.38 | -05 21 31.39 |  124-132 | i    | J,EO,B |
+|  131-046 | 05 35 13.05 | -05 20 45.79 |  131-046 | i    |        |
+|  131-247 | 05 35 13.11 | -05 22 47.11 |  131-247 | i    | J      |
+| 132-1832 | 05 35 13.24 | -05 18 32.95 |          | d    | EO     |
+|  132-042 | 05 35 13.24 | -05 20 41.94 |  132-042 | i    | J,EO   |
+|  133-353 | 05 35 13.30 | -05 23 53.05 |  133-353 | i    | B      |
+|  135-220 | 05 35 13.51 | -05 22 19.49 |  135-220 | i    |        |
+|  138-207 | 05 35 13.78 | -05 22 07.39 |  138-207 | i    |        |
+|  139-320 | 05 35 13.92 | -05 23 20.16 |          | i    |        |
+|  141-520 | 05 35 14.05 | -05 25 20.50 |  141-520 | i    | FO     |
+| 140-1952 | 05 35 14.05 | -05 19 51.90 | 140-1952 | d    | FO     |
+|  142-301 | 05 35 14.15 | -05 23 00.91 |  142-301 | i    |        |
+|  143-425 | 05 35 14.27 | -05 24 24.55 |  143-425 | i    |        |
+|  144-522 | 05 35 14.34 | -05 25 22.30 |  144-522 | i    |        |
+|  146-201 | 05 35 14.61 | -05 22 00.94 |          | i    |        |
+|  147-323 | 05 35 14.72 | -05 23 23.01 |          | i    |        |
+|  148-305 | 05 35 14.80 | -05 23 04.76 |  148-305 | i    | B      |
+|  149-329 | 05 35 14.92 | -05 23 29.05 |  149-329 | i    |        |
+|  150-147 | 05 35 15.00 | -05 21 47.34 |          | i    |        |
+|  150-231 | 05 35 15.02 | -05 22 31.11 |  150-231 | i    | B      |
+|  152-319 | 05 35 15.20 | -05 23 18.81 |  152-319 | i    |        |
+|  152-738 | 05 35 15.21 | -05 27 37.85 |  152-738 | i    |        |
+|  154-324 | 05 35 15.35 | -05 23 24.11 |  154-324 | i    | B      |
+|  154-225 | 05 35 15.37 | -05 22 25.35 |  154-225 | i    | B      |
+|  154-240 | 05 35 15.38 | -05 22 39.85 |          | i    |        |
+|  155-338 | 05 35 15.51 | -05 23 37.45 |  155-338 | i    |        |
+|  157-323 | 05 35 15.72 | -05 23 22.59 |  157-323 | i    | B      |
+|  158-323 | 05 35 15.83 | -05 23 22.59 |  158-323 | i    | B      |
+|  158-327 | 05 35 15.79 | -05 23 26.51 |  158-327 | i    | B      |
+|  158-326 | 05 35 15.81 | -05 23 25.51 |  158-326 | i    | B      |
+|  159-338 | 05 35 15.90 | -05 23 38.00 |  159-338 | i    | B      |
+|  159-418 | 05 35 15.90 | -05 24 17.85 |  159-418 | i    |        |
+|  159-221 | 05 35 15.93 | -05 22 21.05 |  159-221 | d    |        |
+|  159-350 | 05 35 15.96 | -05 23 50.30 |  159-350 | i    | B      |
+|  160-353 | 05 35 16.01 | -05 23 53.00 |  160-353 | i    | J      |
+|  161-324 | 05 35 16.05 | -05 23 24.35 |  161-324 | i    |        |
+|  161-328 | 05 35 16.07 | -05 23 27.81 |  161-328 | i    |        |
+|  161-314 | 05 35 16.10 | -05 23 14.05 |  161-314 | i    |        |
+|  162-133 | 05 35 16.19 | -05 21 32.39 |  162-133 | i    |        |
+|  163-026 | 05 35 16.31 | -05 20 25.24 |          | d    | B      |
+|  163-210 | 05 35 16.27 | -05 22 10.45 |  163-210 | i    | B      |
+|  163-317 | 05 35 16.27 | -05 23 16.51 |  163-317 | i    |        |
+|  163-222 | 05 35 16.30 | -05 22 21.50 |  163-222 | i    | B,FO   |
+|  163-249 | 05 35 16.33 | -05 22 49.01 |  163-249 | i    | B      |
+|  164-511 | 05 35 16.35 | -05 25 09.60 |  164-511 | i    |        |
+|  165-235 | 05 35 16.48 | -05 22 35.16 |  165-235 | i    |        |
+|  165-254 | 05 35 16.54 | -05 22 53.70 |          | d    | RN     |
+|  166-316 | 05 35 16.61 | -05 23 16.19 |  166-315 | i    |        |
+|  166-519 | 05 35 16.57 | -05 25 17.74 |  166-519 | d    |        |
+|  166-406 | 05 35 16.57 | -05 24 06.00 |  166-406 | i    |        |
+|  166-250 | 05 35 16.59 | -05 22 50.36 |  166-250 | i    |        |
+|  167-231 | 05 35 16.73 | -05 22 31.30 |  167-231 | d    | FO     |
+|  167-317 | 05 35 16.74 | -05 23 16.51 |  167-317 | i    |        |
+|  168-235 | 05 35 16.81 | -05 22 34.71 |  168-235 | i    |        |
+|  168-328 | 05 35 16.77 | -05 23 28.06 |  168-328 | i    | B      |
+|  168-326 | 05 35 16.83 | -05 23 25.91 |  168-326 | i    | B      |
+|  169-338 | 05 35 16.88 | -05 23 38.10 |  169-338 | i    | B      |
+|  170-301 | 05 35 16.95 | -05 23 00.91 |  170-301 | i    |        |
+|  170-249 | 05 35 16.96 | -05 22 48.51 |  170-249 | i    | B      |
+|  170-337 | 05 35 16.97 | -05 23 37.15 |  170-337 | i    | B      |
+|  171-340 | 05 35 17.04 | -05 23 39.75 |  171-340 | i    | B      |
+|  171-434 | 05 35 17.11 | -05 24 34.40 |  171-434 | i    | B      |
+|  172-028 | 05 35 17.22 | -05 20 27.84 |  172-028 | d    |        |
+|  173-341 | 05 35 17.32 | -05 23 41.40 |  173-341 | i    | B      |
+|  173-236 | 05 35 17.34 | -05 22 35.81 |  173-236 | i    |        |
+|  174-305 | 05 35 17.37 | -05 23 04.86 |  174-305 | i    |        |
+|  174-414 | 05 35 17.38 | -05 24 13.90 |  174-414 | i    |        |
+|  175-251 | 05 35 17.47 | -05 22 51.26 |  175-251 | i    | B      |
+|  175-355 | 05 35 17.54 | -05 23 55.05 |  175-355 | i    |        |
+|  175-543 | 05 35 17.54 | -05 25 42.89 |  175-543 | i    | J,EO,B |
+|  176-325 | 05 35 17.55 | -05 23 24.96 |  176-325 | i    |        |
+|  176-252 | 05 35 17.64 | -05 22 51.66 |  176-252 | i    |        |
+| 177-341W | 05 35 17.66 | -05 23 41.00 |  177-341 | i    | B      |
+|  177-454 | 05 35 17.69 | -05 24 54.10 |  177-454 | i    |        |
+|  177-541 | 05 35 17.71 | -05 25 40.76 |          | i    | EO,B   |
+|  177-444 | 05 35 17.73 | -05 24 43.75 |  177-444 | i    |        |
+| 177-341E | 05 35 17.73 | -05 23 41.10 |  177-341 | i    | B      |
+|  178-441 | 05 35 17.81 | -05 24 41.05 |          | i    |        |
+|  178-258 | 05 35 17.84 | -05 22 58.15 |          | i    |        |
+|  179-056 | 05 35 17.92 | -05 20 55.44 |  179-056 | i    | B      |
+|  179-354 | 05 35 17.96 | -05 23 53.50 |  179-354 | i    |        |
+|  180-331 | 05 35 18.03 | -05 23 30.80 |  180-331 | i    | B      |
+|  181-247 | 05 35 18.08 | -05 22 47.10 |  181-247 | i    | B      |
+|  181-825 | 05 35 18.10 | -05 28 25.04 |          | i    | RN     |
+|  182-316 | 05 35 18.19 | -05 23 31.55 |  182-316 | d    | B      |
+|  182-413 | 05 35 18.22 | -05 24 13.45 |  182-413 | i    |        |
+|  183-439 | 05 35 18.28 | -05 24 38.85 |  183-439 | i    | B      |
+|  183-419 | 05 35 18.31 | -05 24 18.85 |  183-419 | i    |        |
+|  183-405 | 05 35 18.33 | -05 24 04.85 |  183-405 | d    | FO,B   |
+|  184-427 | 05 35 18.35 | -05 24 26.85 |  184-427 | i    | B      |
+|  184-520 | 05 35 18.44 | -05 25 19.29 |  184-520 | i    |        |
+|  187-314 | 05 35 18.68 | -05 23 14.01 |  187-314 | i    | B      |
+|  189-329 | 05 35 18.87 | -05 23 28.85 |  189-329 | i    |        |
+|  190-251 | 05 35 19.03 | -05 22 50.65 |          | i    | B      |
+|  191-232 | 05 35 19.13 | -05 22 31.20 |          | d    |        |
+|  191-350 | 05 35 19.06 | -05 23 49.50 |  191-350 | i    | J      |
+| 193-1659 | 05 35 19.25 | -05 16 58.69 |          | rn   |        |
+|  197-427 | 05 35 19.65 | -05 24 26.70 |  197-427 | i    | RN     |
+|  198-222 | 05 35 19.82 | -05 22 21.55 |  198-222 | i    |        |
+|  198-448 | 05 35 19.83 | -05 24 47.95 |  198-448 | i    |        |
+| 199-1508 | 05 35 19.89 | -05 15 08.25 |          | i    | B      |
+|  200-106 | 05 35 20.04 | -05 21 05.99 |  200-106 | i    |        |
+|  201-534 | 05 35 20.14 | -05 25 33.84 |  201-534 | i    |        |
+|  202-228 | 05 35 20.15 | -05 22 28.30 |  202-228 | i    | B      |
+|  203-504 | 05 35 20.26 | -05 25 04.05 |  203-504 | i    | B      |
+|  203-506 | 05 35 20.32 | -05 25 05.55 |          | d    | RN     |
+|  205-330 | 05 35 20.45 | -05 23 29.96 |  205-330 | i    | B      |
+|  205-052 | 05 35 20.52 | -05 20 52.05 |  205-052 | i    |        |
+|  205-421 | 05 35 20.53 | -05 24 21.00 |  205-421 | i    | FO     |
+|  206-446 | 05 35 20.62 | -05 24 46.45 |  206-446 | i    |        |
+|  208-122 | 05 35 20.83 | -05 21 21.45 |  208-122 | rn   |        |
+|  209-151 | 05 35 21.00 | -05 21 52.30 |  209-151 | i    | B      |
+|  210-225 | 05 35 21.03 | -05 22 25.20 |          | i    |        |
+|  212-557 | 05 35 21.15 | -05 25 57.04 |  212-557 | i    |        |
+|  212-400 | 05 35 21.19 | -05 24 00.20 |          | i    |        |
+|  212-260 | 05 35 21.24 | -05 22 59.51 |  212-260 | i    |        |
+|  213-533 | 05 35 21.28 | -05 25 33.11 |          | i    | B      |
+|  213-346 | 05 35 21.30 | -05 23 46.10 |          | i    | B      |
+|  215-652 | 05 35 21.45 | -05 26 52.40 |          | i    |        |
+|  215-317 | 05 35 21.49 | -05 23 16.71 |  215-317 | i    |        |
+|  215-106 | 05 35 21.55 | -05 21 05.60 |  215-106 | i    | J      |
+|  216-541 | 05 35 21.60 | -05 25 40.70 |          | i    |        |
+|  216-715 | 05 35 21.62 | -05 27 14.65 |  216-715 | i    |        |
+|  218-339 | 05 35 21.77 | -05 23 39.30 |  218-339 | i    |        |
+|  218-354 | 05 35 21.79 | -05 23 53.90 |  218-354 | d    | EO,B   |
+|  218-529 | 05 35 21.82 | -05 25 28.46 |          | i    | B      |
+|  218-306 | 05 35 21.84 | -05 23 06.46 |          | i    | B      |
+|  221-433 | 05 35 22.08 | -05 24 32.95 |  221-433 | i    |        |
+|  223-414 | 05 35 22.31 | -05 24 14.25 |  223-414 | i    | B      |
+|  224-728 | 05 35 22.37 | -05 27 28.40 |  224-728 | i    |        |
+|  228-548 | 05 35 22.83 | -05 25 47.69 |  228-548 | i    |        |
+|  230-536 | 05 35 23.02 | -05 25 36.29 |          | d    |        |
+|  231-460 | 05 35 23.05 | -05 24 59.86 |  231-460 | i    |        |
+|  231-502 | 05 35 23.16 | -05 25 02.19 |  231-502 | i    | B      |
+|  231-838 | 05 35 23.10 | -05 28 37.34 |  231-838 | i    | J      |
+|  232-453 | 05 35 23.22 | -05 24 52.79 |  232-453 | i    |        |
+|  234-853 | 05 35 23.40 | -05 28 53.19 |          | i    |        |
+|  236-527 | 05 35 23.59 | -05 25 26.54 |  236-527 | i    |        |
+|  237-627 | 05 35 23.66 | -05 26 27.15 |  237-627 | i    |        |
+|  238-334 | 05 35 23.80 | -05 23 34.30 |  238-334 | i    | B      |
+|  239-334 | 05 35 23.86 | -05 23 34.05 |          | d    | EO,B   |
+|  239-510 | 05 35 23.98 | -05 25 09.94 |  239-510 | i    |        |
+|  240-314 | 05 35 24.02 | -05 23 13.85 |  240-314 | i    | B      |
+|  242-519 | 05 35 24.22 | -05 25 18.79 |  242-519 | i    |        |
+|  244-440 | 05 35 24.38 | -05 24 39.74 |  244-440 | i    |        |
+|  245-632 | 05 35 24.45 | -05 26 31.55 |  245-632 | i    | B      |
+| 245-1910 | 05 35 24.48 | -05 19 09.84 |          | i    | RN,B   |
+|  245-502 | 05 35 24.51 | -05 25 01.59 |  245-502 | i    |        |
+|  247-436 | 05 35 24.69 | -05 24 35.74 |  247-436 | i    | J      |
+|  250-439 | 05 35 25.02 | -05 24 38.49 |  250-439 | i    |        |
+|  252-457 | 05 35 25.21 | -05 24 57.34 |  252-457 | i    |        |
+| 253-1536 | 05 35 25.30 | -05 15 35.54 |          | d    | J,RN,B |
+|  254-412 | 05 35 25.37 | -05 24 11.50 |  254-412 | i    |        |
+|  255-512 | 05 35 25.52 | -05 25 11.84 |          | i    |        |
+|  262-521 | 05 35 26.18 | -05 25 20.49 |  262-521 | i    |        |
+|  264-532 | 05 35 26.42 | -05 25 31.69 |  264-532 | i    |        |
+|  266-558 | 05 35 26.62 | -05 25 57.84 |          | i    |        |
+|  280-931 | 05 35 27.96 | -05 29 31.15 |          | i    |        |
+| 280-1720 | 05 35 28.05 | -05 17 20.33 |          | d    | FO     |
+|  281-306 | 05 35 28.13 | -05 23 06.45 |          | d    | FO     |
+|  282-458 | 05 35 28.20 | -05 24 58.19 |  282-458 | i    | J      |
+|  282-614 | 05 35 28.20 | -05 26 14.20 |          | i    |        |
+|  284-439 | 05 35 28.40 | -05 24 38.69 |          | i    |        |
+|  294-757 | 05 35 29.43 | -05 37 56.60 |          | rn   |        |
+|  294-606 | 05 35 29.48 | -05 26 06.63 |          | d    | RN     |
+|  297-025 | 05 35 29.67 | -05 30 24.75 |          | i    |        |
+|  304-539 | 05 35 30.41 | -05 25 38.63 |  304-539 | i    |        |
+| 307-1807 | 05 35 30.70 | -05 18 07.24 | 307-1807 | i    |        |
+|  314-816 | 05 35 31.40 | -05 28 16.48 |          | i    |        |
+|  321-602 | 05 35 32.10 | -05 26 01.94 |  321-602 | d    | EO     |
+|  332-405 | 05 35 33.19 | -05 24 04.74 |          | d    |        |
+| 332-1605 | 05 35 33.20 | -05 16 05.38 | 332-1605 | i    |        |
+| 346-1553 | 05 35 34.62 | -05 15 52.92 |          | d    | FO     |
+| 347-1535 | 05 35 34.67 | -05 15 34.88 | 347-1535 | d    | J      |
+| 351-3349 | 05 35 35.13 | -05 33 49.18 |          | i    | J      |
+|  353-130 | 05 35 35.32 | -05 21 29.59 |          | j    | J,B    |
+|  473-245 | 05 35 47.34 | -05 22 44.82 |          | d    | EO     |
+
+
+***** Write ds9 region file for the proplyds
+#+header: :var table=ricci-proplyd-table
+#+BEGIN_SRC python :results file
+  region_hdr_lines = [
+      "# Region file format: DS9 version 4.1",
+      "global color=#dd8822 dashlist=8 3 width=1 font=\"helvetica 6 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1",
+      "fk5",
+      ]
+  
+  def region_box_to_string(ra="5:34:40.800", dec="-5:22:43.00",
+                           width=50, height=50, angle=0.0, text="LL2"):
+      return "box({},{},{}\",{}\",{}) # text={{{}}}".format(ra, dec, width, height, angle, text)
+  
+  boxes = []
+  size = 2
+  for name, RA, Dec, OW, Type, Note in table[2:]:
+      RA = RA.replace(" ", ":")
+      Dec = Dec.replace(" ", ":")
+      boxes.append(region_box_to_string(RA, Dec, size, size, text=name))
+  
+  region_file = "proplyd-boxes.reg"
+  with open(region_file, "w") as f:
+      f.writelines([s + "\n" for s in region_hdr_lines + boxes])
+  return region_file
+#+END_SRC
+
+#+RESULTS:
+[[file:proplyd-boxes.reg]]
+
+
+
+
+**** Star catalog from Da Rio et al 2012
++ Data is in [[file:Da-Rio-2012-Tab3.dat][Da-Rio-2012-Tab3.dat]]
++ Analysis is  now done in an ipython notebook.
+
+*** TODO 
+
+
+
+
+
+
+** =read-shapes-LL= program design
++ This is a suite of programs for fitting the arcs and measuring their brightness
+*** Original design
+These programs must be run in order:
+1. =find-xy-shell.py --region SOURCE-forma.reg= 
+   + Reads arcs from =SOURCE-forma.reg=
+   + Writes data to =SOURCE-xy.json=
+2. =fit-circle-shell.py SOURCE-xy.json=
+   + Reads arc data from =SOURCE-xy.json=
+   + Fits circles to inner and outer arcs
+   + Saves plot: =SOURCE-arcfits.pdf=
+   + Saves DS9 region file: =SOURCE-arcfits.reg=
+   + Writes data to =SOURCE-xyc.json=
+3. =extract-image.py --source SOURCE --fitsfile IMAGE.fits=
+   + Reads arc data from =SOURCE-xyc.json=
+   + Reads large image data from =IMAGE.fits=
+   + Writes small image around source to =SOURCE-extract.fits=
+4. =arc_brightness.py --source SOURCE=
+   + Reads arc data from =SOURCE-xyc.json=
+   + Reads image data from =SOURCE-extract.fits=
+   + Calculates brightness in shell and background regions
+   + Writes data to =SOURCE-xycb.json=
+   + Saves plots: =SOURCE-arcbright-th.png= and =SOURCE-arcbright-z.png=
+5. =plot-image.py --source SOURCE= 
+   + Reads arc data from =SOURCE-xycb.json=
+   + Reads image data from =SOURCE-extract.fits=
+   + Saves image plot: =SOURCE-images.pdf=
+   + Writes extra data to =SOURCE-xycb.json=
+
+*** New design
+:LOGBOOK:
+CLOCK: [2013-11-16 Sat 11:10]--[2013-11-16 Sat 11:47] =>  0:37
+CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
+:END:
+1. [X] =find-xy-shell.py SOURCE= 
+   + Reads arcs from =SOURCE-forma.reg=
+   + Writes data to =SOURCE-arcdata.json=
+2. [X] =fit-circle-shell.py SOURCE=
+   + Reads arc data from =SOURCE-arcdata.json=
+   + Fits circles to inner and outer arcs
+   + Saves plot: =SOURCE-arcfits.pdf=
+   + Saves DS9 region file: =SOURCE-arcfits.reg=
+   + Writes fit data to =SOURCE-arcdata.json=
+3. [X] =extract-image.py SOURCE --fitsfile PATH/IMAGE.fits=
+   + Run separately for each IMAGE
+   + Reads arc data from =SOURCE-arcdata.json=
+   + Reads large image data from =IMAGE.fits=
+   + Reads instrument configuration from  =IMAGE.fits=
+   + Writes small image around source to =SOURCE-IMAGE-extract.fits=
+   + Writes data about instrument configuration and image files to =SOURCE-arcdata.json=
+4. [X] =arc_brightness.py SOURCE=
+   + Reads arc data and instrument data from =SOURCE-arcdata.json=
+   + For each =IMAGE= found:
+     + Reads image data from =SOURCE-IMAGE-extract.fits=
+     + Calculates brightness in shell and background regions
+     + Writes data about shell brightness to =SOURCE-arcdata.json=
+     + Saves plots: =SOURCE-IMAGE-arcbright-th.png= and =SOURCE-IMAGE-arcbright-z.png=
+5. [X] =plot-image.py SOURCE --image IMAGE= 
+   + Reads arc data from =SOURCE-arcdata.json=
+   + Reads image data from =SOURCE-IMAGE-extract.fits=
+   + Saves image plot: =SOURCE-IMAGE-images.pdf=
+   + Writes data about plot limits to =SOURCE-arcdata.json=
+     
+**** Notes
++ extract-image.py must encode the camera/instrument in the output file somehow
+** [2/3] Next steps for Luis Ángel
+
+*** DONE Finish tracing the arcs
+CLOSED: [2013-11-12 Tue 09:15]
+*** DONE Determine radius of curvature
+CLOSED: [2013-11-15 Fri 11:20]
+*** TODO Measure surface brightnesses
+
+** TODO Determinando la forma de los arcos
+:LOGBOOK:
+CLOCK: [2013-09-19 Thu 19:27]--[2013-10-07 Mon 09:47] => 422:20
+:END:
+
+*** Trazando los arcos
++ Este se hace con ds9
+  + Estrella: =Region->Shape->Point->Circle=
+  + Exterior: =Region->Shape->Point->X=
+  + Interior: =Region->Shape->Point->Cross=
++ Se guardan las regiones en archivos =*-forma.reg=
+  + Por ejemplo, =072-134-forma.reg=
+  + En coordenados WCS, FK5, HMS
+
+    
+*** Procesando los arcos
+
+**** DONE Etapa 1: Encontrar R0 y PA de cada arco
+CLOSED: [2013-09-19 Thu 19:35]
++ Este se hace con [[file:programas/find-xy-shell.py][programas/find-xy-shell.py]]
++ Escribe archivos de la forma =*-xy.json=
+  + Por ejemplo, =072-134-xy.json=
+
+    
+**** DONE Etapa 2: Resumir todos los objetos en una tabla
+CLOSED: [2013-09-26 Thu 10:13]
+
+
+**** Problemas encontrados
+
+***** DONE 136-3057
+CLOSED: [2013-09-26 Thu 11:14]
++ campo 14
++ [X] PA_in muy diferente
+  + Arreglado por agregar puntos extras al choque interior
++ [X] R_out, R_in muy grandes
+  + realmente es grande
+***** DONE 344-3020
+CLOSED: [2013-10-03 Thu 10:31]
++ campo 08
++ R_in negativo
++ Muy débil y tiene jet que sale al este-noreste
++ Restringimos los arcos a ángulos pequeños respeto al eje para evitar las regiones posiblemente afectadas por el jet
+
+***** DONE 041-637
+CLOSED: [2013-10-03 Thu 10:39]
++ campo 16
++ R_out < R_in
++ Agregamos más puntos al arco interior para resolver el problema
+***** DONE 066-3251
+CLOSED: [2013-10-03 Thu 10:56]
++ campo 14
++ muy grande (corregimos esto)
++ Muestra el arco exterio solamente, y es muy débil
+
+*** Objetos problemáticos
+Unos objetos son más complicados.  Por ejemplo, que necesita más de dos arcos para describirlos
+
+**** 051-024
+This has detached inner shell and outer shells, with a gap between them
+**** 4578-251
+This might have 3 arcs.  On the other hand, the innermost one may just be a diffraction artefact
+
+** Buena descripción de los números OW
+Este viene del =README= de la tabla de Ricci: http://vizier.cfa.harvard.edu/viz-bin/Cat?J/AJ/136/2136
+
+: Note (G1): Sources identified as <[RRS2008] NNNN-NNNN> in Simbad:
+:    * NNNN-NNN  : MSSs-MSS   (position: 5 3M SS.s -5 2M SS)
+:    * NNN-NNN   : SSs-MSS    (position: 5 35 SS.s -5 2M SS)
+:    * NNN-NNNN  : SSs-MMSS   (position: 5 35 SS.s -5 MM SS)
+:    * NNNN-NNNN : MSSs-MMSS  (position: 5 3M SS.s -5 MM SS)
+
+** Fixing coordinates of WFC mosaic
++ Plan is to check each Bally field by hand in ds9
++ Use an RGB image to load:
+  + Red: Bally image
+  + Green: Robberto image
+  + Blue: WFC mosaic
++ Use the "WCS Parameters" panel to make adjustments to the WFC coordinates
+  + Only change the CRPIX parameters
+    + Original values: CRPIX1 = 1642.6, CRPIX2 = 2441.3
+  + Check each corner of each Bally field
++ Bally 01:
+  + E corner:
+    + coordinates: 5:35:18.654 -5:23:13.88
+    + CRPIX1 = 1643, CRPIX2 = 2442
+  + N corner
+    + coordinates: 5:35:10.560 -5:21:56.47
+    + CRPIX1 = 1648, CRPIX2 = 2442
+  + W corner
+    + coordinates 5:34:59.553 -5:24:00.19
+    + CRPIX1 = 1649.5, CRPIX2 = 2438.5
+  + S corner
+    + coordinates  5:35:06.596 -5:26:50.87
+    + CRPIX1 = 1646.5, CRPIX2 = 2436
+  + CENTER
+    + coordinates  5:35:12.593 -5:23:44.06
+    + CRPIX1 = 1645, CRPIX2 = 2440
++ Bally 02:
+  + SW
+    + coordinates  5:35:17.209 -5:21:31.59
+    + CRPIX1 = 1646, CRPIX2 = 2443
+  + W corner
+    + coordinates  5:35:12.804 -5:20:43.48
+    + CRPIX1 = 1647, CRPIX2 = 2443.5
+  + S corner (NO SHIFT)
+    + coordinates  5:35:19.204 -5:22:50.59
+    + CRPIX1 = 1642.6, CRPIX2 = 2441.3
++ Bally 06
+  + E corner
+    + coordinates  5:35:26.348 -5:25:40.19
+    + CRPIX1 = 1641.5, CRPIX2 = 2436
+  + N corner
+    + coordinates  5:35:20.458 -5:23:29.72
+
+
+
+
+** Fixing the coordinates of the Bally images
+
+*** Comparing source positions
+:LOGBOOK:
+CLOCK: [2013-11-14 Thu 11:12]--[2013-11-14 Thu 13:45] =>  2:33
+- Note taken on [2013-11-14 Thu 11:11] \\
+  Actually, it does work well enough.  Accuracy of 2 or 3 pixels
+- Note taken on [2013-11-14 Thu 09:49] \\
+  No, this does not work so well - go back to doing this by hand
+:END:
++ [[file:~/Work/Bowshocks/Jorge/bowshock-shape/read-shapes-LL/find-bally-offsets.py][Script]] to calculate the offsets
++ [[file:~/Work/Bowshocks/Jorge/bowshock-shape/read-shapes-LL/plot-bally-offsets.py][Another script]] to plot the offsets
++ There is quite a lot of dispersion in the offsets
+  + Both within a field and between fields
+  + Some fields appear to share a common median offset:
+    + 01, 16, 14, (17, 06, 24?) all have [-1.0, 0.5] (or more or less)
+  + But others are inconsistent:
+    + 07, 08 are around [-2.0, 0.0] (but with large scatter)
+    + 09 is around [-0.8, -0.2] (compact)
+    + 02 is around [0.0, 0.0] (also compact)
+    + 18 is in a world of its own at [0.5, 1.0], but there is only 1 source
+**** DONE Checking each field
+CLOSED: [2013-11-14 Thu 16:13]
++ [X] 01
++ [X] 02
++ [X] 09
++ [X] 24
++ [X] 07  
++ [X] 17
++ [X] 18
++ [X] 16
++ [X] 14
++ [X] 09
++ [X] 08
+
+  
+*** Aligning images by hand
+:LOGBOOK:
+CLOCK: [2013-11-14 Thu 09:50]--[2013-11-14 Thu 11:11] =>  1:21
+CLOCK: [2013-09-05 Thu 12:34]--[2013-09-06 Fri 08:53] => 20:19
+:END:
++ Hopefully a simple shift will suffice
+#+name: bally-corrections 
+| Original           |      x |      y |        RA |        Dec | Fix |
+| j8oc01010_drz.fits | 2074.0 | 2010.0 | 83.777118 | -5.4114893 |   1 |
+
+#+BEGIN_SRC python :var table=bally-corrections :dir ~/Work/OrionTreasury/Bally-ACS :results output
+import astropy.io.fits as pyfits
+for infile, x, y, ra, dec, dofix in table[1:]:
+    if int(dofix) == 1:
+        hdu = pyfits.open(infile)["SCI"]
+        hdu.header.update(crpix1=float(x), crpix2=float(y), crval1=float(ra), crval2=float(dec))
+        outfile = infile.replace("_drz", "_robwcs")
+        hdu.writeto(outfile, clobber=True)
+#+END_SRC
+
+#+RESULTS:
+
+** Buscar objetos LL adicionales
+El mosaico de Robberto cubre una área mayor que las observaciones de BR2001.  Es posible que hay más objetos para descubrir. 
+
+*** An LL object in Carina
+     CLOCK: [2012-02-27 Mon 21:51]--[2012-02-27 Mon 22:01] =>  0:10
+
++ \cite{Smith:2010} find a object in the Carina Nebula (HH 1012) that looks identical to the LL objects.  See their Fig 14.
++ There is also the object HHc-9 (see their Fig 24), which they say is a jet bowshock, but it looks to me like it might be a LL bow too.  However, there is no central star to be seen, which is rather odd. 
+
+
+#+BEGIN_SRC bibtex
+  
+  @article{Smith:2010,
+    Abstract =     {We report the discovery of new Herbig-Haro (HH) jets
+                    in the Carina Nebula, and we discuss the
+                    protostellar outflow activity of a young OB
+                    association. These are the first results of an
+                    Halpha imaging survey of Carina conducted with the
+                    Hubble Space Telescope (HST)/Advanced Camera for
+                    Surveys. Adding to the one previously known example
+                    (HH 666), we detect 21 new HH jets, plus 17 new
+                    candidate jets, ranging in length from 0.005 to
+                    3pc. Using the Halpha emission measure to estimate
+                    jet densities, we derive jet mass-loss rates ranging
+                    from 8 × 10-9 to ~10-6Msolaryr-1, but a comparison
+                    to the distribution of jet mass-loss rates in Orion
+                    suggests that we may be missing a large fraction of
+                    the jets below 10-8Msolaryr-1. A key qualitative
+                    result is that even some of the smallest dark
+                    globules with sizes of <~1 arcsec (0.01pc) are
+                    active sites of ongoing star formation because we
+                    see HH jets emerging from them, and that these offer
+                    potential analogues to the cradle of our Solar
+                    system because of their proximity to dozens of
+                    imminent supernovae that will enrich them with
+                    radioactive nuclides like 60Fe. Although most
+                    proplyd candidates identified from ground-based data
+                    are dark cometary globules, HST images now reveal
+                    proplyd structures in the core of the Tr 14 cluster,
+                    only 0.1-0.2 pc from several extreme O-type
+                    stars. Throughout Carina, some HH jets have axes
+                    bent away from nearby massive stars, while others
+                    show no bend, and still others are bent toward the
+                    massive stars. These jet morphologies serve as `wind
+                    socks' strong photoevaporative flows can shape the
+                    jets, competing with the direct winds and radiation
+                    from massive stars. We find no clear tendency for
+                    jets to be aligned perpendicular to the axes of dust
+                    pillars. Finally, even allowing for a large number
+                    of jets that may escape detection, we find that HH
+                    jets are negligible to the global turbulence of the
+                    surrounding region, which is driven by massive star
+                    feedback.  Based on observations made with the
+                    NASA/ESA Hubble Space Telescope, obtained at the
+                    Space Telescope Science Institute, which is operated
+                    by the Association of Universities for Research in
+                    Astronomy, Inc., under NASA contract NAS5-26555.
+                    E-mail: nathans@astro.berkeley.edu},
+    Adsnote =      {Provided by the SAO/NASA Astrophysics Data System},
+    Adsurl =       {http://adsabs.harvard.edu/abs/2010MNRAS.405.1153S},
+    Archiveprefix ={arXiv},
+    Author =       {{Smith}, N. and {Bally}, J. and {Walborn}, N.~R.},
+    Date-Added =   {2012-02-28 03:16:39 +0000},
+    Date-Modified ={2012-02-28 03:16:39 +0000},
+    Doi =          {10.1111/j.1365-2966.2010.16520.x},
+    Eprint =       {1002.4898},
+    Journal =      {\mnras},
+    Keywords =     {stars: formation, stars: pre-main-sequence, ISM:
+                    Herbig-Haro objects, ISM: individual: NGC 3372, ISM:
+                    individual: NGC 3324, ISM: jets and outflows},
+    Month =        jun,
+    Pages =        {1153-1186},
+    Primaryclass = {astro-ph.SR},
+    Title =        {{HST/ACS H{$\alpha$} imaging of the Carina Nebula:
+                    outflow activity traced by irradiated Herbig-Haro
+                    Jets}},
+    Volume =       405,
+    Year =         2010,
+    Bdsk-Url-1 =   {http://dx.doi.org/10.1111/j.1365-2966.2010.16520.x}
+  }
+  
+#+END_SRC
+
+*** A new LL object: LL 261-3018!
+      CLOCK: [2012-02-27 Mon 20:45]--[2012-02-27 Mon 21:00] =>  0:15
++ I just found a new object while looking at the Bally 2006 paper!
+  + It is along the southern side of the HH 502 jet
+    + Same RA as knot S6 (boxes 18, 19): 05 35 26.1
+    + Nearly same Dec as knot S5 (box 17): say -05 30 18
+
++ I thought I had found another one too, but it is already catalogued as 308-3036, just to W of LL6
+
+** Llenar datos faltantes en la tabla
+
+** Medir los radios R0 y R90 para los objetos LL
+    
+** Comparar los LL que son proplyds con los que no son
+
+** Surface brightness measurements
+:LOGBOOK:
+CLOCK: [2013-11-20 Wed 13:26]--[2013-11-20 Wed 13:43] =>  0:17
+:END:
+
+*** Data on the relevant filters
+:LOGBOOK:
+CLOCK: [2013-11-20 Wed 17:33]--[2013-11-20 Wed 18:00] =>  0:27
+CLOCK: [2013-11-20 Wed 17:28]--[2013-11-20 Wed 17:33] =>  0:05
+:END:
+Useful places I have discussed this before
++ [[id:C1210509-AE95-4F02-8556-1BF7B670B2E9][llobjects.org]] has callibration constants from OD and discussion
+  + it seems that [N II] and continuum contribution to H\alpha are small
+  + whereas H\alpha contribution to [N II] is more
+
+*** Comparison of WFPC2 and ACS images
++ WFPC2 has f656n (H alpha) and f658n ([N II]) which have small contaminations from the other line
++ ACS has f658n (H \alpha + [N II]) which passes both lines
++ So in prinicple we can find the H alpha brightness
+  + See github [[https://github.com/deprecated/bowshock-shape/issues/25][issue #25]]
+  + But we do need to worry about the continuum as well
+**** Relative calibration of the WFPC2 and ACS images
+**** Working out which WFPC2 image applies to each source
+:LOGBOOK:
+CLOCK: [2013-11-20 Wed 21:32]--[2013-11-20 Wed 23:56] =>  2:24
+:END:
++ Use montage's =mCoverageCheck= ([[http://montage.ipac.caltech.edu/docs/mCoverageCheck.html][docs]])
++ Opened github [[https://github.com/deprecated/bowshock-shape/issues/26][issue #26]] on this
++ Can't get python version to work - try command line version:
+***** FIrst get tables of each type of image file
+#+BEGIN_SRC sh :results verbatim
+  for instrument in wfpc2 acs nicmos; do
+      mImgTbl ~/Work/OrionTreasury/${instrument} montage-images-${instrument}.tbl
+  done
+  mImgTbl ~/Work/OrionTreasury/Bally-ACS montage-images-bally.tbl
+#+END_SRC
+
+#+RESULTS:
+: [struct stat="OK", count=117, badfits=0, badwcs=0]
+: [struct stat="OK", count=76, badfits=37, badwcs=75]
+: [struct stat="OK", count=204, badfits=0, badwcs=0]
+: [struct stat="OK", count=116, badfits=0, badwcs=41]
+
+***** Then try to find all the images that cover 177-341
+#+BEGIN_SRC sh :results verbatim
+  for instrument in wfpc2 acs nicmos bally; do
+      mCoverageCheck foo bar montage-images-${instrument}.tbl coverage-${instrument}-177-341.tbl \
+          -point 83.82362812499996 -5.394682638888889 
+      grep fits coverage-${instrument}-177-341.tbl |cut -c 269-
+  done
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[struct stat="OK", count="2"]
+
+wfpc2/hlsp_orion_hst_wfpc2_38_f656n_v1_sci.fits 
+wfpc2/hlsp_orion_hst_wfpc2_39_f656n_v1_sci.fits 
+[struct stat="OK", count="22"]
+
+acs/hlsp_orion_hst_acs_strip0l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip0l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip0l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip5l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip5l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip5r_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip5r_f658n_v1_drz.fits  
+[struct stat="OK", count="4"]
+
+nicmos/hlsp_orion_hst_nicmos_4a_f110w_v1_drz.fits 
+nicmos/hlsp_orion_hst_nicmos_4a_f160w_v1_drz.fits 
+nicmos/hlsp_orion_hst_nicmos_4c_f110w_v1_drz.fits 
+nicmos/hlsp_orion_hst_nicmos_4c_f160w_v1_drz.fits 
+[struct stat="OK", count="8"]
+
+Bally-ACS/j8oc01010_drc.fits                 
+Bally-ACS/j8oc01010_drz.fits                 
+Bally-ACS/j8oc01010_drz.fits                 
+Bally-ACS/j8oc01010_drz.fits                 
+Bally-ACS/j8oc01010_robwcs.fits              
+Bally-ACS/j8oc01010_wcs.fits                 
+Bally-ACS/j8oc01010_wcs.fits                 
+Bally-ACS/j8oc01010_wcs.fits                 
+#+end_example
+
+***** Then try to find all the images that cover LL7
++ Position is 5:35:35.129  -5:33:49.12
+#+BEGIN_SRC python
+  import astropy.coordinates as coords
+  import astropy.units as u
+  c = coords.ICRSCoordinates("5:35:35.129  -5:33:49.12", unit=(u.hour, u.deg))
+  return c
+#+END_SRC
+
+#+RESULTS:
+: <ICRSCoordinates RA=83.89637 deg, Dec=-5.56364 deg>
+
+#+BEGIN_SRC sh :results verbatim
+  for instrument in wfpc2 acs nicmos bally; do
+      mCoverageCheck foo bar montage-images-${instrument}.tbl coverage-${instrument}-LL7.tbl \
+          -point 83.89637 -5.56364
+      grep fits coverage-${instrument}-LL7.tbl |cut -c 269-
+  done
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[struct stat="OK", count="2"]
+
+wfpc2/hlsp_orion_hst_wfpc2_1b_f656n_v1_sci.fits 
+wfpc2/hlsp_orion_hst_wfpc2_64_f656n_v1_sci.fits 
+[struct stat="OK", count="24"]
+
+acs/hlsp_orion_hst_acs_strip2l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip2l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip2l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip7l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f435w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f555w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f775w_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip7l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip7l_f850lp_v1_drz.fits 
+acs/hlsp_orion_hst_acs_strip8l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip8l_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip8r_f658n_v1_drz.fits  
+acs/hlsp_orion_hst_acs_strip8r_f658n_v1_drz.fits  
+[struct stat="OK", count="2"]
+
+nicmos/hlsp_orion_hst_nicmos_0d_f110w_v1_drz.fits 
+nicmos/hlsp_orion_hst_nicmos_0d_f160w_v1_drz.fits 
+[struct stat="OK", count="0"]
+
+#+end_example
+
+
+***** Potential issues 
++ The process does work, but it throws up several false positives
++ This is because the FITS images for wfpc2 and nicmos are much bigger than the instrument footprints, so there is a lot of blank space around the outside.
++ Montage cannot tell which bits of the image actually have data in them.
++ [ ] We could check each image one by one and see if the brightness is zero at the point in question
+
+
+**** Example measurements of object at 5:34:57.780 -5:22:51.21
+| Filter      | Shell             | Neb               | (Shell - Neb)/Neb | S(Ha) [Shell - Neb] |
+|-------------+-------------------+-------------------+-------------------+---------------------|
+| ACS f658n   | 3.0956 +/- 0.0260 | 2.9091 +/- 0.0169 | 0.064 +/- 0.011   |                     |
+| WFPC2 f656n | 0.0377 +/- 0.0005 | 0.0356 +/- 0.0005 | 0.059 +/- 0.020   | 1.26e7 +/- 4.23e6   |
+#+TBLFM: $4=($2 - $3)/$3 ; f3::@2$2=vmeane([3.08594,  3.14877,  3.00769,  3.14877, 3.08658]);f4::@2$3=vmeane([2.94231, 2.87589, 2.88434, 2.93389]);f4::@3$2=vmeane([0.0385699, 0.0384781, 0.0376776, 0.0362713]);f4::@3$3=vmeane([0.036049, 0.0347518, 0.0347819, 0.0367983]);f4::@3$5=($2 - $3)/1.67e-10 ; s3
+
++ From O'Dell & Doi (1999), leading order calibration of WFPC2 f656n is =S(Ha) = CPS/1.67e-10= where =S(Ha)= is surface brightness in units of photons/cm^2/s/sr and =CPS= is counts per second in the filter image.
++ => S(Ha) = 1.26e7 +/- 4.23e6
++ Measurements of shell radius and thickness
+  + Radius of curvature: R = 2 arcsec (very approximately)
+  + Thickness: h = 0.6 arcsec
+  + Path length: Delta l = 2 sqrt(R h) = (2.2 +/- 0.5) arcsec
++ Also we have n = sqrt(4 pi S / alpha Delta l)
+  + where alpha = 1.27e-13 cm^3/s
+  + n = sqrt((1.26e7 +/- 4.23e6) 4 pi / 1.27e-13 (2.2 +/- 0.5) 440 1.49597870691e13)
+  + => n = 300 +/- 60 cm^{-3}
+ 
+    
+** LL 1 Proper Motions
+:PROPERTIES:
+:dir:      LL1-proper-motions
+:END: 
+
+We need to apply the =-delay= argument before each frame 
+#+BEGIN_SRC sh :results silent
+ORDER="\
+ LL1_1995-03-21_O3-Ha-N2_WFPC2.png \
+ LL1_2004-01-14_Ha_ACS.png \
+ LL1_2005-04-07_B-V-I_ACS.png \
+ LL1_2012-01-07_O3-N2-S2_WFC3.png \
+ LL1_2012-01-07_Hb-O3-Ha_WFC3.png"
+
+convert $(for a in "$ORDER"; do printf -- "-delay 25 %s " $a; done; ) HH888-motions.gif
+#+END_SRC
+
+Check that the delay came out right (measured in 1/100 sec)
+#+BEGIN_SRC sh 
+identify -format "%T, " HH888-motions.gif
+#+END_SRC
+#+RESULTS:
+| 25 | 25 | 25 | 25 | 25 |
+
+Display in browser
+#+BEGIN_SRC sh :results silent
+open -a Safari HH888-motions.gif
+#+END_SRC
+
+* Export options
+#+TITLE: luis-angel-ll
+#+AUTHOR: William Henney
+#+EMAIL: will@henney.org
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:{} arch:headline
+#+OPTIONS: author:t c:nil creator:comment d:(not LOGBOOK) date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t toc:t todo:t |:t
+#+CREATOR: Emacs 24.3.1 (Org mode 8.0.7)
+#+DESCRIPTION:
+#+EXCLUDE_TAGS: noexport
+#+KEYWORDS:
+#+LANGUAGE: en
+#+SELECT_TAGS: export
