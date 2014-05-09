@@ -20,19 +20,53 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 ** Make a table of Jorge's measurements
 + JSON files read by [[file:luis-programas/arcs-summary-proplyds.py]]
 + Writes table to [[file:luis-programas/arcs-summary-proplyds.tab]]
++ Next, merge the two tables, giving priority to the Jorge measurements
+#+BEGIN_SRC python :dir luis-programas :results output
+  import numpy as np
+  from  astropy.table import Table
+  import json
+
+  tab = Table.read("arcs-summary.tab", format="ascii.commented_header", delimiter="\t",
+                     fill_values=('-', np.nan) )
+  ptab = Table.read("arcs-summary-proplyds.tab", format="ascii.commented_header", delimiter="\t",
+                     fill_values=('-', np.nan) )
+
+  with open("../ll-data.json") as f:
+      db = json.load(f)
+
+  for source, data in db.items():
+      if data["bname"] in ptab["Object"]:
+          print("Updating", data["bname"], data["oname"])
+          for colname in ptab.colnames[1:]:
+              tab[colname][tab["Object"]==data["oname"]] = ptab[colname][ptab["Object"]==data["bname"]] 
+
+  tab.write("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t")
+
+#+END_SRC
+
+#+RESULTS:
+: Updating LV2b 166-316
+: Updating HST1 177-341
+: Updating LV3 163-317
+: Updating LV4 161-324
+: Updating LV5 158-323
+: Updating LV2 167-317
+
 ** Look at correlations
 :PROPERTIES:
 :dir:      luis-programas
 :END:
 
-#+BEGIN_SRC python :return figlist :results list
-  import numpy as np
-  import matplotlib.pyplot as plt
-  from  astropy.table import Table
+#+name: annotations
+#+BEGIN_SRC python
+  famous = ['177-341', '167-317', '168-326', '161-324', '142-301']
+  other_interesting = ['w073-227', 'w069-601', 'w266-558', 'w000-400', 'w005-514']
 
   def label_sources(labels, x, y, extramask=None):
       """Add labels at points (x, y) for selected sources"""
-      mask = always_annotate
+      mask = np.array(['LL' in source
+                       or source in famous + other_interesting
+                       for source in labels])
       if extramask is not None:
           mask = mask | extramask
       mask = mask & m
@@ -44,11 +78,16 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
           ax.annotate(txt, (x[mask][i], y[mask][i]), (dx, dy),
                       textcoords='offset points', verticalalignment='center',
                       fontsize=5, alpha=0.6)
+#+END_SRC
 
+#+name: read-merge-table
+#+BEGIN_SRC python
+  tab = Table.read("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t",
+                   fill_values=('--', np.nan) )
+#+END_SRC
 
-  tab = Table.read("arcs-summary.tab", format="ascii.commented_header", delimiter="\t",
-                   fill_values=('-', np.nan) )
-
+#+name: mask-out-unwanted
+#+BEGIN_SRC python
   with open("problem-sources.txt") as f:
       problem_sources = f.read().split('\n')
   with open("interproplyd.txt") as f:
@@ -56,16 +95,30 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 
   m = np.isfinite(tab['R_out']) & np.isfinite(tab['R_in']) & (tab['R_out'] > tab['R_in'])
   m = m & np.array([not source in problem_sources for source in tab['Object']])
+#+END_SRC
+
+#+name: set-common-vars
+#+BEGIN_SRC python
   A = tab['Rc_out']/tab['R_out']
   Ain = tab['Rc_in']/tab['R_in']
   H = (tab['R_out'] - tab['R_in'])/tab['R_out']
   D60 = tab['D']/60
   contrast = np.log10(tab['Dif_Bally']/tab['Value_bg_Bally'])
   q = tab['R_out']/tab['D']
+  PA_star = (tab['PA_star'] - 180.0) % 360.0
+  dPA = ((tab ['PA_out'] - tab ['PA_star'] + 180.0) % 360.0) - 180.0
+#+END_SRC
+
+#+BEGIN_SRC python :noweb yes :return figlist :results list :tangle luis-programas/will-correlations.py
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from  astropy.table import Table
+
+  <<annotations>>
+  <<read-merge-table>>
+  <<mask-out-unwanted>>
+  <<set-common-vars>>
    
-  always_annotate = np.array(['LL' in source for source in tab['Object']])
-  famous = ['177-341', '167-317', '168-326', '161-324']
-  always_annotate = always_annotate | np.array([source in famous for source in tab['Object']])
   figlist = []
 
   pltfile = 'will-A-vs-q.pdf'
@@ -144,6 +197,27 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   fig.savefig(pltfile)
   figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
+  pltfile = 'will-PA-vs-PA.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.fill_betweenx([-90.0, 90.0], [0.0, 0.0], [90.0, 90.0], zorder=-10, alpha=0.05)
+  plt.fill_betweenx([-90.0, 90.0], [180.0, 180.0], [270.0, 270.0], zorder=-10, alpha=0.05)
+  plt.fill_betweenx([-90.0, 90.0], [360.0, 360.0], [450.0, 450.0], zorder=-10, alpha=0.05)
+  plt.text(45.0, -80.0, 'NE\nquadrant',  ha='center', fontsize='x-small')
+  plt.text(135.0, -80.0, 'SE\nquadrant', ha='center', fontsize='x-small')
+  plt.text(225.0, -80.0, 'SW\nquadrant', ha='center', fontsize='x-small')
+  plt.text(315.0, -80.0, 'NW\nquadrant', ha='center', fontsize='x-small')
+  plt.axhline(zorder=-5)
+  plt.scatter(PA_star[m], dPA[m], s=20*tab['R_out'][m], c=D60[m], cmap=plt.cm.hot, alpha=0.6)
+  label_sources(tab['Object'], PA_star, dPA, np.abs(dPA) > 45.0)
+  cb = plt.colorbar()
+  cb.set_label('Projected distance from Trapezium, D / arcmin')
+  plt.xlabel('PA of source from Trapezium, deg')
+  plt.ylabel('Angle between bowshock axis and radial direction, deg')
+  ax.set_xlim(-30.0, 375.0)
+  ax.set_ylim(-90.0, 90.0)
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
 #+END_SRC
 
@@ -153,8 +227,94 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 - [[file:luis-programas/will-H-vs-q.pdf][will-H-vs-q.pdf]]
 - [[file:luis-programas/will-q-vs-D.pdf][will-q-vs-D.pdf]]
 - [[file:luis-programas/will-r0-vs-D.pdf][will-r0-vs-D.pdf]]
+- [[file:luis-programas/will-PA-vs-PA.pdf][will-PA-vs-PA.pdf]]
 
 
+** Convert S(Ha) to shall density and pressure
+:PROPERTIES:
+:dir:      luis-programas
+:END:
+Based on Luis's program [[file:luis-programas/pressure.py]]
+#+name: luis-constants
+#+BEGIN_SRC python 
+# Conversion counts/pixel -> erg/s/cm2/sr
+Sfactor_ACS = 0.0025030687604156482
+
+# Value of recombination coefficient in cm^3/s
+alpha = 2.6e-13 
+
+# Energy to 3 to 2... erg
+Eha = 3.0267338723714944e-12 
+
+# Relative extinction at Ha from Blagrave
+fha = 0.78
+
+# Distances 
+D_orion_pc = 436.0
+AU = 1.49597870691e13
+cm_per_arcsec = D_orion_pc*AU
+
+# Boltzmann in erg/K
+k = 1.3806503e-16
+
+# Temperatura
+T = 1e4
+
+# Stellar wind
+Mdot_wind = 3.5e-7 #Msun/yr
+Vwind = 1200     #km/s
+#+END_SRC
+
+#+BEGIN_SRC python :noweb yes :return figlist :results list
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from  astropy.table import Table
+  import json
+
+  <<luis-constants>>
+  <<annotations>>
+  <<read-merge-table>>
+  <<mask-out-unwanted>>
+  <<set-common-vars>>
+
+  with open("extinction.json") as f:
+      extinction_data = json.load(f)
+
+  # Ha surface brightness, corrected for extinction
+  Sha = Sfactor_ACS*tab['Dif_Bally']
+  Chb = np.array([extinction_data.get(source, 0.0) for source in tab['Object']])
+  Sha *= 10**(fha*Chb)
+
+  # Thickness and radius of the shell for measurements of delta l
+  h0 = tab['h']*cm_per_arcsec
+  rc = tab['Rc_out']*cm_per_arcsec
+  deltal = 2*np.sqrt(h0*rc)
+
+  nshell = np.sqrt(4.*np.pi*Sha/(alpha*deltal*Eha))
+
+  figlist = []
+
+  pltfile = 'will-nshell-vs-D.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
+  label_sources(tab['Object'], D60, nshell)
+  cb = plt.colorbar()
+  cb.set_label('H alpha surface brightness, erg/s/cm2/sr')
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Shell electron density, ne / pcc ')
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(50.0, 5.e4)
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+
+#+END_SRC
+
+#+RESULTS:
+- [[file:luis-programas/will-nshell-vs-D.pdf][will-nshell-vs-D.pdf]]
 
 * Objetos LL
 :LOGBOOK:
@@ -816,6 +976,8 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
       key = bname or oname or sname
       if key == oname:
           key = key.split()[-1]
+      if key.startswith("w"):
+          key = key[1:]
       db[key] = dict(bname=bname, oname=oname, sname=sname, RA=RA,
                      Dec=Dec, Ref=Ref, Bally=Bally, Notes=Notes, Arc=Arc)
       with open(dbfile, "w") as f:
