@@ -17,6 +17,114 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 *** inter-proplyd shocks
 *** objects lacking an outer arc
 *** anything else where the data is low-quality
+** A better document with all the images
++ Luis has this, but there is a lot of whitespace
+#+BEGIN_SRC python :return figs :results list
+  import json
+  with open("ll-data.json") as f:
+      db = json.load(f)
+
+  fig_template = r'\BowshockFig{{{:s}}}{{{:02d}}}'
+
+  keys = sorted(db.keys(), key=lambda k: db[k]["RA"])
+
+  def name(k):
+      if "LL" in db[k]["bname"]:
+          return db[k]["bname"]
+      else:
+          return db[k]["oname"].split()[-1]
+
+  def field(k):
+      try:
+          result = int(db[k]['Bally'])
+      except ValueError:
+          if ',' in db[k]['Bally']:
+              result = int(db[k]['Bally'].split(',')[-1])
+          else:
+              result = 0
+      return result
+
+  figs = []
+  for k in keys:
+      figs.append(fig_template.format(name(k), field(k)))
+
+#+END_SRC
+
+#+RESULTS:
+- \BowshockFig{LL3}{17}
+- \BowshockFig{LL2}{18}
+- \BowshockFig{LL4}{24}
+- \BowshockFig{4468-605}{17}
+- \BowshockFig{4578-251}{09}
+- \BowshockFig{4582-635}{16}
+- \BowshockFig{w000-400}{09}
+- \BowshockFig{w005-514}{16}
+- \BowshockFig{w012-407}{01}
+- \BowshockFig{w014-414}{01}
+- \BowshockFig{022-635}{16}
+- \BowshockFig{w030-524}{01}
+- \BowshockFig{041-637}{16}
+- \BowshockFig{042-628}{16}
+- \BowshockFig{w044-527}{01}
+- \BowshockFig{049-143}{09}
+- \BowshockFig{051-024}{09}
+- \BowshockFig{LL1}{01}
+- \BowshockFig{065-502}{01}
+- \BowshockFig{066-3251}{14}
+- \BowshockFig{w069-601}{01}
+- \BowshockFig{072-134}{09}
+- \BowshockFig{w073-227}{01}
+- \BowshockFig{074-229}{01}
+- \BowshockFig{083-435}{01}
+- \BowshockFig{101-233}{01}
+- \BowshockFig{102-157}{01}
+- \BowshockFig{106-245}{01}
+- \BowshockFig{109-246}{01}
+- \BowshockFig{117-421}{01}
+- \BowshockFig{116-3101}{14}
+- \BowshockFig{119-3155}{14}
+- \BowshockFig{121-434}{01}
+- \BowshockFig{131-046}{02}
+- \BowshockFig{132-053}{02}
+- \BowshockFig{136-3057}{14}
+- \BowshockFig{138-3024}{15}
+- \BowshockFig{142-301}{01}
+- \BowshockFig{154-225}{01}
+- \BowshockFig{154-240}{01}
+- \BowshockFig{158-323}{01}
+- \BowshockFig{159-221}{01}
+- \BowshockFig{161-324}{01}
+- \BowshockFig{163-317}{01}
+- \BowshockFig{163-222}{01}
+- \BowshockFig{165-235}{01}
+- \BowshockFig{166-316}{01}
+- \BowshockFig{167-317}{01}
+- \BowshockFig{168-328}{01}
+- \BowshockFig{168-326N}{01}
+- \BowshockFig{168-326}{01}
+- \BowshockFig{169-338}{01}
+- \BowshockFig{170-249}{01}
+- \BowshockFig{173-342}{01}
+- \BowshockFig{173-236}{01}
+- \BowshockFig{175-321}{01}
+- \BowshockFig{177-341}{01}
+- \BowshockFig{178-258}{01}
+- \BowshockFig{180-331}{01}
+- \BowshockFig{189-329}{01}
+- \BowshockFig{203-3039}{14}
+- \BowshockFig{205-230}{06}
+- \BowshockFig{206-043}{02}
+- \BowshockFig{212-400}{06}
+- \BowshockFig{261-3018}{07}
+- \BowshockFig{w266-558}{06}
+- \BowshockFig{305-811}{07}
+- \BowshockFig{308-3036}{08}
+- \BowshockFig{LL5}{07}
+- \BowshockFig{LL6}{08}
+- \BowshockFig{344-3020}{08}
+- \BowshockFig{LL7}{00}
+- \BowshockFig{362-3137}{08}
+
 ** Make a table of Jorge's measurements
 + JSON files read by [[file:luis-programas/arcs-summary-proplyds.py]]
 + Writes table to [[file:luis-programas/arcs-summary-proplyds.tab]]
@@ -62,14 +170,15 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   famous = ['177-341', '167-317', '168-326', '161-324', '142-301']
   other_interesting = ['w073-227', 'w069-601', 'w266-558', 'w000-400', 'w005-514']
 
-  def label_sources(labels, x, y, extramask=None):
+  def label_sources(labels, x, y, extramask=None, allmask=None):
       """Add labels at points (x, y) for selected sources"""
       mask = np.array(['LL' in source
                        or source in famous + other_interesting
                        for source in labels])
       if extramask is not None:
           mask = mask | extramask
-      mask = mask & m
+      if allmask is not None:
+          mask = mask & allmask
       radius = 5.0
       theta_max = np.pi/3.0
       for i, txt in enumerate(labels[mask]):
@@ -84,6 +193,12 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 #+BEGIN_SRC python
   tab = Table.read("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t",
                    fill_values=('--', np.nan) )
+#+END_SRC
+
+#+name: read-luis-table
+#+BEGIN_SRC python
+  tab = Table.read("arcs-summary.tab", format="ascii.commented_header", delimiter="\t",
+                   fill_values=('-', np.nan) )
 #+END_SRC
 
 #+name: mask-out-unwanted
@@ -125,7 +240,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(q[m], A[m], s=20*tab['R_out'][m], c=D60[m], vmin=0.0, cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], q, A)
+  label_sources(tab['Object'], q, A, allmask=m)
   cb = plt.colorbar()
   cb.set_label('Projected distance from Trapezium, D / arcmin')
   plt.xlabel('Bowshock fractional size, q = r0/D')
@@ -138,7 +253,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(A[m], H[m], s=20*tab['R_out'][m], c=D60[m], vmin=0.0, cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], A, H, (A > 5.0) | (A < 1.0) | (H <= 0.2) | (H >= 0.6))
+  label_sources(tab['Object'], A, H, (A > 5.0) | (A < 1.0) | (H <= 0.2) | (H >= 0.6), allmask=m)
   cb = plt.colorbar()
   cb.set_label('Projected distance from Trapezium, D / arcmin')
   plt.xlabel('Bowshock bluntness, A = Rc/r0')
@@ -150,7 +265,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(q[m], H[m], s=20*tab['R_out'][m], c=np.log10(D60[m]), cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], q, H)
+  label_sources(tab['Object'], q, H, allmask=m)
   cb = plt.colorbar()
   cb.set_label('Projected distance from Trapezium, D / arcmin')
   plt.xlabel('Bowshock fractional size, q = r0/D')
@@ -163,7 +278,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(D60[m], q[m], s=20*tab['R_out'][m], c=contrast[m], cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], D60, q)
+  label_sources(tab['Object'], D60, q, allmask=m)
   cb = plt.colorbar()
   cb.set_label('Shell/background brightness contrast')
   plt.xlabel('Projected distance from Trapezium, D / arcmin')
@@ -179,7 +294,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(D60[m], tab['R_out'][m], s=100*H[m], c=contrast[m], cmap=plt.cm.hot, alpha=0.6)
   label_sources(tab['Object'], D60, tab['R_out'],
-                (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8))
+                (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
   Darray = np.linspace(D60.min(), D60.max())
   r0norm = 0.8
   plt.plot(Darray, r0norm*Darray/Darray.min(), 'k--', zorder=-100)
@@ -209,7 +324,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   plt.text(315.0, -80.0, 'NW\nquadrant', ha='center', fontsize='x-small')
   plt.axhline(zorder=-5)
   plt.scatter(PA_star[m], dPA[m], s=20*tab['R_out'][m], c=D60[m], cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], PA_star, dPA, np.abs(dPA) > 45.0)
+  label_sources(tab['Object'], PA_star, dPA, np.abs(dPA) > 45.0, allmask=m)
   cb = plt.colorbar()
   cb.set_label('Projected distance from Trapezium, D / arcmin')
   plt.xlabel('PA of source from Trapezium, deg')
@@ -230,7 +345,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 - [[file:luis-programas/will-PA-vs-PA.pdf][will-PA-vs-PA.pdf]]
 
 
-** Convert S(Ha) to shall density and pressure
+** Convert S(Ha) to shell density and pressure
 :PROPERTIES:
 :dir:      luis-programas
 :END:
@@ -261,10 +376,53 @@ k = 1.3806503e-16
 T = 1e4
 
 # Stellar wind
-Mdot_wind = 3.5e-7 #Msun/yr
-Vwind = 1200     #km/s
+yr = 3.15576e7
+Msun = 1.989e33
+km = 1.0e5
+Mdot_wind = 3.5e-7*Msun/yr # g/s 
+Vwind = 1200*km     # cm/s
 #+END_SRC
 
+#+name: arrow-utils
+#+BEGIN_SRC python
+  def draw_inclination_arrow(x0, y0, inc=45):
+      """Show effects of inclination changes on x-axis"""
+      x1 = x0/np.cos(np.radians(inc))
+      plt.plot([x0, x1], [y0, y0], '-k')
+      plt.plot(x0, y0, 'ok', ms=3.5)
+      plt.plot(x1, y0, '>k', ms=3.5)
+      plt.text(x1, y0, '   i = {}'.format(inc), va='center', fontsize='x-small')
+#+END_SRC
+
+#+RESULTS: arrow-utils
+: None
+
+Three categories: 
+- -1 :: probably not a proplyd
+- 0 :: looks like a proplyd
+- 1 :: catalogued as a proplyd
+#+name: identify-proplyds
+#+BEGIN_SRC python
+  with open("../ll-data.json") as f:
+      db = json.load(f)
+  
+  is_proplyd = {}
+  for data in db.values():
+      if "LL" in data["bname"]:
+          key = data["bname"]
+      elif data["oname"]:
+          key = data["oname"].split()[-1]
+      else:
+          continue
+      if "proplyd?" in data["Notes"]:
+          is_proplyd[key] = 0
+      elif "proplyd" in data["Notes"]:
+          is_proplyd[key] = 1
+      else:
+          is_proplyd[key] = -1
+#+END_SRC
+
+#+header: :tangle luis-programas/will-shell-physical.py
 #+BEGIN_SRC python :noweb yes :return figlist :results list
   import numpy as np
   import matplotlib.pyplot as plt
@@ -273,9 +431,11 @@ Vwind = 1200     #km/s
 
   <<luis-constants>>
   <<annotations>>
+  <<arrow-utils>>
   <<read-merge-table>>
   <<mask-out-unwanted>>
   <<set-common-vars>>
+  <<identify-proplyds>>
 
   with open("extinction.json") as f:
       extinction_data = json.load(f)
@@ -291,6 +451,16 @@ Vwind = 1200     #km/s
   deltal = 2*np.sqrt(h0*rc)
 
   nshell = np.sqrt(4.*np.pi*Sha/(alpha*deltal*Eha))
+  pshell = 2.0*nshell*k*T
+  MdotV_in = pshell*4.*np.pi*(tab['R_in']*cm_per_arcsec)**2 *yr/Msun/km
+
+  D60_grid = np.linspace(D60.min(), D60.max(), 2)
+  Dcm_grid = 60*D60_grid*cm_per_arcsec
+  Pram = Mdot_wind*Vwind/(4.*np.pi*Dcm_grid**2)
+
+  proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
+  not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
+  maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
 
   figlist = []
 
@@ -298,8 +468,13 @@ Vwind = 1200     #km/s
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
-  label_sources(tab['Object'], D60, nshell)
+  label_sources(tab['Object'], D60, nshell, (nshell > 3500.0/D60) | (nshell < 1000.0/D60), allmask=m)
   cb = plt.colorbar()
+  draw_inclination_arrow(0.1, 100*1.3**3, 30)
+  draw_inclination_arrow(0.1, 100*1.3**2, 45)
+  draw_inclination_arrow(0.1, 100*1.3, 60)
+  draw_inclination_arrow(0.1, 100, 75)
+  plt.text(0.1, 100/1.4, 'True distance correction', fontsize='x-small')
   cb.set_label('H alpha surface brightness, erg/s/cm2/sr')
   plt.xlabel('Projected distance from Trapezium, D / arcmin')
   plt.ylabel('Shell electron density, ne / pcc ')
@@ -310,11 +485,51 @@ Vwind = 1200     #km/s
   fig.savefig(pltfile)
   figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
+  pltfile = 'will-Pshell-vs-D.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.scatter(D60[m], pshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
+  label_sources(tab['Object'], D60, pshell, allmask=m)
+  cb = plt.colorbar()
+  cb.set_label('H alpha surface brightness, erg/s/cm2/sr')
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Shell pressure, P / dynes/cm^2 ')
+  plt.plot(D60_grid, Pram, '-k')
+  plt.plot(D60_grid*np.cos(np.radians(30)), Pram, '--k')
+  plt.plot(D60_grid*np.cos(np.radians(60)), Pram, ':k')
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(2e-10, 1.5e-7)
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+  pltfile = 'will-MdotV-vs-D.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  mm = m & proplyd_mask
+  plt.scatter(D60[mm], MdotV_in[mm], s=10*deltal[mm]/cm_per_arcsec, c='red', alpha=0.6)
+  mm = m & maybe_proplyd_mask
+  plt.scatter(D60[mm], MdotV_in[mm], s=10*deltal[mm]/cm_per_arcsec, c='orange', alpha=0.6)
+  mm = m & not_proplyd_mask
+  plt.scatter(D60[mm], MdotV_in[mm], s=10*deltal[mm]/cm_per_arcsec, c='black', alpha=0.6)
+  label_sources(tab['Object'], D60, MdotV_in, not_proplyd_mask | (MdotV_in > 1.e-6/D60), allmask=m)
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Inner flow Mdot V, Msun/yr km/s')
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(6e-9, 3e-5)
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
 
 #+END_SRC
 
 #+RESULTS:
 - [[file:luis-programas/will-nshell-vs-D.pdf][will-nshell-vs-D.pdf]]
+- [[file:luis-programas/will-Pshell-vs-D.pdf][will-Pshell-vs-D.pdf]]
+- [[file:luis-programas/will-MdotV-vs-D.pdf][will-MdotV-vs-D.pdf]]
 
 * Objetos LL
 :LOGBOOK:
@@ -575,43 +790,43 @@ Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]]
 #+name: orion-ll-objects
 | Bally name |      OW name | Star     |           RA |          Dec | Ref          | Bally field | Notes                 | Arc |
 |------------+--------------+----------+--------------+--------------+--------------+-------------+-----------------------+-----|
-| LL2        |              | IX Ori   |   5:34:40.86 |   -5:22:42.2 | BR01         |          18 |                       | x   |
-| LL3        |              |          |  5:34:40.807 |   -5:26:38.6 | BR01         |          17 |                       | x   |
-| LL4        |  LL 4427-838 |          |  5:34:42.724 |  -5:28:37.38 | BR01         |          24 |                       | x   |
-|            | LLP 4468-605 |          |  5:34:46.765 |  -5:26:04.74 | BLSW06       |          17 | proplyd - axial jet   | x   |
-|            |  LL 4578-251 |          |   5:34:57.79 |   -5:22:51.1 | WJH          |          09 |                       | x   |
-|            | LLP 4582-635 |          |   5:34:58.17 |   -5:26:35.1 | WJH          |          16 | proplyd - very faint  | x   |
-|            |     w000-400 |          |   5:34:59.57 |   -5:24:00.4 | BOM00        |          09 | proplyd? 4596-400     | x   |
-|            |     w005-514 |          |  5:35:00.463 |  -5:25:14.22 | BOM00        |      01, 16 | proplyd               | xx  |
-|            |     w012-407 |          |  5:35:01.175 |  -5:24:06.68 | BOM00        |          01 |                       | x   |
-|            |     w014-414 |          |  5:35:01.373 |  -5:24:13.42 | BOM00        |          01 |                       | x   |
-|            |   LL 022-635 |          |   5:35:02.20 |   -5:26:35.3 | WJH          |          16 |                       | x   |
-|            |     w030-524 |          |  5:35:03.001 |  -5:25:24.35 | BOM00        |          01 |                       | x   |
-|            |   LL 041-637 |          |   5:35:04.05 |   -5:26:37.3 | WJH          |          16 |                       | x?  |
-|            |  LLP 042-628 |          |   5:35:04.19 |   -5:26:27.7 | WJH          |          16 | proplyd 038-627       | x   |
-|            |     w044-527 |          |  5:35:04.422 |  -5:25:27.39 | BOM00        |          01 |                       | x   |
-|            |  LLP 049-143 |          |   5:35:04.95 |   -5:21:42.9 | WJH          |          09 | proplyd               | x   |
-|            |  LLP 051-024 |          |   5:35:05.13 |   -5:20:24.3 | WJH          |          09 | proplyd               | x   |
-| LL1        |     w056-519 | LL Ori   |   5:35:05.64 |   -5:25:19.4 | BR01, BOM00  |          01 |                       | x   |
-|            |      065-502 |          |  5:35:06.534 |  -5:25:01.53 | WJH          |          01 | proplyd?              | x   |
-|            |     066-3251 |          |   5:35:06.57 |  -5:32:51.49 | WJH (R08)    |          14 | proplyd?, globule?    | x   |
-|            |     w069-601 |          |   5:35:06.91 |   -5:26:00.6 | BOM00        |          01 |                       | x   |
-|            |  LLP 072-134 |          |   5:35:07.20 |   -5:21:34.3 | WJH          |          09 | proplyd - thin shell  | x   |
-|            |     w073-227 |          |   5:35:07.27 |   -5:22:26.6 | BOM00        |          01 | proplyd               | x   |
-|            |      074-229 |          |  5:35:07.381 |  -5:22:28.92 | WJH          |          01 | very faint            |     |
-|            |      083-435 |          |  5:35:08.289 |  -5:24:34.84 | WJH          |          01 | proplyd?, very faint  | x   |
-|            |  LLP 101-233 |          |   5:35:10.14 |   -5:22:32.6 | WJH          |          01 | proplyd               | x   |
-|            |   LL 102-157 |          |  5:35:10.252 |  -5:21:57.06 | WJH          |          01 | very faint            | x   |
-|            |      106-245 |          |  5:35:10.577 |  -5:22:44.69 | WJH          |          01 | proplyd?              | x   |
-|            |      109-246 |          |   5:35:10.90 |  -5:22:46.36 | BOM00        |          01 | proplyd 109-247, jet? | x   |
-|            | LLP 116-3101 | V488 Ori |  5:35:11.653 |  -5:31:01.04 | BLSW06       |          14 | proplyd               | x   |
-|            |      117-421 |          |   5:35:11.65 |  -5:24:21.50 | WJH (OW96)   |          01 | proplyd, large bow    | x   |
-|            |     119-3155 |          |  5:35:11.876 |  -5:31:55.40 | WJH          |          14 |                       | x   |
-|            |      121-434 |          |   5:35:12.12 |  -5:24:33.80 | WJH (R08)    |          01 | proplyd               | x   |
+| LL2        |     4409-242 | IX Ori   |  05:34:40.86 |   -5:22:42.2 | BR01         |          18 |                       | x   |
+| LL3        |     4408-639 |          | 05:34:40.807 |   -5:26:38.6 | BR01         |          17 |                       | x   |
+| LL4        |  LL 4427-838 |          | 05:34:42.724 |  -5:28:37.38 | BR01         |          24 |                       | x   |
+|            | LLP 4468-605 |          | 05:34:46.765 |  -5:26:04.74 | BLSW06       |          17 | proplyd - axial jet   | x   |
+|            |  LL 4578-251 |          |  05:34:57.79 |   -5:22:51.1 | WJH          |          09 |                       | x   |
+|            | LLP 4582-635 |          |  05:34:58.17 |   -5:26:35.1 | WJH          |          16 | proplyd - very faint  | x   |
+|            |     w000-400 |          |  05:34:59.57 |   -5:24:00.4 | BOM00        |          09 | proplyd 4596-400      | x   |
+|            |     w005-514 |          | 05:35:00.463 |  -5:25:14.22 | BOM00        |      01, 16 | proplyd               | xx  |
+|            |     w012-407 |          | 05:35:01.175 |  -5:24:06.68 | BOM00        |          01 |                       | x   |
+|            |     w014-414 |          | 05:35:01.373 |  -5:24:13.42 | BOM00        |          01 | proplyd?              | x   |
+|            |   LL 022-635 |          |  05:35:02.20 |   -5:26:35.3 | WJH          |          16 |                       | x   |
+|            |     w030-524 |          | 05:35:03.001 |  -5:25:24.35 | BOM00        |          01 | proplyd?              | x   |
+|            |   LL 041-637 |          |  05:35:04.05 |   -5:26:37.3 | WJH          |          16 |                       | x?  |
+|            |  LLP 042-628 |          |  05:35:04.19 |   -5:26:27.7 | WJH          |          16 | proplyd 038-627       | x   |
+|            |     w044-527 |          | 05:35:04.422 |  -5:25:27.39 | BOM00        |          01 | proplyd               | x   |
+|            |  LLP 049-143 |          |  05:35:04.95 |   -5:21:42.9 | WJH          |          09 | proplyd               | x   |
+|            |  LLP 051-024 |          |  05:35:05.13 |   -5:20:24.3 | WJH          |          09 | proplyd               | x   |
+| LL1        |     w056-519 | LL Ori   |  05:35:05.64 |   -5:25:19.4 | BR01, BOM00  |          01 |                       | x   |
+|            |      065-502 |          | 05:35:06.534 |  -5:25:01.53 | WJH          |          01 | proplyd?              | x   |
+|            |     066-3251 |          |  05:35:06.57 |  -5:32:51.49 | WJH (R08)    |          14 | proplyd?, globule?    | x   |
+|            |     w069-601 |          |  05:35:06.91 |   -5:26:00.6 | BOM00        |          01 | proplyd?              | x   |
+|            |  LLP 072-134 |          |  05:35:07.20 |   -5:21:34.3 | WJH          |          09 | proplyd - thin shell  | x   |
+|            |     w073-227 |          |  05:35:07.27 |   -5:22:26.6 | BOM00        |          01 | proplyd               | x   |
+|            |      074-229 |          | 05:35:07.381 |  -5:22:28.92 | WJH          |          01 | very faint            |     |
+|            |      083-435 |          | 05:35:08.289 |  -5:24:34.84 | WJH          |          01 | proplyd?, very faint  | x   |
+|            |  LLP 101-233 |          |  05:35:10.14 |   -5:22:32.6 | WJH          |          01 | proplyd               | x   |
+|            |   LL 102-157 |          | 05:35:10.252 |  -5:21:57.06 | WJH          |          01 | very faint, proplyd?  | x   |
+|            |      106-245 |          | 05:35:10.577 |  -5:22:44.69 | WJH          |          01 | proplyd?              | x   |
+|            |      109-246 |          |  05:35:10.90 |  -5:22:46.36 | BOM00        |          01 | proplyd 109-247, jet? | x   |
+|            | LLP 116-3101 | V488 Ori | 05:35:11.653 |  -5:31:01.04 | BLSW06       |          14 | proplyd               | x   |
+|            |      117-421 |          |  05:35:11.65 |  -5:24:21.50 | WJH (OW96)   |          01 | proplyd, large bow    | x   |
+|            |     119-3155 |          | 05:35:11.876 |  -5:31:55.40 | WJH          |          14 |                       | x   |
+|            |      121-434 |          |  05:35:12.12 |  -5:24:33.80 | WJH (R08)    |          01 | proplyd               | x   |
 |            |      131-046 |          |  05:35:13.05 | -05:20:45.79 |              |          02 | proplyd               |     |
-|            |      132-053 |          |  5:35:13.204 |  -5:20:52.61 |              |          02 | proplyd?              |     |
-|            |  LL 136-3057 |          |   5:35:13.60 |   -5:30:57.4 | WJH          |          14 | faint XX              | x   |
-|            |   B 138-3024 |          |  5:35:13.801 |  -5:30:24.34 | WJH          |          15 | B-band hole           | x   |
+|            |      132-053 |          | 05:35:13.204 |  -5:20:52.61 |              |          02 | proplyd?              |     |
+|            |  LL 136-3057 |          |  05:35:13.60 |   -5:30:57.4 | WJH          |          14 | faint XX              | x   |
+|            |   B 138-3024 |          | 05:35:13.801 |  -5:30:24.34 | WJH          |          15 | B-band hole           | x   |
 |            |      142-301 |          |  05:35:14.15 | -05:23:00.91 |              |          01 | proplyd               |     |
 |            |      154-225 |          |  05:35:15.37 | -05:22:25.35 |              |          01 | proplyd               | x   |
 |            |      154-240 |          |  05:35:15.38 | -05:22:39.85 |              |          01 | proplyd, inner only   | x   |
@@ -629,25 +844,25 @@ Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]]
 |            |      169-338 |          |  05:35:16.88 | -05:23:38.10 |              |          01 | proplyd, Jorge        |     |
 |            |      170-249 |          |  05:35:16.96 | -05:22:48.51 |              |          01 | proplyd               |     |
 |            |      173-236 |          | 05:35:17.344 | -05:22:35.65 |              |          01 | proplyd               |     |
-|            |      175-321 |          |  5:35:17.458 |  -5:23:20.96 | WJH          |          01 | near th1D             | x   |
+|            |      175-321 |          | 05:35:17.458 |  -5:23:20.96 | WJH          |          01 | near th1D             | x   |
 | HST1       |      177-341 |          |  05:35:17.66 | -05:23:41.00 |              |          01 | proplyd, Jorge        |     |
-|            |      173-342 |          |  5:35:17.321 |  -5:23:41.33 |              |          01 | interproplyd          |     |
-|            |      178-258 |          |  5:35:17.834 |  -5:22:58.10 | WJH (R08)    |          01 | proplyd               | x   |
+|            |      173-342 |          | 05:35:17.321 |  -5:23:41.33 |              |          01 | interproplyd          |     |
+|            |      178-258 |          | 05:35:17.834 |  -5:22:58.10 | WJH (R08)    |          01 | proplyd               | x   |
 |            |      180-331 |          | 05:35:18.037 | -05:23:30.63 |              |          01 | proplyd               |     |
-|            |      189-329 |          |   5:35:18.87 |  -5:23:28.85 | WJH (OW96)   |          01 | proplyd               | x   |
-|            |     203-3039 | MY Ori   |  5:35:20.297 |  -5:30:39.37 | WJH (BLSW06) |          14 | jet                   | x   |
+|            |      189-329 |          |  05:35:18.87 |  -5:23:28.85 | WJH (OW96)   |          01 | proplyd               | x   |
+|            |     203-3039 | MY Ori   | 05:35:20.297 |  -5:30:39.37 | WJH (BLSW06) |          14 | jet                   | x   |
 |            |      205-230 |          |  05:35:20.45 | -05:23:29.96 |              |          06 | interproplyd          |     |
-|            |      206-043 |          |  5:35:20.562 |  -5:20:43.06 |              |          02 |                       |     |
+|            |      206-043 |          | 05:35:20.562 |  -5:20:43.06 |              |          02 |                       |     |
 |            |      212-400 |          |  05:35:21.19 | -05:24:00.20 |              |          06 | proplyd               |     |
-|            |  LL 261-3018 |          |  5:35:26.171 |  -5:30:18.02 | WJH (BLSW06) |          07 |                       | x   |
-|            |     w266-558 |          |   5:35:26.62 |   -5:25:58.4 | BOM00        |          06 |                       | x   |
-|            |   LL 305-811 |          |  5:35:30.447 |  -5:28:11.27 | BLSW06       |          07 |                       | x   |
-|            |  LL 308-3036 |          |    5:35:30.8 |     -5:30:36 | BLSW06       |          08 |                       | x   |
-| LL5        |  LLP 315-816 |          |  5:35:31.403 |  -5:28:16.38 | BR01         |          07 | proplyd 314-816       | x   |
-| LL6        |  LL 329-3021 |          |   5:35:32.85 |   -5:30:21.6 | BR01         |          08 |                       | x   |
-|            |  LL 344-3020 |          |  5:35:34.362 |  -5:30:20.43 | BLSW06       |          08 |                       | x?  |
-| LL7        |  LL 351-3349 |          |  5:35:35.129 |  -5:33:49.12 | BR01         |           - | proplyd               |     |
-|            |  LL 362-3137 |          |   5:35:36.35 |   -5:31:37.9 | WJH          |          08 | faint, proplyd?       |     |
+|            |  LL 261-3018 |          | 05:35:26.171 |  -5:30:18.02 | WJH (BLSW06) |          07 |                       | x   |
+|            |     w266-558 |          |  05:35:26.62 |   -5:25:58.4 | BOM00        |          06 | proplyd               | x   |
+|            |   LL 305-811 |          | 05:35:30.447 |  -5:28:11.27 | BLSW06       |          07 | proplyd?              | x   |
+|            |  LL 308-3036 |          |   05:35:30.8 |     -5:30:36 | BLSW06       |          08 |                       | x   |
+| LL5        |  LLP 315-816 |          | 05:35:31.403 |  -5:28:16.38 | BR01         |          07 | proplyd 314-816       | x   |
+| LL6        |  LL 329-3021 |          |  05:35:32.85 |   -5:30:21.6 | BR01         |          08 |                       | x   |
+|            |  LL 344-3020 |          | 05:35:34.362 |  -5:30:20.43 | BLSW06       |          08 |                       | x?  |
+| LL7        |  LL 351-3349 |          | 05:35:35.129 |  -5:33:49.12 | BR01         |           - | proplyd               |     |
+|            |  LL 362-3137 |          |  05:35:36.35 |   -5:31:37.9 | WJH          |          08 | faint, proplyd?       |     |
 
  
 + "Arc" column is for noting which objects have had the arcs measured by Luis Angel
