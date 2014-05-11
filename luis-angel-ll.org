@@ -18,22 +18,32 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 *** objects lacking an outer arc
 *** anything else where the data is low-quality
 ** A better document with all the images
+:PROPERTIES:
+:noweb:    yes
+:END:
+
 + Luis has this, but there is a lot of whitespace
-#+BEGIN_SRC python :return figs :results list
-  import json
+
+#+name: list-of-sources-sorted-by-ra
+#+BEGIN_SRC python
   with open("ll-data.json") as f:
       db = json.load(f)
 
-  fig_template = r'\BowshockFig{{{:s}}}{{{:02d}}}'
-
   keys = sorted(db.keys(), key=lambda k: db[k]["RA"])
 
+#+END_SRC
+
+#+name: extract-usual-name-of-each-source
+#+BEGIN_SRC python
   def name(k):
       if "LL" in db[k]["bname"]:
           return db[k]["bname"]
       else:
           return db[k]["oname"].split()[-1]
+#+END_SRC
 
+#+name: extract-which-of-bally-fields-contains-source
+#+BEGIN_SRC python
   def field(k):
       try:
           result = int(db[k]['Bally'])
@@ -43,87 +53,220 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
           else:
               result = 0
       return result
+#+END_SRC
+
+#+BEGIN_SRC python :return latex_file :results file
+  import json
+  import os
+
+  <<list-of-sources-sorted-by-ra>>
+
+  pdf_template = "j8oc{1:02d}010_wcs/{0:s}-Bally_{1:02d}-images.pdf"
+  fig_template = r'\BowshockFig{{{:s}}}{{{:02d}}}'
+  nofig_template = r'\MissingFig{{{:s}}}{{{:02d}}}'
+
+  <<extract-usual-name-of-each-source>>
+  <<extract-which-of-bally-fields-contains-source>>
 
   figs = []
   for k in keys:
-      figs.append(fig_template.format(name(k), field(k)))
+      if field(k):
+          if os.path.isfile(pdf_template.format(name(k), field(k))):
+              figs.append(fig_template.format(name(k), field(k)))
+          else: 
+              figs.append(nofig_template.format(name(k), field(k)))
 
+  NCOLS = 2
+  NROWS = 5
+
+  pages = []
+  thisrow = []
+  thispage = []
+  for fig in figs:
+      thisrow.append(fig)
+      if len(thisrow) == NCOLS:
+          thispage.append(thisrow)
+          thisrow = []
+      if len(thispage) == NROWS:
+          pages.append(thispage)
+          thispage = []
+
+  def output_row(row):
+      return " & ".join(row) + r" \\"
+
+  def output_page(page):
+      result = r"\begin{tabular}{" + "l "*NCOLS + "}" + "\n"
+      for row in page:
+          result += output_row(row) + "\n"
+      result += r"\end{tabular}" + "\n"
+      return result
+
+  latex_pages = ""
+  for page in pages:
+      latex_pages += output_page(page) + "\n\n"
+
+  latex_file = "bowshock-figs-{:02d}x{:02d}.tex".format(NROWS, NCOLS)
+  with open(latex_file, 'w') as f:
+      f.write(latex_pages)
 #+END_SRC
 
 #+RESULTS:
-- \BowshockFig{LL3}{17}
-- \BowshockFig{LL2}{18}
-- \BowshockFig{LL4}{24}
-- \BowshockFig{4468-605}{17}
-- \BowshockFig{4578-251}{09}
-- \BowshockFig{4582-635}{16}
-- \BowshockFig{w000-400}{09}
-- \BowshockFig{w005-514}{16}
-- \BowshockFig{w012-407}{01}
-- \BowshockFig{w014-414}{01}
-- \BowshockFig{022-635}{16}
-- \BowshockFig{w030-524}{01}
-- \BowshockFig{041-637}{16}
-- \BowshockFig{042-628}{16}
-- \BowshockFig{w044-527}{01}
-- \BowshockFig{049-143}{09}
-- \BowshockFig{051-024}{09}
-- \BowshockFig{LL1}{01}
-- \BowshockFig{065-502}{01}
-- \BowshockFig{066-3251}{14}
-- \BowshockFig{w069-601}{01}
-- \BowshockFig{072-134}{09}
-- \BowshockFig{w073-227}{01}
-- \BowshockFig{074-229}{01}
-- \BowshockFig{083-435}{01}
-- \BowshockFig{101-233}{01}
-- \BowshockFig{102-157}{01}
-- \BowshockFig{106-245}{01}
-- \BowshockFig{109-246}{01}
-- \BowshockFig{117-421}{01}
-- \BowshockFig{116-3101}{14}
-- \BowshockFig{119-3155}{14}
-- \BowshockFig{121-434}{01}
-- \BowshockFig{131-046}{02}
-- \BowshockFig{132-053}{02}
-- \BowshockFig{136-3057}{14}
-- \BowshockFig{138-3024}{15}
-- \BowshockFig{142-301}{01}
-- \BowshockFig{154-225}{01}
-- \BowshockFig{154-240}{01}
-- \BowshockFig{158-323}{01}
-- \BowshockFig{159-221}{01}
-- \BowshockFig{161-324}{01}
-- \BowshockFig{163-317}{01}
-- \BowshockFig{163-222}{01}
-- \BowshockFig{165-235}{01}
-- \BowshockFig{166-316}{01}
-- \BowshockFig{167-317}{01}
-- \BowshockFig{168-328}{01}
-- \BowshockFig{168-326N}{01}
-- \BowshockFig{168-326}{01}
-- \BowshockFig{169-338}{01}
-- \BowshockFig{170-249}{01}
-- \BowshockFig{173-342}{01}
-- \BowshockFig{173-236}{01}
-- \BowshockFig{175-321}{01}
-- \BowshockFig{177-341}{01}
-- \BowshockFig{178-258}{01}
-- \BowshockFig{180-331}{01}
-- \BowshockFig{189-329}{01}
-- \BowshockFig{203-3039}{14}
-- \BowshockFig{205-230}{06}
-- \BowshockFig{206-043}{02}
-- \BowshockFig{212-400}{06}
-- \BowshockFig{261-3018}{07}
-- \BowshockFig{w266-558}{06}
-- \BowshockFig{305-811}{07}
-- \BowshockFig{308-3036}{08}
-- \BowshockFig{LL5}{07}
-- \BowshockFig{LL6}{08}
-- \BowshockFig{344-3020}{08}
-- \BowshockFig{LL7}{00}
-- \BowshockFig{362-3137}{08}
+[[file:bowshock-figs-05x02.tex]]
+
+#+BEGIN_SRC latex :tangle bowshock-figs-driver.tex
+    \documentclass{article}
+    \usepackage[margin=0.3cm]{geometry}
+    \usepackage{graphicx}
+    \usepackage{etoolbox} % provies \patchcmd
+
+    \setlength{\fboxsep}{0pt}%
+
+    \newlength\figwidth
+    \setlength\figwidth{0.48\textwidth}
+
+    \newcommand\BowshockFig[2]{
+      \framebox{\includegraphics[width=\figwidth, clip, trim=60 50 100 50]
+      {j8oc#2010_wcs/#1-Bally_#2-images}}
+    }
+    \newcommand\MissingFig[2]{%
+      \framebox{\makebox[\figwidth][c]{\raisebox{0.25\figwidth}[0.48\figwidth]{%
+            Not found: #1 from Field #2}}}%
+    }
+
+    \setlength\tabcolsep{0pt}
+
+    \begin{document}
+    \input{bowshock-figs-05x02.tex}
+
+    \end{document}
+
+#+END_SRC
+
+Recompile the latex file and open the PDF file
+#+BEGIN_SRC sh :results verbatim silent
+pdflatex bowshock-figs-driver
+open bowshock-figs-driver.pdf
+#+END_SRC
+
+*** Fix the gray limits of the image thumbnails
++ Currently [2014-05-10 Sat] they are far too dark on the whole
++ First get a table of the current levels
+#+BEGIN_SRC python :return table
+  import json
+  <<list-of-sources-sorted-by-ra>>
+  <<extract-usual-name-of-each-source>>
+  <<extract-which-of-bally-fields-contains-source>>
+
+  table = [["Source", "Field", "vmin", "vmax", "minfac", "maxfac"], None]
+  for key in keys:
+      source = name(key)
+      bfield = field(key)
+      jsonfile = "j8oc{1:02d}010_wcs/{0:s}-arcdata.json".format(source, bfield)
+      image_name = "Bally_{:02d}".format(bfield)
+      try:
+          with open(jsonfile) as f:
+              arcdata = json.load(f)
+      except FileNotFoundError:
+          table.append([source, bfield, -1, -1])
+          continue
+
+      if "plot limits" in arcdata[image_name].keys():
+          vmax, vmin = [arcdata[image_name]["plot limits"][k] for k in ("max", "min")]
+          # Average and dispersion for shell and background
+          avsh = max(arcdata[image_name]["shell"]["value"], 
+                     arcdata[image_name]["shell center"]["value"])
+          dsh = max(arcdata[image_name]["shell"]["delta"], 
+                    arcdata[image_name]["shell center"]["delta"])
+          avbg = arcdata[image_name]["background"]["value"]
+          dbg = arcdata[image_name]["background"]["delta"]
+          maxfac = (vmax - avsh)/dsh
+          minfac = (avbg - vmin)/dbg
+      else:
+          vmax, vmin = 0.0, 0.0
+          maxfac, minfac = 3.0, 3.0
+     
+
+
+      table.append([source, bfield] + ["{:.4g}".format(v)
+                                       for v in (vmin, vmax, minfac, maxfac)])
+#+END_SRC
+
+#+RESULTS:
+|   Source | Field |   vmin |   vmax | minfac | maxfac |
+|----------+-------+--------+--------+--------+--------|
+|      LL3 |    17 | 0.4655 |  1.659 |     20 |      6 |
+|      LL2 |    18 | 0.7334 |  2.145 |     13 |      3 |
+|      LL4 |    24 | 0.7911 |  1.097 |      3 |      5 |
+| 4468-605 |    17 |   1.16 |  1.628 |     10 |      5 |
+| 4578-251 |     9 |      0 |      0 |      3 |      3 |
+| 4582-635 |    16 | 0.9376 |  3.485 |     14 |     10 |
+| w000-400 |     9 |      0 |      0 |      3 |      3 |
+| w005-514 |    16 |  2.424 |  5.805 |     15 |      3 |
+| w012-407 |     1 |  2.336 |  4.078 |     17 |      3 |
+| w014-414 |     1 |  3.157 |  3.922 |      4 |      4 |
+|  022-635 |    16 |  2.016 |    3.8 |     14 |     17 |
+| w030-524 |     1 |      0 |      0 |      3 |      3 |
+|  041-637 |    16 |  1.064 |  3.951 |     14 |     10 |
+|  042-628 |    16 |  1.869 |   4.26 |     14 |     10 |
+| w044-527 |     1 |  3.397 |  9.087 |      7 |      3 |
+|  049-143 |     9 |      0 |      0 |      3 |      3 |
+|  051-024 |     9 |    3.3 |  7.698 |     10 |      5 |
+|      LL1 |     1 |      0 |      0 |      3 |      3 |
+|  065-502 |     1 |      0 |      0 |      3 |      3 |
+| 066-3251 |    14 |      0 |      0 |      3 |      3 |
+| w069-601 |     1 |      0 |      0 |      3 |      3 |
+|  072-134 |     9 |      0 |      0 |      3 |      3 |
+| w073-227 |     1 |  6.849 |  15.87 |     10 |     11 |
+|  074-229 |     1 |     -1 |     -1 |        |        |
+|  083-435 |     1 |  10.36 |  13.07 |     11 |      4 |
+|  101-233 |     1 |  5.559 |  35.61 |      7 |      5 |
+|  102-157 |     1 |  8.143 |  24.68 |     15 |     17 |
+|  106-245 |     1 |      0 |      0 |      3 |      3 |
+|  109-246 |     1 |  2.862 |  52.57 |     20 |      7 |
+|  117-421 |     1 |  12.19 |   31.6 |      5 |      3 |
+| 116-3101 |    14 | 0.6292 | 0.9497 |     10 |      3 |
+| 119-3155 |    14 | 0.6134 | 0.9455 |     10 |      7 |
+|  121-434 |     1 |      0 |      0 |      3 |      3 |
+|  131-046 |     2 |  6.555 |  21.09 |      3 |      4 |
+|  132-053 |     2 |  15.83 |  19.84 |      6 |      8 |
+| 136-3057 |    14 |  0.484 | 0.9517 |     10 |      3 |
+| 138-3024 |    15 |     -1 |     -1 |        |        |
+|  142-301 |     1 |  22.06 |  107.2 |     10 |      5 |
+|  154-225 |     1 |  19.95 |  54.99 |     10 |      6 |
+|  154-240 |     1 | -7.849 |  82.27 |      5 |    2.5 |
+|  158-323 |     1 |      0 |      0 |      3 |      3 |
+|  159-221 |     1 |      0 |      0 |      3 |      3 |
+|  161-324 |     1 |      0 |      0 |      3 |      3 |
+|  163-317 |     1 |  29.15 |  113.4 |     10 |      5 |
+|  163-222 |     1 |  25.16 |  52.43 |      3 |      6 |
+|  165-235 |     1 |  18.05 |  75.94 |     10 |     12 |
+|  166-316 |     1 |      0 |      0 |      3 |      3 |
+|  167-317 |     1 | -124.4 |  248.2 |     10 |      1 |
+|  168-328 |     1 |  13.33 |  94.19 |     10 |     10 |
+| 168-326N |     1 | -64.06 |  211.2 |     70 |      2 |
+|  168-326 |     1 |      0 |      0 |      3 |      3 |
+|  169-338 |     1 |      0 |      0 |      3 |      3 |
+|  170-249 |     1 |  10.09 |   78.5 |      5 |     10 |
+|  173-342 |     1 |  9.858 |  65.48 |     15 |     10 |
+|  173-236 |     1 |  19.79 |  78.26 |     15 |     10 |
+|  175-321 |     1 |  2.622 |  98.13 |     10 |      6 |
+|  177-341 |     1 |  7.584 |  60.73 |      7 |      5 |
+|  178-258 |     1 |  14.52 |  58.76 |      7 |      5 |
+|  180-331 |     1 |  16.98 |  49.55 |     12 |      3 |
+|  189-329 |     1 |  9.095 |  58.95 |     12 |      4 |
+| 203-3039 |    14 | 0.7288 |  1.232 |      7 |      7 |
+|  205-230 |     6 |  7.861 |  38.27 |      2 |      3 |
+|  206-043 |     2 |  3.881 |  8.658 |     14 |     12 |
+|  212-400 |     6 |      0 |      0 |      3 |      3 |
+| 261-3018 |     7 | 0.7511 |  1.457 |     10 |      3 |
+| w266-558 |     6 |  7.668 |  12.04 |     15 |      3 |
+|  305-811 |     7 |  2.813 |  4.275 |     13 |      5 |
+| 308-3036 |     8 | 0.9322 |  1.526 |     10 |      6 |
+|      LL5 |     7 |      0 |      0 |      3 |      3 |
+|      LL6 |     8 |      0 |      0 |      3 |      3 |
+| 344-3020 |     8 |  1.203 |  1.596 |      9 |      3 |
+|      LL7 |     0 |     -1 |     -1 |        |        |
+| 362-3137 |     8 | 0.6394 | 0.9473 |      8 |      3 |
 
 ** Make a table of Jorge's measurements
 + JSON files read by [[file:luis-programas/arcs-summary-proplyds.py]]
