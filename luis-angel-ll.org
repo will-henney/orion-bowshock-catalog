@@ -196,7 +196,7 @@ open bowshock-figs-driver.pdf
 
 **** TODO Better estimate of shell thickness
 + We are currently using R_{out} - R_{in} but that won't do since in general the tow circles are not concentric
-**** [4/22] Objects that need attention
+**** [7/22] Objects that need attention
 :PROPERTIES:
 :results:  silent
 :END:
@@ -432,9 +432,222 @@ WARNING: Overwriting existing file 'w005-514-Bally_16-extract.fits'. [astropy.io
 
 
 
-+ [ ] 022-635 - trim outer shock points away from axis
-+ [ ] 041-637 - trim outer shock points away from axis
-+ [ ] 044-527 - fix inner shock
++ [X] 022-635 - trim outer shock points away from axis
+  #+BEGIN_SRC sh
+  xpaset -p ds9 fits j8oc16010_wcs/022-635-Bally_16-extract.fits
+  xpaset -p ds9 regions delete all
+  xpaset -p ds9 align wcs
+  xpaset -p ds9 zoom to fit
+  xpaset -p ds9 scale limits 2.55 3.5
+  xpaset -p ds9 cmap invert
+  #+END_SRC
+
+#+BEGIN_SRC sh 
+  xpaset -p ds9 regions load j8oc16010_wcs/022-635-forma.reg
+#+END_SRC
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  python ../programas/find-xy-shell.py 022-635
+  python ../programas/fit-circle-shell.py 022-635
+  python ../programas/extract-image.py --fitsfile j8oc16010_wcs.fits 022-635
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+[[Variables]]
+     xc:    -1.507735 +/- 0.117263 (7.78%) initial = -0.732506
+     yc:    -0.299054 +/- 0.030731 (10.28%) initial = -0.162168
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.912 
+[[Variables]]
+     xc:    -3.286607 +/- 0.462597 (14.08%) initial = -1.096470
+     yc:    -0.597022 +/- 0.097536 (16.34%) initial = -0.130984
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.920 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:35:01.55922 5:35:02.94431
+Dec range: -5:26:46.27 -5:26:23.96
+Extracted image window: [1295:1903, 5005:5615]
+WARNING: Overwriting existing file '022-635-Bally_16-extract.fits'. [astropy.io.fits.file]
+#+end_example
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  source activate py27
+  python ../programas/arc_brightness.py 022-635
+#+END_SRC
+
+#+RESULTS:
+: **************************************************
+: Calculating shell brightness for Bally_16
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 2.72, iqr = 0.05
+: Shell trimean = 2.80, iqr = 0.06
+: Adopting plot range of 2.62 to 2.92
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  python ../programas/plot-image.py --image Bally_16 --vmin 2.55 --vmax 3.5 022-635
+#+END_SRC
+
+#+RESULTS:
+: 83.75916666666666 -5.443147222222223
+: 0.0012376389115610646
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmprrsu5h [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmp0c7q09 [montage_wrapper.wrappers]
+: No mask regions found
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs
+  open 022-635-Bally_16-images.pdf
+#+END_SRC
+
++ [X] 041-637 - trim outer shock points away from axis
+  #+BEGIN_SRC sh
+  xpaset -p ds9 fits j8oc16010_wcs/041-637-Bally_16-extract.fits
+  xpaset -p ds9 regions delete all
+  xpaset -p ds9 align wcs
+  xpaset -p ds9 zoom to fit
+  xpaset -p ds9 scale limits 2.7 3.2
+  xpaset -p ds9 cmap invert
+  #+END_SRC
+
+#+BEGIN_SRC sh 
+  xpaset -p ds9 regions load j8oc16010_wcs/041-637-forma.reg
+#+END_SRC
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  python ../programas/find-xy-shell.py 041-637
+  python ../programas/fit-circle-shell.py 041-637
+  python ../programas/extract-image.py --fitsfile j8oc16010_wcs.fits 041-637
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+Warning: Closest point of inner arc is at one end, using all points in parabola fit
+[[Variables]]
+     xc:    -0.110713 +/- 0.089542 (80.88%) initial = -0.317276
+     yc:    -2.035671 +/- 0.130180 (6.39%) initial = -1.145374
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.947 
+[[Variables]]
+     xc:    -0.248792 +/- 0.077250 (31.05%) initial = -0.142779
+     yc:    -2.465663 +/- 0.153325 (6.22%) initial = -1.932033
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.930 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:35:03.36148 5:35:04.97355
+Dec range: -5:26:47.68 -5:26:25.14
+Extracted image window: [839:1500, 5359:6019]
+WARNING: Overwriting existing file '041-637-Bally_16-extract.fits'. [astropy.io.fits.file]
+#+end_example
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  source activate py27
+  python ../programas/arc_brightness.py 041-637
+#+END_SRC
+
+#+RESULTS:
+: **************************************************
+: Calculating shell brightness for Bally_16
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 2.93, iqr = 0.11
+: Shell trimean = 2.97, iqr = 0.10
+: Adopting plot range of 2.71 to 3.16
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs :results verbatim replace
+  python ../programas/plot-image.py --image Bally_16 --vmin 2.7 --vmax 3.2 041-637
+#+END_SRC
+
+#+RESULTS:
+: 83.76691666666665 -5.443627777777778
+: 0.0012208432087212264
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpvarkm0 [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmph6x3fb [montage_wrapper.wrappers]
+: No mask regions found
+
+#+BEGIN_SRC sh :dir j8oc16010_wcs
+  open 041-637-Bally_16-images.pdf
+#+END_SRC
+
+
++ [X] 044-527 - fix inner shock
+  #+BEGIN_SRC sh
+  xpaset -p ds9 fits j8oc01010_wcs/w044-527-Bally_01-extract.fits
+  xpaset -p ds9 regions delete all
+  xpaset -p ds9 align wcs
+  xpaset -p ds9 zoom to fit
+  xpaset -p ds9 scale limits 6.0 8.5
+  xpaset -p ds9 cmap invert
+  #+END_SRC
+
+#+BEGIN_SRC sh 
+  xpaset -p ds9 regions load j8oc01010_wcs/w044-527-forma.reg
+#+END_SRC
+
+#+BEGIN_SRC sh :dir j8oc01010_wcs :results verbatim replace
+  python ../programas/find-xy-shell.py w044-527
+  python ../programas/fit-circle-shell.py w044-527
+  python ../programas/extract-image.py --fitsfile j8oc01010_wcs.fits w044-527
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+Warning: Closest point of inner arc is at one end, using all points in parabola fit
+Warning: Closest point of outer arc is at one end, using all points in parabola fit
+Warning: only 0 points within 90 deg of axis. Using all points instead
+[[Variables]]
+     xc:    -0.175714 +/- 0.066485 (37.84%) initial =  0.779094
+     yc:     0.359200 +/- 0.013458 (3.75%) initial =  0.034886
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.801 
+[[Variables]]
+     xc:    -0.961765 +/- 0.700200 (72.80%) initial = -1.822271
+     yc:     0.565726 +/- 0.074196 (13.12%) initial =  1.102037
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.401 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:35:03.835 5:35:05.24797
+Dec range: -5:25:37.75 -5:25:15.64
+Extracted image window: [1561:2172, 642:1254]
+WARNING: Overwriting existing file 'w044-527-Bally_01-extract.fits'. [astropy.io.fits.file]
+#+end_example
+
+#+BEGIN_SRC sh :dir j8oc01010_wcs :results verbatim replace
+  source activate py27
+  python ../programas/arc_brightness.py w044-527
+#+END_SRC
+
+#+RESULTS:
+: **************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 6.78, iqr = 0.35
+: Shell trimean = 7.01, iqr = 0.43
+: Adopting plot range of 6.08 to 7.86
+
+#+BEGIN_SRC sh :dir j8oc01010_wcs :results verbatim replace
+  python ../programas/plot-image.py --image Bally_01 --vmin 6.0 --vmax 8.5 w044-527
+#+END_SRC
+
+#+RESULTS:
+: 83.76844583333332 -5.424275000000001
+: 0.0009028163236866665
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpa7ah_e [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpnr61aq [montage_wrapper.wrappers]
+: No mask regions found
+
+#+BEGIN_SRC sh :dir j8oc01010_wcs
+  open w044-527-Bally_01-images.pdf
+#+END_SRC
+
+
 + [ ] 049-143 - fix inner shock
 + [ ] 051-024 - fix inner shock
 + [ ] 074-229 - Field 01 - not found
