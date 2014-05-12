@@ -150,12 +150,9 @@ for image_name in arcdata:
     print("Adopting plot range of {:.2f} to {:.2f}".format(ymin, ymax))
 
     # Save brightness statistics to a new JSON file
-    arcdata[image_name]["background"] = {"value": float(avbg), "delta": float(wbg),
-                                         "N": int(nbg)}
-    arcdata[image_name]["shell"] = {"value": float(avsh), "delta": float(wsh),
-                                    "N": int(nsh)}
-    arcdata[image_name]["shell center"] = {"value": float(avshc), "delta": float(wshc),
-                                           "N": int(nshc)}
+    arcdata[image_name]["background"] = {"value": avbg, "delta": wbg, "N": nbg}
+    arcdata[image_name]["shell"] = {"value": avsh, "delta": wsh, "N": nsh}
+    arcdata[image_name]["shell center"] = {"value": avshc, "delta": wshc, "N": nshc}
     arcdata["info"]["history"].append("Shell data for " + image_name + " added/modified by " + run_info())
 
     # Save brightness statistics in the help section
@@ -212,11 +209,11 @@ for image_name in arcdata:
 
     m = mask["<60"] & mask["good"] & mask["core"]
     c = np.array(theta["outer"][m].deg)
-    # plt.scatter(z[m], hdu.data[m], s=2, c=c,
-    #             marker="o", cmap=plt.cm.gist_rainbow, alpha=0.6,
-    #             edgecolors='none', zorder=100)
-    # cb = plt.colorbar()
-    # cb.set_label("theta")
+    plt.scatter(z[m], hdu.data[m], s=2, c=c,
+                marker="o", cmap=plt.cm.gist_rainbow, alpha=0.6,
+                edgecolors='none', zorder=100)
+    cb = plt.colorbar()
+    cb.set_label("theta")
     plt.xlabel("Radius relative to shell: (R - R_in) / (R_out - R_in)")
     plt.ylabel("Surface brightness")
     plt.legend(prop={"size": "small"})
