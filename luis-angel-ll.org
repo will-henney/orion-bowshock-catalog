@@ -194,8 +194,88 @@ open bowshock-figs-driver.pdf
 
 #+RESULTS:
 
+**** TODO Better estimate of shell thickness
++ We are currently using R_{out} - R_{in} but that won't do since in general the tow circles are not concentric
 **** Objects that need attention
-+ [ ] LL3 - need to trace outer shock - double shell
+:PROPERTIES:
+:results:  silent
+:END:
+
++ [X] LL3 - need to trace outer shock - double shell
+  #+BEGIN_SRC sh
+  xpaset -p ds9 fits j8oc17010_wcs/LL3-Bally_17-extract.fits
+  xpaset -p ds9 zoom to fit
+  xpaset -p ds9 scale limits 1.1 1.6
+  xpaset -p ds9 cmap invert
+  #+END_SRC
+
+#+BEGIN_SRC sh 
+  xpaset -p ds9 regions load j8oc17010_wcs/LL3-forma.reg
+#+END_SRC
+
+#+BEGIN_SRC sh 
+  xpaset -p ds9 regions save j8oc17010_wcs/LL3-forma.reg
+#+END_SRC
+That doesn't work.  I needed to do it with the GUI
+
+
+#+BEGIN_SRC sh :dir j8oc17010_wcs :results verbatim replace
+  python ../programas/find-xy-shell.py LL3
+  python ../programas/fit-circle-shell.py LL3
+  python ../programas/extract-image.py --fitsfile j8oc17010_wcs.fits LL3
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+[[Variables]]
+     xc:    -1.757824 +/- 0.242035 (13.77%) initial = -1.265962
+     yc:     0.021365 +/- 0.054636 (255.73%) initial =  0.213949
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.532 
+[[Variables]]
+     xc:    -3.356228 +/- 0.238226 (7.10%) initial = -3.118187
+     yc:    -0.850554 +/- 0.057592 (6.77%) initial = -0.046187
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    =  0.217 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:34:39.9094 5:34:41.6817
+Dec range: -5:26:54.11 -5:26:22.47
+Extracted image window: [1945:2766, 300:1124]
+WARNING: Overwriting existing file 'LL3-Bally_17-extract.fits'. [astropy.io.fits.file]
+#+end_example
+
+#+BEGIN_SRC sh :dir j8oc17010_wcs :results verbatim replace
+  source activate py27
+  python ../programas/arc_brightness.py LL3
+#+END_SRC
+
+#+RESULTS:
+: **************************************************
+: Calculating shell brightness for Bally_17
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 1.28, iqr = 0.06
+: Shell trimean = 1.33, iqr = 0.06
+: Adopting plot range of 1.15 to 1.45
+
+#+BEGIN_SRC sh :dir j8oc17010_wcs :results verbatim replace
+  source activate py27
+  python ../programas/plot-image.py --image Bally_17 LL3
+#+END_SRC
+
+#+RESULTS:
+: 83.6700291667 -5.44403888889
+: 0.00181770907741
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmp6TkdQa [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpyxK8bq [montage_wrapper.wrappers]
+: No mask regions found
+
+#+BEGIN_SRC sh :dir j8oc17010_wcs
+  open LL3-Bally_17-images.pdf
+#+END_SRC
+
 + [ ] LL2 - should not use lower shell - jet
 + [ ] 4582-635 - is this a jet bowshock? - looks triangular
 + [ ] 005-514 - trim outer shock points to south

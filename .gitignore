@@ -6,6 +6,7 @@
 !*.html
 !programas
 !programas/*.py
+!luis-programas/*.txt
 !*.tab
 !*/*.fits
 !*/*.png
