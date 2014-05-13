@@ -196,7 +196,56 @@ open bowshock-figs-driver.pdf
 
 **** TODO Better estimate of shell thickness
 + We are currently using R_{out} - R_{in} but that won't do since in general the tow circles are not concentric
-**** [7/22] Objects that need attention
+
+
+**** Utility functions for fitting arcs and generating images
+#+name: display-in-ds9
+#+header: :var source="LL3", field="17", vmin="1.1", vmax="1.6"
+#+BEGIN_SRC sh
+  xpaset -p ds9 fits j8oc${field}010_wcs/${source}-Bally_${field}-extract.fits
+  xpaset -p ds9 regions delete all
+  xpaset -p ds9 align wcs
+  xpaset -p ds9 zoom to fit
+  xpaset -p ds9 scale limits ${vmin} ${vmax}
+  xpaset -p ds9 cmap invert
+  xpaset -p ds9 regions load j8oc${field}010_wcs/${source}-forma.reg
+#+END_SRC
+
+#+RESULTS: display-in-ds9
+
+#+name: find-fit-extract
+#+header: :var source="LL3", field="17"
+#+BEGIN_SRC sh :results verbatim replace
+  cd j8oc${field}010_wcs
+  python ../programas/find-xy-shell.py ${source}
+  python ../programas/fit-circle-shell.py ${source}
+  python ../programas/extract-image.py --fitsfile j8oc${field}010_wcs.fits ${source}
+#+END_SRC
+
+#+name: arc-brightness
+#+header: :var source="LL3", field="17"
+#+BEGIN_SRC sh :results verbatim replace
+  source activate py27
+  cd j8oc${field}010_wcs
+  python ../programas/arc_brightness.py ${source}
+#+END_SRC
+
+#+name: plot-image
+#+header: :var source="LL3", field="17", vmin="1.1", vmax="1.6"
+#+BEGIN_SRC sh :results verbatim replace
+  cd j8oc${field}010_wcs
+  python ../programas/plot-image.py --image Bally_${field} --vmin ${vmin} --vmax ${vmax} ${source}  
+#+END_SRC
+
+
+#+name: view-pdf
+#+header: :var source="LL3", field="17"
+#+BEGIN_SRC sh
+  open j8oc${field}010_wcs/${source}-Bally_${field}-images.pdf
+#+END_SRC
+
+
+**** [22/22] Objects that need attention
 :PROPERTIES:
 :results:  silent
 :END:
@@ -648,21 +697,388 @@ WARNING: Overwriting existing file 'w044-527-Bally_01-extract.fits'. [astropy.io
 #+END_SRC
 
 
-+ [ ] 049-143 - fix inner shock
-+ [ ] 051-024 - fix inner shock
-+ [ ] 074-229 - Field 01 - not found
-+ [ ] 101-233 - fix up both shocks - the outer shock is probably spurious - may not be double shell
-+ [ ] 106-245 - fix up both shocks - extra point to N in outer shock
-+ [ ] 119-3155 - fix up shocks - don't use detached one
-+ [ ] 138-3024 - Field 15 - not found
-+ [ ] 142-301 - fix up inner shock - asymmetrical
-+ [ ] 154-209 - very weak, maybe remove from catalog
-+ [ ] 163-317 - fix up shock - use IR image
-+ [ ] 163-322 - missing inner shock - no reason why
-+ [ ] 165-235 - missing inner shock - fix up outer shock (not so far to E)
-+ [ ] 166-316 - fix up inner shock
-+ [ ] 180-331 - fix up inner and outer shocks - include part to south
-+ [ ] 212-400 - Field 06 - not found
++ [X] 049-143 - fix inner shock
+
+#+call: display-in-ds9(source="049-143", field="09", vmin="6.8", vmax="9.5")
+
+#+call: find-fit-extract(source="049-143", field="09") :results verbatim replace
+
+#+RESULTS:
+#+begin_example
+"WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+Warning: Closest point of inner arc is at one end, using all points in parabola fit
+[[Variables]]
+     xc:    -0.042428 +/- 0.031684 (74.68%) initial = -0.409580
+     yc:     0.027929 +/- 0.021221 (75.98%) initial =  0.471532
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    = -0.869 
+[[Variables]]
+     xc:    -2.909361 +/- 0.491963 (16.91%) initial = -1.142830
+     yc:     0.522770 +/- 0.098664 (18.87%) initial =  0.266095
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    = -0.773 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:35:04.2853 5:35:05.69829
+Dec range: -5:21:54.67 -5:21:31.31
+Extracted image window: [740:1369, 3842:4472]
+WARNING: Overwriting existing file '049-143-Bally_09-extract.fits'. [astropy.io.fits.file]
+"
+#+end_example
+
+#+call: arc-brightness(source="049-143", field="09")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_09
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 7.82, iqr = 0.22
+: Shell trimean = 7.96, iqr = 0.12
+: Adopting plot range of 7.38 to 8.20
+: "
+
+#+call: plot-image(source="049-143", field="09", vmin="6.8", vmax="9.5")  :results verbatim replace
+
+#+RESULTS:
+: "83.77060416666666 -5.361922222222222
+: 0.0011605359657427174
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmp1e2ggc [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpnoms46 [montage_wrapper.wrappers]
+: No mask regions found
+: "
+
+#+call: view-pdf(source="049-143", field="09")
+
+
++ [X] 051-024 - fix inner shock
+#+call: display-in-ds9(source="051-024", field="09", vmin="5.3", vmax="7.5")
+
+#+call: find-fit-extract(source="051-024", field="09") :results verbatim replace
+
+#+RESULTS:
+#+begin_example
+"WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+[[Variables]]
+     xc:    -0.581884 +/- 0.111453 (19.15%) initial = -0.745252
+     yc:     0.499692 +/- 0.112251 (22.46%) initial =  0.495043
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    = -0.963 
+[[Variables]]
+     xc:    -0.731958 +/- 0.106078 (14.49%) initial = -0.816505
+     yc:     0.806276 +/- 0.106147 (13.17%) initial =  0.860521
+[[Correlations]] (unreported correlations are <  0.100)
+    C(xc, yc)                    = -0.971 
+WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+WARNING: AstropyBackwardsIncompatibleChangeWarning: Using the `ICRSCoordinates` name for this class is deprecated in v0.3, and will be removed in the next version. Use `ICRS` instead. [astropy.coordinates.old_builtin_systems_names]
+RA range: 5:35:04.45936 5:35:05.89026
+Dec range: -5:20:35.63 -5:20:14.34
+Extracted image window: [1797:2401, 5015:5619]
+WARNING: Overwriting existing file '051-024-Bally_09-extract.fits'. [astropy.io.fits.file]
+"
+#+end_example
+
+#+call: arc-brightness(source="051-024", field="09")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_09
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 6.34, iqr = 0.15
+: Shell trimean = 6.38, iqr = 0.13
+: Adopting plot range of 6.03 to 6.64
+: "
+
+#+call: plot-image(source="051-024", field="09", vmin="5.3", vmax="7.5")  :results verbatim replace
+
+#+RESULTS:
+: "83.77137916666663 -5.340088888888888
+: 0.0006352322955144185
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmpwvjm4b [montage_wrapper.wrappers]
+: INFO: Deleting work directory /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/tmp0t8fix [montage_wrapper.wrappers]
+: No mask regions found
+: "
+
+#+call: view-pdf(source="051-024", field="09")
+
+
++ [X] 074-229 - Field 01 - not found
+
+#+call: display-in-ds9(source="074-229", field="01", vmin="10", vmax="14")
+
+#+call: find-fit-extract(source="074-229", field="01")
+
+#+call: arc-brightness(source="074-229", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 11.55, iqr = 0.32
+: Shell trimean = 12.11, iqr = 0.46
+: Adopting plot range of 10.91 to 13.04
+: "
+
+#+call: plot-image(source="074-229", field="01", vmin="10", vmax="14")
+
+#+call: view-pdf(source="074-229", field="01")
+
++ [X] 101-233 - fix up both shocks - the outer shock is probably spurious - may not be double shell
+#+call: display-in-ds9(source="101-233", field="01", vmin="17", vmax="35")
+
+#+call: find-fit-extract(source="101-233", field="01")
+
+#+call: arc-brightness(source="101-233", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 28.40, iqr = 2.88
+: Shell trimean = 28.11, iqr = 2.61
+: Adopting plot range of 22.64 to 33.34
+: "
+
+#+call: plot-image(source="101-233", field="01", vmin="17", vmax="35")
+
+#+call: view-pdf(source="101-233", field="01")
+
++ [X] 106-245 - fix up both shocks - extra point to N in outer shock
+#+call: display-in-ds9(source="106-245", field="01", vmin="24", vmax="45")
+
+#+call: find-fit-extract(source="106-245", field="01")
+
+#+call: arc-brightness(source="106-245", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 31.70, iqr = 0.40
+: Shell trimean = 34.09, iqr = 1.75
+: Adopting plot range of 30.90 to 37.59
+: "
+
+#+call: plot-image(source="106-245", field="01", vmin="24", vmax="45")
+
+#+call: view-pdf(source="106-245", field="01")
+
++ [X] 119-3155 - fix up shocks - don't use detached one
+#+call: display-in-ds9(source="119-3155", field="14", vmin="0.73", vmax="0.9")
+
+#+call: find-fit-extract(source="119-3155", field="14")
+
+#+call: arc-brightness(source="119-3155", field="14")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_14
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 0.77, iqr = 0.02
+: Shell trimean = 0.80, iqr = 0.02
+: Adopting plot range of 0.74 to 0.84
+: "
+
+#+call: plot-image(source="119-3155", field="14", vmin="0.73", vmax="0.9")
+
+#+call: view-pdf(source="119-3155", field="14")
+
++ [X] 138-3024 - Field 15 - not found
+  + Should be in Field 14
+#+call: display-in-ds9(source="138-3024", field="14", vmin="0.82", vmax="0.95")
+
+#+call: find-fit-extract(source="138-3024", field="14")
+
+#+call: arc-brightness(source="138-3024", field="14")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_14
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 0.87, iqr = 0.03
+: Shell trimean = 0.88, iqr = 0.03
+: Adopting plot range of 0.81 to 0.94
+: "
+
+#+call: plot-image(source="138-3024", field="14", vmin="0.82", vmax="0.95")
+
+#+call: view-pdf(source="138-3024", field="14")
+
++ [X] 142-301 - fix up inner shock - asymmetrical
+#+call: display-in-ds9(source="142-301", field="01", vmin="30", vmax="150")
+
+#+call: find-fit-extract(source="142-301", field="01")
+
+#+call: arc-brightness(source="142-301", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 64.89, iqr = 3.75
+: Shell trimean = 73.18, iqr = 4.86
+: Adopting plot range of 57.38 to 82.89
+: "
+
+#+call: plot-image(source="142-301", field="01", vmin="30", vmax="150")
+
+#+call: view-pdf(source="142-301", field="01")
+
++ [X] 154-225 - very weak, maybe remove from catalog
+#+call: display-in-ds9(source="154-225", field="01", vmin="30", vmax="60")
+
+#+call: find-fit-extract(source="154-225", field="01")
+
+#+call: arc-brightness(source="154-225", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 40.78, iqr = 3.25
+: Shell trimean = 43.59, iqr = 2.17
+: Adopting plot range of 34.28 to 47.92
+: "
+
+#+call: plot-image(source="154-225", field="01", vmin="30", vmax="60")
+
+#+call: view-pdf(source="154-225", field="01")
+
++ [X] 163-317 - fix up shock - use IR image
+#+call: display-in-ds9(source="163-317", field="01", vmin="45", vmax="100")
+
+#+call: find-fit-extract(source="163-317", field="01")
+
+#+call: arc-brightness(source="163-317", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 68.49, iqr = 4.22
+: Shell trimean = 69.14, iqr = 5.19
+: Adopting plot range of 60.05 to 79.52
+: "
+
+#+call: plot-image(source="163-317", field="01", vmin="45", vmax="100")
+
+#+call: view-pdf(source="163-317", field="01")
+
++ [X] 163-222 - missing inner shock - no reason why
+#+call: display-in-ds9(source="163-222", field="01", vmin="35", vmax="50")
+
+#+call: find-fit-extract(source="163-222", field="01")
+
+#+call: arc-brightness(source="163-222", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 46.02, iqr = 1.42
+: Shell trimean = 44.15, iqr = 1.13
+: Adopting plot range of 43.19 to 46.40
+: "
+
+#+call: plot-image(source="163-222", field="01", vmin="35", vmax="50")
+
+#+call: view-pdf(source="163-222", field="01")
+
+This is a good example of a high-incliation object, giving rise to low value of A'
+
++ [X] 165-235 - missing inner shock - fix up outer shock (not so far to E)
+#+call: display-in-ds9(source="165-235", field="01", vmin="40", vmax="70")
+
+#+call: find-fit-extract(source="165-235", field="01")
+
+#+call: arc-brightness(source="165-235", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 50.27, iqr = 4.70
+: Shell trimean = 53.13, iqr = 4.13
+: Adopting plot range of 40.87 to 61.40
+: "
+
+#+call: plot-image(source="165-235", field="01", vmin="40", vmax="70")
+
+#+call: view-pdf(source="165-235", field="01")
+
++ [X] 166-316 - fix up inner shock
+#+call: display-in-ds9(source="166-316", field="01", vmin="64", vmax="85")
+
+#+call: find-fit-extract(source="166-316", field="01")
+
+#+call: arc-brightness(source="166-316", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 71.48, iqr = 3.25
+: Shell trimean = 72.16, iqr = 1.53
+: Adopting plot range of 64.97 to 75.21
+: "
+
+#+call: plot-image(source="166-316", field="01", vmin="64", vmax="85")
+
+#+call: view-pdf(source="166-316", field="01")
+
++ [X] 180-331 - fix up inner and outer shocks - include part to south
+#+call: display-in-ds9(source="180-331", field="01", vmin="25", vmax="50")
+
+#+call: find-fit-extract(source="180-331", field="01")
+
+#+call: arc-brightness(source="180-331", field="01")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_01
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 29.37, iqr = 0.99
+: Shell trimean = 33.67, iqr = 5.30
+: Adopting plot range of 27.40 to 44.27
+: "
+
+#+call: plot-image(source="180-331", field="01", vmin="25", vmax="50")
+
+#+call: view-pdf(source="180-331", field="01")
+
++ [X] 212-400 - Field 06 - not found
+#+call: display-in-ds9(source="212-400", field="06", vmin="20", vmax="33")
+
+#+call: find-fit-extract(source="212-400", field="06")
+
+#+call: arc-brightness(source="212-400", field="06")  :results verbatim replace
+
+#+RESULTS:
+: "**************************************************
+: Calculating shell brightness for Bally_06
+: **************************************************
+: No bad pixel mask found
+: BG trimean = 23.36, iqr = 0.90
+: Shell trimean = 23.36, iqr = 0.75
+: Adopting plot range of 21.56 to 24.85
+: "
+
+#+call: plot-image(source="212-400", field="06", vmin="20", vmax="33")
+
+#+call: view-pdf(source="212-400", field="06")
 
 
 
