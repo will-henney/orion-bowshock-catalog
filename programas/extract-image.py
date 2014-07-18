@@ -10,6 +10,12 @@ import argparse
 import fits_utils
 import misc_utils
 
+# Python 2 compatibility kludge
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 parser = argparse.ArgumentParser(
     description="""Extract a small image around a bowshock and save it as a FITS file""")
 
@@ -39,7 +45,32 @@ fits_path = os.path.join(
      misc_utils.image_set_fits_dir (image_name),
      cmd_args.fitsfile
 )
+
+if cmd_args.debug:
+     print("Short image name:", image_name)
+     print("Full path:", fits_path)
+
 hdu = fits_utils.get_image_hdu(fits.open(fits_path), debug=cmd_args.debug)
+
+##
+## Correct the coordinates if necessary - look to see if a shift file
+## is present.  This is done first, so that the enclosing box will
+## also be shifted.
+##
+shiftfile = "-".join([cmd_args.source, image_name, "shifts.json"])
+try: 
+     with open(shiftfile) as f:
+          shift = json.load(f)
+     if cmd_args.debug:
+          print("Coordinate adjustments:", shift)
+     hdu.header["CRVAL1"] += shift['dRA']/3600
+     hdu.header["CRVAL2"] += shift['dDEC']/3600
+
+except FileNotFoundError:
+     if cmd_args.debug:
+          print("Shift file", shiftfile,
+                "not found - no coordinate adjustments will be performed")
+
 
 dbfile = cmd_args.source + "-arcdata.json"
 with open(dbfile) as f:
