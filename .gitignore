@@ -7,6 +7,8 @@
 !programas
 !programas/*.py
 !luis-programas/*.txt
+!luis-programas/*.py
+!luis-programas/*.pdf
 !*.tab
 !*/*.fits
 !*/*.png
