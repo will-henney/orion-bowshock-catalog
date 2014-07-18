@@ -7,6 +7,19 @@ Presentamos una lista completa de todos los choques estacionarios asociados a es
 Catalog of stationary bowshock arcs in the Orion Nebula
 
 We present a complete catalog of all the stationary emission line arcs (LL objects and proplyd bowshocks) found in archival HST imaging of the Orion Nebula.   The total number of objects detected is 73, of which 20 have not previously been reported in the literature.  We classify the shapes of emission line arcs by fitting conic sections to the inner and outer shell boundaries and calculate the background corrected H alpha surface brightness of each object.   We find significant differences in the shell shapes between the objects closest to the ionizing stars and those farther away.  The closer group, which all represent proplyd interactions with the hypersonic stellar wind, have relatively closed shapes, while the farther group, which are due to interactions with the transonic ionized champagne flow in the nebula, are more open and hyperbolic.  Although some of the latter group are also known proplyds, many are not, and the largest and brighest arcs tend to be associated with particularly luminous young stars, suggesting that the intrinsic T Tauri disk wind may play a role.  The orientations of the arcs, together with the stagnation pressures estimated from the surface brightness, allow the internal velocity field of the H II region to be probed.  We find that approximately radial flows from the core of the nebula dominate over disordered, turbulent flows.
+* Informes semestrales
+** 2014-II [2014-07-02 Wed]
+Durante este semestre, el estudiante ha cursado el Seminario de
+Investigación III y el Seminario de Investigación, obteniendo un grado
+de 10 en cada una.  Su trabajo de investigación ha sido muy
+satisfactorio, logrando avances importantes en la preparación y
+analisis de un catálogo de choques estacionarios en la nebulosa de
+Orión.  El trabajo para su tésis de maestría es ahora 95% completo, y
+ha empezado con la escritura de la misma; ahora cuenta con borradores
+de 3 capítulos.  Se espera que se gradue durante el transcurso del
+próximo semestre. 
+
+
 * Tasks to finish before OSSF 2014 conference
 ** Text snippets for the posters
 *** Jorge poster
