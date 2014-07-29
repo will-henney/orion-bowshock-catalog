@@ -14,7 +14,8 @@
             "Image WFC_mosaic_f656 added by extract-image.py: <angel@crya> 2014-07-16 18:20", 
             "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 18:35", 
             "Image WFC_mosaic_f658 added by extract-image.py: <angel@crya> 2014-07-16 18:55", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 19:16"
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 19:16", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:27"
         ]
     }, 
     "Robberto_WFPC2_39_f656n": {
@@ -177,33 +178,20 @@
     }, 
     "outer": {
         "PA0": 218.65288616054957, 
+        "x": [
+            1.3739144482096968, 
+            0.46294943372930025, 
+            -0.7914941929467708, 
+            -1.1648405103348511, 
+            -1.7024592074271674, 
+            -2.1355409355820605, 
+            -2.299813315286296, 
+            -2.3296810206697023, 
+            -2.3595487262441095
+        ], 
         "R0": 1.4786660485075314, 
         "xc": 1.4013787493179903, 
         "yc": 1.8456764691348646, 
-        "Y": [
-            -2.409596128774313, 
-            -1.616985124308815, 
-            -0.1688840277254036, 
-            0.3100588526067518, 
-            0.9110433004132226, 
-            1.5240803063232924, 
-            1.883470141179236, 
-            2.137897415058321, 
-            2.6609029916538782
-        ], 
-        "PAc": -142.79145188143445, 
-        "X": [
-            0.8130728178996673, 
-            1.2805394511554289, 
-            1.4783576166274197, 
-            1.4772667066028187, 
-            1.5865898832792629, 
-            1.5134775543178007, 
-            1.3271328164336518, 
-            1.0568388243987514, 
-            0.4507387941318829
-        ], 
-        "Rc": 3.9435052444334064, 
         "y": [
             -2.1400000000028285, 
             -2.0100000000027762, 
@@ -215,16 +203,29 @@
             0.510000000000943, 
             1.3100000000029866
         ], 
-        "x": [
-            1.3739144482096968, 
-            0.46294943372930025, 
-            -0.7914941929467708, 
-            -1.1648405103348511, 
-            -1.7024592074271674, 
-            -2.1355409355820605, 
-            -2.299813315286296, 
-            -2.3296810206697023, 
-            -2.3595487262441095
+        "PAc": -142.79145188143445, 
+        "Rc": 3.9435052444334064, 
+        "Y": [
+            -2.409596128774313, 
+            -1.616985124308815, 
+            -0.1688840277254036, 
+            0.3100588526067518, 
+            0.9110433004132226, 
+            1.5240803063232924, 
+            1.883470141179236, 
+            2.137897415058321, 
+            2.6609029916538782
+        ], 
+        "X": [
+            0.8130728178996673, 
+            1.2805394511554289, 
+            1.4783576166274197, 
+            1.4772667066028187, 
+            1.5865898832792629, 
+            1.5134775543178007, 
+            1.3271328164336518, 
+            1.0568388243987514, 
+            0.4507387941318829
         ], 
         "R": [
             2.543077055657469, 
@@ -250,8 +251,21 @@
         ]
     }, 
     "help": {
-        "thickness": {
-            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
+        "brightness": {
+            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
+            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
+            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
+        }, 
+        "arcs": {
+            "PA0": "[deg] Position angle of symmetry axis", 
+            "R0": "[arcsec] Radius along symmetry axis", 
+            "h": "[arcsec] Bowshock width along symmetry axis", 
+            "y": "(list) [arcsec] Dec offsets from star of shell points", 
+            "R": "(list) [arcsec] Radii of shell points from star", 
+            "x": "(list) [arcsec] RA offsets from star of shell points", 
+            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
+            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
+            "theta": "(list) [deg] Angle from axis of shell points"
         }, 
         "star": {
             "Dec_dg": "[deg] Declination of source", 
@@ -262,21 +276,8 @@
             "RA_dg": "[deg] Right ascension of source", 
             "id": "Source identifier deduced from region filename"
         }, 
-        "arcs": {
-            "PA0": "[deg] Position angle of symmetry axis", 
-            "R0": "[arcsec] Radius along symmetry axis", 
-            "h": "[arcsec] Bowshock width along symmetry axis", 
-            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
-            "R": "(list) [arcsec] Radii of shell points from star", 
-            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
-            "y": "(list) [arcsec] Dec offsets from star of shell points", 
-            "x": "(list) [arcsec] RA offsets from star of shell points", 
-            "theta": "(list) [deg] Angle from axis of shell points"
-        }, 
-        "brightness": {
-            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
-            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
-            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
+        "thickness": {
+            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
         }
     }, 
     "WFC_mosaic_f656": {
@@ -298,27 +299,17 @@
     }, 
     "inner": {
         "PA0": 210.33919797661088, 
+        "x": [
+            0.5376186972833166, 
+            -0.47788328613450265, 
+            -1.0155019834178192, 
+            -1.5680545331063382, 
+            -1.7472607655977772, 
+            -1.8517977343441994
+        ], 
         "R0": 0.9231654123252622, 
         "xc": 1.2985274708759171, 
         "yc": 2.045546606885358, 
-        "Y": [
-            -1.1357991000925156, 
-            0.013393892975260085, 
-            0.6238700819825692, 
-            1.373514480992183, 
-            1.7100209991013497, 
-            2.0224936500784687
-        ], 
-        "PAc": -147.59233052352306, 
-        "X": [
-            0.8762957650777371, 
-            0.9231971830530108, 
-            0.9444736095471734, 
-            0.7575308503949733, 
-            0.5373531107492061, 
-            0.21041455348539118
-        ], 
-        "Rc": 3.429986267107862, 
         "y": [
             -1.3299999999983214, 
             -0.7899999999995799, 
@@ -327,13 +318,23 @@
             0.4000000000026205, 
             0.8400000000023056
         ], 
-        "x": [
-            0.5376186972833166, 
-            -0.47788328613450265, 
-            -1.0155019834178192, 
-            -1.5680545331063382, 
-            -1.7472607655977772, 
-            -1.8517977343441994
+        "PAc": -147.59233052352306, 
+        "Rc": 3.429986267107862, 
+        "Y": [
+            -1.1357991000925156, 
+            0.013393892975260085, 
+            0.6238700819825692, 
+            1.373514480992183, 
+            1.7100209991013497, 
+            2.0224936500784687
+        ], 
+        "X": [
+            0.8762957650777371, 
+            0.9231971830530108, 
+            0.9444736095471734, 
+            0.7575308503949733, 
+            0.5373531107492061, 
+            0.21041455348539118
         ], 
         "R": [
             1.4345500561723683, 
@@ -363,9 +364,9 @@
     }, 
     "Bally_01": {
         "shell": {
-            "delta": 2.0485572814941406, 
+            "N": 397, 
             "value": 47.2800817489624, 
-            "N": 397
+            "delta": 2.0485572814941406
         }, 
         "extracted FITS file": "178-258-Bally_01-extract.fits", 
         "original FITS file": "$LARGE_FITS_DIR/Bally-ACS/j8oc01010_wcs.fits", 
@@ -423,32 +424,6 @@
                 48.72907257080078, 
                 48.055423736572266
             ], 
-            "background N": [
-                44, 
-                41, 
-                37, 
-                35, 
-                33, 
-                30, 
-                8, 
-                0, 
-                0, 
-                0, 
-                20, 
-                25, 
-                24, 
-                29, 
-                22, 
-                24, 
-                26, 
-                27, 
-                26, 
-                29, 
-                30, 
-                30, 
-                31, 
-                32
-            ], 
             "background": [
                 44.46963858604431, 
                 45.757389068603516, 
@@ -474,6 +449,32 @@
                 45.14262580871582, 
                 45.31745433807373, 
                 45.37982892990112
+            ], 
+            "background N": [
+                44, 
+                41, 
+                37, 
+                35, 
+                33, 
+                30, 
+                8, 
+                0, 
+                0, 
+                0, 
+                20, 
+                25, 
+                24, 
+                29, 
+                22, 
+                24, 
+                26, 
+                27, 
+                26, 
+                29, 
+                30, 
+                30, 
+                31, 
+                32
             ], 
             "background sigma": [
                 0.59975007756779, 
@@ -504,14 +505,14 @@
         }, 
         "camera": "ACS", 
         "shell center": {
-            "delta": 1.802628517150879, 
+            "N": 198, 
             "value": 47.58502459526062, 
-            "N": 198
+            "delta": 1.802628517150879
         }, 
         "background": {
-            "delta": 3.973484992980957, 
+            "N": 388, 
             "value": 45.69359564781189, 
-            "N": 388
+            "delta": 3.973484992980957
         }, 
         "date": "2004-01-14"
     }

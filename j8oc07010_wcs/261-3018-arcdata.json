@@ -14,7 +14,9 @@
             "Plot limits modified for Bally_07 plot-image.py: <will@mac> 2014-05-14 10:03", 
             "Plot limits modified for Bally_07 plot-image.py: <will@mac> 2014-05-14 10:04", 
             "Shell data for Robberto_WFPC2_f656n_19 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:54", 
-            "Shell data for Bally_07 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:54"
+            "Shell data for Bally_07 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:54", 
+            "Shell data for Robberto_WFPC2_f656n_19 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:34", 
+            "Shell data for Bally_07 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:34"
         ]
     }, 
     "star": {
@@ -27,10 +29,16 @@
         "id": "261-3018"
     }, 
     "help": {
-        "brightness": {
-            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
-            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
-            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
+        "arcs": {
+            "PA0": "[deg] Position angle of symmetry axis", 
+            "R0": "[arcsec] Radius along symmetry axis", 
+            "h": "[arcsec] Bowshock width along symmetry axis", 
+            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
+            "R": "(list) [arcsec] Radii of shell points from star", 
+            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
+            "y": "(list) [arcsec] Dec offsets from star of shell points", 
+            "x": "(list) [arcsec] RA offsets from star of shell points", 
+            "theta": "(list) [deg] Angle from axis of shell points"
         }, 
         "star": {
             "Dec_dg": "[deg] Declination of source", 
@@ -41,19 +49,13 @@
             "RA_dg": "[deg] Right ascension of source", 
             "id": "Source identifier deduced from region filename"
         }, 
-        "arcs": {
-            "PA0": "[deg] Position angle of symmetry axis", 
-            "x": "(list) [arcsec] RA offsets from star of shell points", 
-            "R0": "[arcsec] Radius along symmetry axis", 
-            "h": "[arcsec] Bowshock width along symmetry axis", 
-            "y": "(list) [arcsec] Dec offsets from star of shell points", 
-            "R": "(list) [arcsec] Radii of shell points from star", 
-            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
-            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
-            "theta": "(list) [deg] Angle from axis of shell points"
-        }, 
         "thickness": {
             "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
+        }, 
+        "brightness": {
+            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
+            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
+            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
         }
     }, 
     "thickness": {
@@ -219,9 +221,22 @@
     }, 
     "inner": {
         "PA0": 357.1300565732907, 
+        "x": [
+            -1.8514213495476046, 
+            -0.6270943281957768, 
+            0.9854339440894074, 
+            1.8812829842054073
+        ], 
         "R0": 2.514353225539292, 
         "xc": 0.06176304060857236, 
         "yc": -1.0715973549969893, 
+        "Y": [
+            -1.7509639462459248, 
+            -0.5036387054673539, 
+            1.103862928424799, 
+            1.9800628219994119
+        ], 
+        "PAc": -3.298674444877183, 
         "Rc": 3.585786576319018, 
         "y": [
             1.9600000000000506, 
@@ -229,43 +244,63 @@
             2.3900000000004695, 
             2.019999999998845
         ], 
-        "PAc": -3.298674444877183, 
         "X": [
             2.0502405401580983, 
             2.4783251099899855, 
             2.337662656033859, 
             1.923272442373119
         ], 
-        "x": [
-            -1.8514213495476046, 
-            -0.6270943281957768, 
-            0.9854339440894074, 
-            1.8812829842054073
-        ], 
-        "Y": [
-            -1.7509639462459248, 
-            -0.5036387054673539, 
-            1.103862928424799, 
-            1.9800628219994119
+        "R": [
+            2.696175256462545, 
+            2.5289814741218857, 
+            2.585184724186233, 
+            2.7603669442043635
         ], 
         "theta": [
             -40.49827258637008, 
             -11.487073843624472, 
             25.27705435364782, 
             45.833548564953766
-        ], 
-        "R": [
-            2.696175256462545, 
-            2.5289814741218857, 
-            2.585184724186233, 
-            2.7603669442043635
         ]
     }, 
     "outer": {
         "PA0": 1.7149043810596487, 
+        "x": [
+            -12.362716753295258, 
+            -9.973785979716245, 
+            -6.7636602527612215, 
+            -2.3142766868390248, 
+            0.8659874054581972, 
+            4.1358364017288265, 
+            8.017848908770851, 
+            10.406779682349864, 
+            12.885295359902283, 
+            16.423899068093135, 
+            19.798263785761556, 
+            22.635119079398567, 
+            25.20321966111536, 
+            27.338326540007568
+        ], 
         "R0": 4.986278559138861, 
         "xc": 0.9860911300537543, 
         "yc": -28.458818332290203, 
+        "Y": [
+            -12.396083743097595, 
+            -10.064185054152517, 
+            -6.89589756275647, 
+            -2.4625721765579165, 
+            0.7171652924993513, 
+            3.996921731963729, 
+            7.890961600526482, 
+            10.31204054161058, 
+            12.819671636503529, 
+            16.386317433181834, 
+            19.7995712537483, 
+            22.681242385037006, 
+            25.286199087208306, 
+            27.466735372998734
+        ], 
+        "PAc": -1.9844908749256982, 
         "Rc": 33.287543481125375, 
         "y": [
             1.300000000000523, 
@@ -283,7 +318,6 @@
             -3.150000000002251, 
             -4.700000000000415
         ], 
-        "PAc": -1.9844908749256982, 
         "X": [
             0.9294478771400457, 
             2.8701020826692116, 
@@ -300,37 +334,21 @@
             -2.3943510620858697, 
             -3.879761069672474
         ], 
-        "x": [
-            -12.362716753295258, 
-            -9.973785979716245, 
-            -6.7636602527612215, 
-            -2.3142766868390248, 
-            0.8659874054581972, 
-            4.1358364017288265, 
-            8.017848908770851, 
-            10.406779682349864, 
-            12.885295359902283, 
-            16.423899068093135, 
-            19.798263785761556, 
-            22.635119079398567, 
-            25.20321966111536, 
-            27.338326540007568
-        ], 
-        "Y": [
-            -12.396083743097595, 
-            -10.064185054152517, 
-            -6.89589756275647, 
-            -2.4625721765579165, 
-            0.7171652924993513, 
-            3.996921731963729, 
-            7.890961600526482, 
-            10.31204054161058, 
-            12.819671636503529, 
-            16.386317433181834, 
-            19.7995712537483, 
-            22.681242385037006, 
-            25.286199087208306, 
-            27.466735372998734
+        "R": [
+            12.43087951523176, 
+            10.465433902575136, 
+            8.134955440244317, 
+            5.5005432989141925, 
+            5.035030703622112, 
+            6.171024448327996, 
+            9.014449574092875, 
+            10.833335744680323, 
+            13.039587283036246, 
+            16.454925116782192, 
+            19.801183018461245, 
+            22.713058264763717, 
+            25.399306708775455, 
+            27.73939613632723
         ], 
         "theta": [
             -85.71203435623536, 
@@ -347,22 +365,6 @@
             93.03300062368643, 
             95.40921111417293, 
             98.04001449219152
-        ], 
-        "R": [
-            12.43087951523176, 
-            10.465433902575136, 
-            8.134955440244317, 
-            5.5005432989141925, 
-            5.035030703622112, 
-            6.171024448327996, 
-            9.014449574092875, 
-            10.833335744680323, 
-            13.039587283036246, 
-            16.454925116782192, 
-            19.801183018461245, 
-            22.713058264763717, 
-            25.399306708775455, 
-            27.73939613632723
         ]
     }, 
     "Bally_07": {
