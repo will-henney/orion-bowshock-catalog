@@ -27,6 +27,25 @@ próximo semestre.
 S(Hα), R₀, H
 ** Finish brightness calibration
 *** Correct for [N II] contamination
+**** Comparison with older WFPC2 mosaics
+: The normalization is to the exposure times in the program GO 5085, i.e.
+: f656n(200S), f658n(500s), f502n(200s), f547m(50s).
+
++ To get count/sec, divide values by the exposure times T given above
++ Conversion to surface brightness: use coefficients from O'Dell (2009)
+  + Use values of K1 from Table 3
+  + Units are 1.e-10 counts cm2 ster / photon
+  + => valores / (T * K1) will give us phot/s/cm2/sr
++ So we need to multiply by the photon energy to get to erg/s/cm2/sr
+  + E = h c / \lambda = 3.02673387238e-12 erg for H\alpha
+  + 3.0175382659e-12 erg for [N II] 6583
+***** Values of K1 from Table 3 of O'Dell (2009)
+| F469N | F487N | F502N | F656N | F658N | F673N |
+|-------+-------+-------+-------+-------+-------|
+|  0.51 |  0.70 |  0.82 |  1.62 |  1.60 |  1.42 |
+     
+**** Correct for continuum contamination
+
 ** Shell pressure
 + Check that this is done properly
 + Calculate pre-shock density - compare with H II region density

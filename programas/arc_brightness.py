@@ -167,31 +167,77 @@ for image_name in arcdata:
 
 
     # Calculate average binned profiles versus theta
-    th_edges = np.linspace(-60.0, 60.0, 25)
-    th_centers = 0.5*(th_edges[:-1] + th_edges[1:])
-    m = mask["<60"] & mask["good"] & mask["bg"]
-    bg, dbg, nbg = robust_statistics(theta["outer"][m].deg, hdu.data[m], th_edges, return_npix=True)
-    m = mask["<60"] & mask["good"] & mask["shell center"]
-    sh, dsh = robust_statistics(theta["outer"][m].deg, hdu.data[m], th_edges)
+    NTH = 25
+    need_to_bin_profiles = True
+    while need_to_bin_profiles: 
+        th_edges = np.linspace(-60.0, 60.0, NTH)
+        th_centers = 0.5*(th_edges[:-1] + th_edges[1:])
+        m = mask["<60"] & mask["good"] & mask["bg"]
+        bg, dbg, nbg = robust_statistics(theta["outer"][m].deg, hdu.data[m], th_edges,
+                                         return_npix=True)
+        m = mask["<60"] & mask["good"] & mask["shell center"]
+        sh, dsh = robust_statistics(theta["outer"][m].deg, hdu.data[m], th_edges)
+        # Check that there were not to many NaNs in the shell arrays
+        # These are caused by there being fewer than 2 points in the bin
+        number_of_nans = np.isnan(sh).sum()
+        if number_of_nans > 0.25*NTH:
+            # If more than 25% are NaNs, we try again with fewer bins
+            NTH = NTH // 2
+            print('Insufficient points, reducing theta bins to N =', NTH)
+            assert NTH > 0, 'Not enough points for good statistics'
+        else:
+            # Otherwise, we are done
+            need_to_bin_profiles = False
+
 
     # Calculate average binned profiles versus radius
-    z_edges = np.linspace(-2.0, 3.0, 50)
-    z_centers = 0.5*(z_edges[:-1] + z_edges[1:])
-    m = mask["good"] & mask["<15"]
-    axis, daxis = robust_statistics(z[m], hdu.data[m], z_edges)
-    m = mask["good"] & mask["+15 to +45"]
-    upper, dupper = robust_statistics(z[m], hdu.data[m], z_edges)
-    m = mask["good"] & mask["-15 to -45"]
-    lower, dlower = robust_statistics(z[m], hdu.data[m], z_edges)
+    NZ = 50
+    need_to_bin_profiles = True
+    while need_to_bin_profiles: 
+        z_edges = np.linspace(-2.0, 3.0, NZ)
+        z_centers = 0.5*(z_edges[:-1] + z_edges[1:])
+        m = mask["good"] & mask["<15"]
+        axis, daxis = robust_statistics(z[m], hdu.data[m], z_edges)
+        m = mask["good"] & mask["+15 to +45"]
+        upper, dupper = robust_statistics(z[m], hdu.data[m], z_edges)
+        m = mask["good"] & mask["-15 to -45"]
+        lower, dlower = robust_statistics(z[m], hdu.data[m], z_edges)
+        # Perform the same check as we did above for th bins
+        number_of_nans = np.isnan(axis).sum()
+        if number_of_nans > 0.33*NZ:
+            # If more than 33% are NaNs, we try again with fewer bins
+            NZ = NZ // 2
+            print('Insufficient points, reducing z bins to N =', NZ)
+            assert NZ > 0, 'Not enough points for good statistics'
+        else:
+            # Otherwise, we are done
+            need_to_bin_profiles = False
+
 
     # Save th-binned profiles for later use
     arcdata[image_name]["binned"] = {
         "theta": list(th_centers),
-        "background N": list(nbg),
+        "background N": [int(n) for n in nbg],
         "background": list(bg),
         "background sigma": list(dbg),
         "shell": list(sh),
     }
+    if cmd_args.debug:
+        print("Binned profiles:")
+        print(arcdata[image_name]["binned"])
+
+    camera = arcdata[image_name]["camera"]
+    fname = arcdata[image_name]["filter"]
+    # Work around bad headers in the WFC mosaics
+    if "WFC_mosaic" in image_name:
+        if "656" in image_name:
+            fname = "F656N"
+        elif "658" in image_name:
+            fname = "F658N"
+        elif "502" in image_name:
+            fname = "F502N"
+        elif "547" in image_name:
+            fname = "F547M"
 
     # Plot graph of radial profiles
     #
@@ -220,11 +266,11 @@ for image_name in arcdata:
     plt.xlabel("Radius relative to shell: (R - R_in) / (R_out - R_in)")
     plt.ylabel("Surface brightness")
     plt.legend(prop={"size": "small"})
-    plt.title(" ".join([cmd_args.source, arcdata[image_name]["camera"], arcdata[image_name]["filter"]]))
+    plt.title(" ".join([cmd_args.source, camera, fname]))
     plt.xlim(-2.0, 3.0)
     plt.ylim(ymin, ymax)
     plt.grid()
-    plt.savefig(plot_prefix + "-z.png", dpi=600)
+    plt.savefig(plot_prefix + "-z.jpg", dpi=600)
 
 
     #
@@ -246,11 +292,10 @@ for image_name in arcdata:
     plt.xlabel("Angle, theta, from outer shell axis")
     plt.ylabel("Surface brightness")
     plt.legend()
-    plt.title(" ".join([
-        cmd_args.source, arcdata[image_name]["camera"], arcdata[image_name]["filter"]]))
+    plt.title(" ".join([cmd_args.source, camera, fname]))
     plt.ylim(ymin, ymax)
     plt.grid()
-    plt.savefig(plot_prefix + "-th.png", dpi=600)
+    plt.savefig(plot_prefix + "-th.jpg", dpi=600)
 
 
 
