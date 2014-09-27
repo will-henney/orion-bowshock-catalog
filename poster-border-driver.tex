@@ -1,0 +1,19 @@
+
+\documentclass{article}
+\usepackage[a1paper, margin=0.0cm]{geometry}
+\usepackage{graphicx}
+\setlength{\fboxsep}{0pt}%
+
+\newlength\figwidth
+\setlength\figwidth{0.2\textwidth}
+
+\newcommand\BowshockFig[2]{
+  \includegraphics[width=\figwidth, clip, trim=60 50 100 50]
+  {j8oc#2010_wcs/#1-Bally_#2-images}%
+}
+
+\begin{document}
+\setlength\tabcolsep{0pt}
+\noindent\input{poster-border-14x05.tex}
+
+\end{document}

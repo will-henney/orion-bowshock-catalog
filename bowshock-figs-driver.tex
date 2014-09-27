@@ -1,0 +1,26 @@
+
+\documentclass{article}
+\usepackage[margin=0.3cm]{geometry}
+\usepackage{graphicx}
+\usepackage{etoolbox} % provies \patchcmd
+
+\setlength{\fboxsep}{0pt}%
+
+\newlength\figwidth
+\setlength\figwidth{0.48\textwidth}
+
+\newcommand\BowshockFig[2]{
+  \framebox{\includegraphics[width=\figwidth, clip, trim=60 50 100 50]
+  {j8oc#2010_wcs/#1-Bally_#2-images}}
+}
+\newcommand\MissingFig[2]{%
+  \framebox{\makebox[\figwidth][c]{\raisebox{0.25\figwidth}[0.48\figwidth]{%
+        Not found: #1 from Field #2}}}%
+}
+
+\setlength\tabcolsep{0pt}
+
+\begin{document}
+\input{bowshock-figs-05x02.tex}
+
+\end{document}

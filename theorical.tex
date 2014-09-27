@@ -1,0 +1,262 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
+\usepackage[spanish, es-minimal]{babel}
+\bibliographystyle{apj}
+\newcommand\U[1]{\ensuremath{\mathrm{#1}}}
+\newcommand\K{\U{K}}
+\newcommand\cm{\U{cm}}
+\newcommand\AU{\U{AU}}
+\newcommand\g{\U{g}}
+\newcommand\msolagno{M_\odot\,\U{yr^{-1}}}
+
+\newcommand\thC{\ensuremath{\mathrm{\theta^1\,Ori~C}}}
+\newcommand\acre{\ensuremath{_{\mathrm{acre}}}}
+\newcommand\eff{\ensuremath{_{\mathrm{eff}}}}
+\newcommand\Ext{\ensuremath{_{\mathrm{Ext}}}}
+\newcommand\Int{\ensuremath{_{\mathrm{Int}}}}
+\newcommand\ha{\ensuremath{\mathrm{H}\alpha}}
+\newcommand\nii{\ensuremath{\mathrm{[N\,II]}}}
+\newcommand\oiii{\ensuremath{\mathrm{[O\,III]}}}
+\newcommand\Out{\ensuremath{\mathrm{out}}}
+\newcommand\In{\ensuremath{\mathrm{in}}}
+\newcommand\A{\ensuremath{\mathrm{\AA{}}}}
+\title{Tratamiento teórico}
+
+\author{
+  Alumno: Luis Angel Gutiérrez Soto\\
+  Tutor: Dr. William Henney
+}
+
+\begin{document}
+\maketitle
+
+\section{Interacción de dos vientos}
+\label{sec:interaction}
+[1]
+La interacción de dos flujos da como resultado una cáscara limita por dos choques, donde su  geometría está modelada por las variables \(\mathrm{D,~R_{0}(\Out{})~ y ~R_{0}(\In{})}\), \(\mathrm{ R_{c}(\Out{})~y~R_{c}(\In{}),~h_{0}}\). Los cuales representan en el mismo orden; la distancia de la fuenta a \thC{}, los radios desde el choque externo e interno a la estrella central en la direción a \thC{}, los radios de los círculos fijados en el choque externo e interno y la anchura de la cáscara chocada. Las suposiciones para este tipo de modelo son las siguientes:
+
+\begin{enumerate}
+\item Las cáscaras chocadas están en estado estacionario (tiempo dinámico \(\ll\) tiempo evolutivo)
+\item No hay aceleración ni gravedad.
+\item En el viento externo e interno al choque domina la presión hidrodinámica, mientras que en la cásscara chocada domina la presión térmica (ver figura ~\ref{fig:interaction}).  
+\end{enumerate}
+
+Con estas suposiciones es posible determinar las presiones en cada una de estas zonas y el flujo de momento como podremos ver a cantinuación.
+
+\subsection{Presión hidrodinámica}
+\label{sec:pressure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.95\linewidth, clip]{figuras-tesis/pressures-bowshocks.jpg}
+  \caption{Choque formado por la interacción de dos flujos. El viento en el ambiente está dominado por la presión hidrodinámica  (\(P_{\text{Hyd}}(\Out{})\)), al igual que en la parte interna al choque (\(P_{\text{Hyd}}(\In{})\)). Por otro lado la cáscara chocada está dominada por la presión térmica (\(P_{\text{Termica}}\)).}
+  \label{fig:interaction}
+\end{figure}
+
+ En términos generareles la tasa de pérdida de masa está dada por
+
+\begin{equation}
+  \label{eq:perdida-masa}
+  \dot{M}=4\pi \rho v R^{2}
+\end{equation}
+
+Donde \(\mathrm{\rho}\), \(v\) y \(R\) son las densidad del viento, la velocidad del viento y la distancia a la fuente. Por otro lado la presión del viento estelar es,
+
+\begin{equation}
+  \label{eq:presion-viento}
+  P=\rho v^{2}
+\end{equation}
+
+si combinamos las ecuaciones \ref{eq:perdida-masa} y \ref{eq:presion-viento} obtenemos,
+
+\begin{equation}
+  \label{eq:presin-interna}
+  P=\frac{\dot{M} v}{4 \pi R^{2}}. 
+\end{equation}
+ 
+En general esta (Eq.~\ref{eq:presin-interna}) es la presión para un flujo de partículas en términos de \(\dot{M}\) y \(v\). Particularmente para nuestro modelo tendremos  dos tipos de presiones hidrodinámicas; una que corresponde a la región externa al choque dada por
+
+\begin{equation}
+  \label{eq:presin-interna}
+   P_{\text{Hyd}}(\Out{})=\frac{\dot{M}(\Out{}) v(\Out)}{4 \pi D^{2}}
+\end{equation}
+
+donde \(D\) es la distancia de la fuente a \thC{}, \(\dot{M}(\Out{})\) es la tasa de pérdida de masa externa y \(v(\Out{})\) es la velocidad del viento estelar externo. Y la otra que corresponde a la región interna al choque esto es
+
+ 
+\begin{equation}
+  \label{eq:presin-interna}
+  P_{\text{Hyd}}(\In{})=\frac{\dot{M}(\In{}) v(\In)}{4 \pi R_{0}(\In{})^{2}}.
+\end{equation}
+
+Las variables de ecuación anterior se refieren a la componente interna al choque, además de esto \(R_{0}(\In{})\) representa la distancia de la estrella o proplyd al choque interno.
+
+\subsection{Presión Térmica}
+\label{sec:pressur-thermal}
+
+Como se dijo arriba, en la cáscara chocada la presión dominante es la presión térmica,
+
+\begin{equation}
+  \label{eq:presion-cascara}
+  P_{\text{Termica}}=2 n k T 
+\end{equation}
+ 
+Donde \(n\) es la densidad total de núcleos de hidrógeno \footnote{Más adelante veremos como obtener \(n\) a partir de \(S_{\ha{}}\). }, \(k\) la constante de Boltzmann y \(T\) es la temperatura en la cáscara chocada, para la cuál se considera \(T\simeq10^{4}~\K\). Si se incluye la contribución de helio entonces la densidad total de partículas es,
+
+\begin{equation*}
+  \label{eq:particulas}
+  p = n + n_{e} + n_{\text{He}} + n_{z}
+\end{equation*}
+
+donde \(n_{e}\) es la densidad numérica de electrones, \(n_{\text{He}}\) es la densidad numérica de átomos de helio y \(n_{z}\) es la densidad de los elementos más pesados, esta última se puede despreciar debido a que su abundancia es pequeña. Es de notar que la abundancia por número de helio es \(y_{\text{He}}\) de tal manera que, \(n_{\text{He}} = y_{\text{He}} n\) con \(y_{\text{He}} \simeq 0.08\). Ahora podemos escribir la densidad electrónica como;
+
+\begin{equation*}
+  \label{eq:densidad-electronica}
+  n_{e}=nx_{\text{H}^{+}} + y_{\text{He}}nx_{\text{He}^{+}} + 2 y_{\text{He}}nx_{\text{He}^{++}} + \sum_{k} \sum_{j}njy_{j}x_{jk}
+\end{equation*}
+
+Aquí \(x_{\text{H}^{+}}\) y \(x_{\text{He}^{+}}\) representan el grado de ionización del hidrógeno y el helio respectivamente, donde \(x_{\text{H}^{+}}=1\) y \(x_{\text{He}^{++}} \simeq 0\) para Orión, el último término de la expresión anterior es despreciable debido a que corresponde a los metales, de este modo nos queda
+
+\begin{equation*}
+  \label{eq:density}
+  n_{e} \simeq n(1 +  y_{\text{He}}x_{\text{He}^{+}})
+\end{equation*}
+
+ Los choques LL se encuentran lejos del Trapecio donde \(x_{\text{He}^{+}} \simeq 0\) entonces,
+
+\begin{equation}
+  \label{eq:pressure}
+  P =  \left\{ \begin{array}{ll}
+  2.08 n k T  & \mathrm{si} ~~ \mbox{$x_{\text{He}^{+}} \simeq 0$}\\
+  2.16 n k T  & \mathrm{si} ~~ \mbox{$x_{\text{He}^{+}} \simeq 1$}
+ \end{array}
+ \right.
+\end{equation}
+
+\subsection{Densidad }
+\label{sec:densinty}
+
+La ecuación~\ref{eq:presion-cascara} está en términos de la densinad numérica \(n\) que hasta el momento es una variable desconocida para nosotros. Así que para determinar la densidad en los choques LL es necesario utilizar los parámetros observacionales \(S_{\ha{}}\) y \(\zeta\). No obstante como se ha dicho en la sección (tal) en la cáscara chocada domina la emisión por las líneas de recombinación tales como \ha{}, por ello hemos de utilizar el brillo superficial de \ha{} para este fin. Es pertinente antes de continuar con nuestro análisis abrir un pequeño paréntesis, para hablar un poco de la naturaleza de la línea de recombinación; Balmer-\ha{}.\\
+
+\subsubsection{Líneas de recombinación de \ha{}}
+\label{sec:lines-ha}
+
+La serie de Balmer es un conjunto de líneas espectrales del átomo de hidrógeno que a diferencia de otras líneas de emisión del mismo, las transiciónes ocurren desde los niveles de energía \(\text{n}= 3,4,5,...\) al nivel \(\text{n}=2\) con \(\text{n}\) el número cuántico principal, así cada una de estas transiciones corresponde a una longitud de onda partícular (\(\lambda_{32}\) = 6563~\A~(\ha{}; rojo), \(\lambda_{42} = 4862~\A{}\) (\(\text{H}_{\beta}\); turquesa), \(\lambda_{52} = 4340~\A{}\) (\(\text{H}_{\gamma}\); azul) y \(\lambda_{62} = 4101.75~\A{}\) (\(\text{H}_{\delta}\); violeta)) estas longitudes de onda se han determinado a partir de datos experimentales, además éstas longitudes de onda \(\lambda\) caen dentro de la región visible del espectro electromagnético \citep{Carroll:1996}) (ver figura ). Por otro lado, para las líneas de recombinación del átomo de hidrógeno tenemos que la energía de los fotones que se emiten durante las transiciónes está dada por,
+
+\begin{equation}
+  \label{eq:energy}
+  E = \frac{hc}{\lambda}. 
+\end{equation}
+ 
+Según el tratado de Bohr la energía en un estado cuántico es
+
+\begin{equation}
+  \label{eq:quantum}
+  E_{\text{n}} = -13.6~\text{eV}~\frac{1}{\text{n}^{2}},
+\end{equation}
+
+esta última expresión también nos proporciona la energía del fotón emitido, es decir
+
+\begin{equation}
+  \label{eq:energy-}
+ E = 13.6~\text{eV}~\left(\frac{1}{\text{n}_{\text{Inf}}^{2}}-\frac{1}{\text{n}_{\text{Sup}}^{2}}\right).
+\end{equation}
+
+ Donde el electrón decae de un nivel de energía, \(\text{n}_{\text{Sup}}\), a un nivel de menor enrgía, \(\text{n}_{\text{Inf}}\). Usando las ecuaciones~\ref{eq:energy} y \ref{eq:energy-} para el caso particular de las líneas de recombinación de \ha{} (donde la transición ocurre del nivel superior de energía \(\text{n}=3\) al nivel inferior de \(\text{n}=2\)) tendremos que: 
+
+\begin{equation}
+ \label{eq:values-energy-landa}
+  E_{32} = 1.889~\text{eV}  ~~ \text{y} ~~
+  \lambda_{32} = 6563~\A{}.
+ \end{equation}
+
+\subsubsection{Estimación de la densidad en función de \(S_{\ha{}}\) y \(\zeta\) }
+\label{sec:brillo}
+
+Empezemos por escribir la relación de brillo superficial, suponiendo que no hay abosorción y que además está corregida por la absorción del polvo;
+
+\begin{equation}
+  \label{eq:brillo}
+  S_{\ha{}} = \int \eta_{\ha{}} d\zeta \simeq \eta_{\ha{}} \Delta \zeta
+\end{equation}  
+
+\noindent en la que  \(\eta_{\ha{}}\) es la emisividad, cuyas unidades son [\(\mathrm{erg~s^{-1}~cm^{-3}~sr^{-1}}\)] y \(\Delta \zeta\) es el camino de la línea de visión. El primero de estos parámetro está dado por,
+
+  \begin{equation}
+    \label{eq:emision-coeficiente}
+    \eta_{\ha} = \frac{n(H^0_{\text{n}=3})A_{32}}{4 \pi} \left(\frac{hc}{\lambda_{32}}\right) 
+  \end{equation}
+
+ Si la tasa de recombinaciones por volumen que producen \ha{}  es 
+\begin{equation}
+  \label{eq:recombinaciones}
+  \alpha_{\ha} n_{e}n_{H^{+}}=n(H^0_{\text{n}=3})A_{32}
+\end{equation}
+
+donde  \(\alpha_{\ha}=1.27\times 10^{-13}\cm^{3} \text{s}^{-1} \) es el coeficiente recombinación efectiva. Al sustituir la Ec. \ref{eq:recombinaciones} en la Ec.~\ref{eq:emision-coeficiente} y teniendo en cuenta que \(n_{e}\simeq n_{H} \simeq n\) obtenemos que
+
+\begin{equation*}
+ \eta_{\ha} =  \frac{\alpha_{\ha}n^{2}}{4\pi} \left(\frac{hc}{\lambda_{32}}\right)  
+\end{equation*}
+
+ usando la ec. (\ref{eq:brillo}) se concluye que,
+
+\begin{equation}
+  \label{eq:densidad}
+  n^{2}=\frac{4 \pi S_{\ha}}{\alpha_{\ha} E_{32} \Delta \zeta}
+\end{equation}
+
+\noindent donde \( E_{32} = hc/\lambda_{32}\)  es la energía de los fotones en la emisión de \ha{} y cuyo valor es perceptible en la expresión~\ref{eq:values-energy-landa}. 
+
+\subsubsection{Estimación de \(\Delta \zeta\)}
+\label{sec:camino}
+
+A partir del radio de curvatura \(R_{c}\) y del ancho de la zona chocada \(h\) podemos determinar \(\Delta \zeta\) (ver figura~\ref{fig:geometria}), suponiendo simetría cilíndrica y el eje de simetría en el plano del cielo (xy).\\
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\linewidth, clip]{figuras-tesis/geometry-chock.jpg}
+  \caption{Geometría de la cáscara chocada. En el que se supone simetría cilíndrica, en el plano del cielo (xy) la línea de visión va en dirección al eje de las z. }
+  \label{fig:geometria}
+\end{figure}
+
+Entonces como la geometría de la cáscara en xz (ver figura~\ref{fig:geometria1}) es igual en xy. Así que para \(h \gg R_{c}\) tendremos que,
+
+\begin{equation}
+  \label{eq:vision}
+  \Delta \zeta = 2(R_{c}h)^{1/2}
+\end{equation}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\linewidth, clip]{figuras-tesis/geometry-shock2.jpg}
+  \caption{Geometría de la cáscara en el plano xz, que entre otras cosas es igual al plano xy.}
+  \label{fig:geometria1}
+\end{figure}
+
+\subsection{Flujo de momento \(\dot{M}v\) del viento interno}
+\label{sec:momento}
+
+Deacuerdo a la suposición 1, existe un equilibrio de presiones de tal manera que podemos establecer;
+ 
+\begin{equation}
+  \label{eq:igualda-presion}
+  P_{\text{Hyd}}(\Out{})=P_{\text{Termica}}=P_{\text{Hyd}}(\In{})
+\end{equation}
+
+Ahora si sustituimos la ec~\ref{eq:presin-interna} en la anterior ecuación obtenemos que,
+
+\begin{equation}
+  \label{eq:momentum}
+   \dot{M}v = 4 \pi  R_{0}(\In{})^{2}  P_{\text{Termica}}. 
+\end{equation}
+
+Donde \(P_{\text{Termica}}\) está dada por la ec~\ref{eq:presion-cascara}. 
+
+\bibliography{luis-ref}
+
+\end{document}

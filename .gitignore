@@ -1,4 +1,5 @@
 *
+!*.tex
 !*.org
 !*.org_archive
 !.gitignore
@@ -21,3 +22,4 @@
 *conflicted*copy*
 
 /programas/extract-image_flymake.py
+/_region_.tex
