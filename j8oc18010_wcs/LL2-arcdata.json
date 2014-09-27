@@ -15,7 +15,16 @@
             "Plot limits modified for Bally_18 plot-image.py: <will@mac> 2014-05-13 16:19", 
             "Image Robberto_WFPC2_f656n_33 added by extract-image.py: <angel@crya> 2014-06-25 17:05", 
             "Shell data for Robberto_WFPC2_f656n_33 added/modified by arc_brightness.py: <angel@crya> 2014-06-25 17:05", 
-            "Shell data for Bally_18 added/modified by arc_brightness.py: <angel@crya> 2014-06-25 17:05"
+            "Shell data for Bally_18 added/modified by arc_brightness.py: <angel@crya> 2014-06-25 17:05", 
+            "Image WFC_mosaic_f547 added by extract-image.py: <angel@crya> 2014-07-30 18:16", 
+            "Shell data for Robberto_WFPC2_f656n_33 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 18:16", 
+            "Shell data for Bally_18 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 18:16", 
+            "Image WFC_mosaic_f502 added by extract-image.py: <angel@crya> 2014-07-31 20:59", 
+            "Shell data for Robberto_WFPC2_f656n_33 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 20:59", 
+            "Shell data for Bally_18 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 20:59", 
+            "Image WFC_mosaic_f502 added by extract-image.py: <angel@crya> 2014-07-31 21:00", 
+            "Shell data for Robberto_WFPC2_f656n_33 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 21:00", 
+            "Shell data for Bally_18 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 21:01"
         ]
     }, 
     "star": {
@@ -33,16 +42,8 @@
             "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
             "background": "Trimean brightness and interquartile (difference between quartiles) of background"
         }, 
-        "arcs": {
-            "PA0": "[deg] Position angle of symmetry axis", 
-            "R0": "[arcsec] Radius along symmetry axis", 
-            "h": "[arcsec] Bowshock width along symmetry axis", 
-            "y": "(list) [arcsec] Dec offsets from star of shell points", 
-            "R": "(list) [arcsec] Radii of shell points from star", 
-            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
-            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
-            "x": "(list) [arcsec] RA offsets from star of shell points", 
-            "theta": "(list) [deg] Angle from axis of shell points"
+        "thickness": {
+            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
         }, 
         "star": {
             "Dec_dg": "[deg] Declination of source", 
@@ -53,8 +54,16 @@
             "RA_dg": "[deg] Right ascension of source", 
             "id": "Source identifier deduced from region filename"
         }, 
-        "thickness": {
-            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
+        "arcs": {
+            "PA0": "[deg] Position angle of symmetry axis", 
+            "R0": "[arcsec] Radius along symmetry axis", 
+            "h": "[arcsec] Bowshock width along symmetry axis", 
+            "y": "(list) [arcsec] Dec offsets from star of shell points", 
+            "R": "(list) [arcsec] Radii of shell points from star", 
+            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
+            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
+            "x": "(list) [arcsec] RA offsets from star of shell points", 
+            "theta": "(list) [deg] Angle from axis of shell points"
         }
     }, 
     "Robberto_WFPC2_f656n_33": {
@@ -377,7 +386,6 @@
         "R0": 2.073656586175038, 
         "xc": -11.766190902374152, 
         "yc": 0.3797686234416043, 
-        "Rc": 13.843598702595136, 
         "y": [
             7.9200000000007265, 
             6.890000000002772, 
@@ -399,6 +407,7 @@
             1.4808062354771296, 
             0.9766739627369508
         ], 
+        "Rc": 13.843598702595136, 
         "Y": [
             -7.922383856146094, 
             -6.88593847461539, 
@@ -440,12 +449,18 @@
             78.58678182760843
         ]
     }, 
+    "WFC_mosaic_f502": {
+        "filter": "F547M", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf502-fixw-align.fits", 
+        "camera": "WFPC2", 
+        "date": "1995-03-21", 
+        "extracted FITS file": "LL2-WFC_mosaic_f502-extract.fits"
+    }, 
     "outer": {
         "PA0": 97.59839631885691, 
         "R0": 4.0348917023486415, 
         "xc": -24.090728416900657, 
         "yc": 1.7579622427635664, 
-        "Rc": 27.930397112362527, 
         "y": [
             26.65000000000113, 
             23.320000000002494, 
@@ -473,6 +488,7 @@
             3.8890551624294454, 
             3.4581049451664767
         ], 
+        "Rc": 27.930397112362527, 
         "Y": [
             -25.772241427596025, 
             -22.81902810074185, 
@@ -525,5 +541,12 @@
             25.09982244151918, 
             54.87543885518467
         ]
+    }, 
+    "WFC_mosaic_f547": {
+        "filter": "F547M", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf547-fixw-align.fits", 
+        "camera": "WFPC2", 
+        "date": "1995-03-21", 
+        "extracted FITS file": "LL2-WFC_mosaic_f547-extract.fits"
     }
 }

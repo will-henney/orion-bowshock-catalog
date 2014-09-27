@@ -116,7 +116,7 @@ def bright_fmt(r):
     return "{:.5f}".format(r)
 
     
-for s, a, b, c , d, e , f, g, h, i, j, k, l, n in zip(label_['star'], distance['star'], Sfactor_f658*shell_mean['WFC_f658'], Sfactor_f658*sigma_mean['WFC_f658'], Sfactor_f656*shell_mean['WFC_f656'],  Sfactor_f656*sigma_mean['WFC_f656'], Sfactor_f658*bg_mean['WFC_f658'], Sfactor_f658*dbg_mean['WFC_f658'], Sfactor_f656*bg_mean['WFC_f656'], Sfactor_f656*dbg_mean['WFC_f656'], Nii_ha, sigma_ratio_Niiha, Bg_Nii_ha, Bg_sigma_ratio_Niiha): 
+for s, a, b, c , d, e , f, g, h, i, j, k, l, n in zip(label_['star'], distance['star'], Sfactor_f658*shell_mean['WFC_f658'], Sfactor_f658*sigma_mean['WFC_f658'], Sfactor_f656*shell_mean['WFC_f656'], Sfactor_f656*sigma_mean['WFC_f656'], Sfactor_f658*bg_mean['WFC_f658'], Sfactor_f658*dbg_mean['WFC_f658'], Sfactor_f656*bg_mean['WFC_f656'], Sfactor_f656*dbg_mean['WFC_f656'], Nii_ha, sigma_ratio_Niiha, Bg_Nii_ha, Bg_sigma_ratio_Niiha): 
     table["Object"].append(s)
     table["D"].append(str(arcsec_fmt(a)))
     table["S(shell_mosaicf658)"].append(str(bright_fmt(b)))

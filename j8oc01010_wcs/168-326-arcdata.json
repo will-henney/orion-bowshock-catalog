@@ -25,8 +25,189 @@
             "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25", 
             "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25", 
             "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25", 
-            "Shell data for Bally_01 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25"
+            "Shell data for Bally_01 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25", 
+            "Image WFC_mosaic_f547 added by extract-image.py: <angel@crya> 2014-07-30 16:42", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Shell data for Bally_01 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Shell data for WFC_mosaic_f547 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Image WFC_mosaic_f502 added by extract-image.py: <angel@crya> 2014-07-31 16:22", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29", 
+            "Shell data for WFC_mosaic_f502 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29", 
+            "Shell data for Bally_01 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29", 
+            "Shell data for WFC_mosaic_f547 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:30"
         ]
+    }, 
+    "star": {
+        "Dec_dg": -5.390644444444445, 
+        "D": 7.711885308746633, 
+        "PA": 299.4594268020983, 
+        "RA": "5:35:16.839", 
+        "Dec": "-5:23:26.32", 
+        "RA_dg": 83.82016249999997, 
+        "id": "168-326"
+    }, 
+    "help": {
+        "brightness": {
+            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
+            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
+            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
+        }, 
+        "thickness": {
+            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
+        }, 
+        "star": {
+            "Dec_dg": "[deg] Declination of source", 
+            "D": "[arcsec] Distance of th^1 C from source", 
+            "PA": "[deg] Position Angle of th^1 C from source", 
+            "RA": "[HH:MM:SS] Right ascension of source", 
+            "Dec": "[deg:arcmin:arcsec] Declination of source", 
+            "RA_dg": "[deg] Right ascension of source", 
+            "id": "Source identifier deduced from region filename"
+        }, 
+        "arcs": {
+            "PA0": "[deg] Position angle of symmetry axis", 
+            "R0": "[arcsec] Radius along symmetry axis", 
+            "h": "[arcsec] Bowshock width along symmetry axis", 
+            "y": "(list) [arcsec] Dec offsets from star of shell points", 
+            "R": "(list) [arcsec] Radii of shell points from star", 
+            "x": "(list) [arcsec] RA offsets from star of shell points", 
+            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
+            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
+            "theta": "(list) [deg] Angle from axis of shell points"
+        }
+    }, 
+    "WFC_mosaic_f656": {
+        "shell": {
+            "N": 32, 
+            "value": 1619.1035079956055, 
+            "delta": 58.512176513671875
+        }, 
+        "extracted FITS file": "168-326-WFC_mosaic_f656-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf656-fixw-align.fits", 
+        "filter": "F547M", 
+        "binned": {
+            "theta": [
+                -48.0, 
+                -24.0, 
+                0.0, 
+                24.0, 
+                48.0
+            ], 
+            "shell": [
+                1472.6498031616211, 
+                1636.9344635009766, 
+                1627.7886047363281, 
+                1618.7099304199219, 
+                1634.6462020874023
+            ], 
+            "background": [
+                1447.2127075195312, 
+                1570.8031311035156, 
+                1521.2857971191406, 
+                1525.9681091308594, 
+                1612.6644897460938
+            ], 
+            "background N": [
+                7, 
+                6, 
+                5, 
+                6, 
+                9
+            ], 
+            "background sigma": [
+                29.593044330654905, 
+                47.389564667918819, 
+                20.750187189872076, 
+                26.471924145201005, 
+                36.188380029724868
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "plot limits": {
+            "max": 1795.9755249023438, 
+            "min": 1366.7532348632812
+        }, 
+        "shell center": {
+            "N": 13, 
+            "value": 1620.4389953613281, 
+            "delta": 21.8868408203125
+        }, 
+        "background": {
+            "N": 22, 
+            "value": 1537.6071166992188, 
+            "delta": 56.9512939453125
+        }, 
+        "date": "1995-03-21"
+    }, 
+    "WFC_mosaic_f658": {
+        "shell": {
+            "N": 32, 
+            "value": 773.9981842041016, 
+            "delta": 62.0428466796875
+        }, 
+        "extracted FITS file": "168-326-WFC_mosaic_f658-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf658-fixw-align.fits", 
+        "filter": "F547M", 
+        "binned": {
+            "theta": [
+                -48.0, 
+                -24.0, 
+                0.0, 
+                24.0, 
+                48.0
+            ], 
+            "shell": [
+                752.69199752807617, 
+                898.49404907226562, 
+                769.96348571777344, 
+                747.7396240234375, 
+                656.27980041503906
+            ], 
+            "background": [
+                935.99036407470703, 
+                1088.0068206787109, 
+                801.74526977539062, 
+                662.40617370605469, 
+                636.57736206054688
+            ], 
+            "background N": [
+                7, 
+                6, 
+                5, 
+                6, 
+                9
+            ], 
+            "background sigma": [
+                367.71971409273874, 
+                62.979012977024063, 
+                12.315172346379571, 
+                12.563841224336931, 
+                4.0022296704141702
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "plot limits": {
+            "max": 960.1267242431641, 
+            "min": -158.23291015625
+        }, 
+        "shell center": {
+            "N": 13, 
+            "value": 769.3526611328125, 
+            "delta": 16.260009765625
+        }, 
+        "background": {
+            "N": 22, 
+            "value": 811.5798950195312, 
+            "delta": 323.27093505859375
+        }, 
+        "date": "1995-03-21"
+    }, 
+    "thickness": {
+        "h0": 0.20967596501982888
     }, 
     "Robberto_WFPC2_39_f656n": {
         "shell": {
@@ -308,164 +489,94 @@
             63.45332276284299
         ]
     }, 
-    "help": {
-        "brightness": {
-            "shell": "Trimean brightness and interquartile (difference between quartiles) of shell", 
-            "shell center": "Trimean brightness and interquartile (difference between quartiles) of shell center", 
-            "background": "Trimean brightness and interquartile (difference between quartiles) of background"
-        }, 
-        "thickness": {
-            "h0": "Shell thickness on axis: h0 = R0(outer) - R0(inner)"
-        }, 
-        "star": {
-            "Dec_dg": "[deg] Declination of source", 
-            "D": "[arcsec] Distance of th^1 C from source", 
-            "PA": "[deg] Position Angle of th^1 C from source", 
-            "RA": "[HH:MM:SS] Right ascension of source", 
-            "Dec": "[deg:arcmin:arcsec] Declination of source", 
-            "RA_dg": "[deg] Right ascension of source", 
-            "id": "Source identifier deduced from region filename"
-        }, 
-        "arcs": {
-            "PA0": "[deg] Position angle of symmetry axis", 
-            "R0": "[arcsec] Radius along symmetry axis", 
-            "h": "[arcsec] Bowshock width along symmetry axis", 
-            "y": "(list) [arcsec] Dec offsets from star of shell points", 
-            "R": "(list) [arcsec] Radii of shell points from star", 
-            "x": "(list) [arcsec] RA offsets from star of shell points", 
-            "Y": "(list) [arcsec] Offsets from star perpendicular to axis of shell points", 
-            "X": "(list) [arcsec] Offsets from star parallel to axis of shell points", 
-            "theta": "(list) [deg] Angle from axis of shell points"
-        }
-    }, 
-    "WFC_mosaic_f656": {
+    "WFC_mosaic_f547": {
         "shell": {
             "N": 32, 
-            "value": 1619.1035079956055, 
-            "delta": 58.512176513671875
+            "value": 308.348445892334, 
+            "delta": 56.50852966308594
         }, 
-        "extracted FITS file": "168-326-WFC_mosaic_f656-extract.fits", 
-        "original FITS file": "$SMALL_FITS_DIR/mosaicf656-fixw-align.fits", 
+        "extracted FITS file": "168-326-WFC_mosaic_f547-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf547-fixw-align.fits", 
         "filter": "F547M", 
         "binned": {
             "theta": [
-                -48.0, 
-                -24.0, 
-                0.0, 
-                24.0, 
-                48.0
+                -54.545454545454547, 
+                -43.63636363636364, 
+                -32.727272727272734, 
+                -21.81818181818182, 
+                -10.909090909090914, 
+                -3.5527136788005009e-15, 
+                10.909090909090907, 
+                21.818181818181813, 
+                32.72727272727272, 
+                43.636363636363626, 
+                54.54545454545454
             ], 
             "shell": [
-                1472.6498031616211, 
-                1636.9344635009766, 
-                1627.7886047363281, 
-                1618.7099304199219, 
-                1634.6462020874023
+                286.91604614257812, 
+                285.43154907226562, 
+                322.97076416015625, 
+                NaN, 
+                NaN, 
+                332.20932006835938, 
+                337.2569580078125, 
+                286.16602325439453, 
+                NaN, 
+                262.08115386962891, 
+                260.29278564453125
             ], 
             "background": [
-                1447.2127075195312, 
-                1570.8031311035156, 
-                1521.2857971191406, 
-                1525.9681091308594, 
-                1612.6644897460938
+                302.66725540161133, 
+                305.48305511474609, 
+                368.76123046875, 
+                484.0880012512207, 
+                370.63906097412109, 
+                340.6792106628418, 
+                322.55776977539062, 
+                306.30021286010742, 
+                264.53792762756348, 
+                214.30967044830322, 
+                205.93386268615723
             ], 
             "background N": [
-                7, 
-                6, 
-                5, 
-                6, 
-                9
+                3, 
+                4, 
+                2, 
+                3, 
+                3, 
+                3, 
+                2, 
+                3, 
+                3, 
+                4, 
+                4
             ], 
             "background sigma": [
-                29.593044330654905, 
-                47.389564667918819, 
-                20.750187189872076, 
-                26.471924145201005, 
-                36.188380029724868
+                3.619170556875869, 
+                9.0012726991795233, 
+                25.469896251153937, 
+                45.210623985260511, 
+                23.77074940930337, 
+                9.2633342241302206, 
+                3.4992814812995379, 
+                13.692386649313452, 
+                17.659443654334225, 
+                13.237158248630525, 
+                7.0438932268100531
             ]
         }, 
         "camera": "WFPC2", 
-        "plot limits": {
-            "max": 1795.9755249023438, 
-            "min": 1366.7532348632812
-        }, 
         "shell center": {
-            "N": 13, 
-            "value": 1620.4389953613281, 
-            "delta": 21.8868408203125
+            "N": 15, 
+            "value": 306.2852973937988, 
+            "delta": 54.39811706542969
         }, 
         "background": {
-            "N": 22, 
-            "value": 1537.6071166992188, 
-            "delta": 56.9512939453125
+            "N": 25, 
+            "value": 325.8988571166992, 
+            "delta": 65.91842651367188
         }, 
         "date": "1995-03-21"
-    }, 
-    "WFC_mosaic_f658": {
-        "shell": {
-            "N": 32, 
-            "value": 773.9981842041016, 
-            "delta": 62.0428466796875
-        }, 
-        "extracted FITS file": "168-326-WFC_mosaic_f658-extract.fits", 
-        "original FITS file": "$SMALL_FITS_DIR/mosaicf658-fixw-align.fits", 
-        "filter": "F547M", 
-        "binned": {
-            "theta": [
-                -48.0, 
-                -24.0, 
-                0.0, 
-                24.0, 
-                48.0
-            ], 
-            "shell": [
-                752.69199752807617, 
-                898.49404907226562, 
-                769.96348571777344, 
-                747.7396240234375, 
-                656.27980041503906
-            ], 
-            "background": [
-                935.99036407470703, 
-                1088.0068206787109, 
-                801.74526977539062, 
-                662.40617370605469, 
-                636.57736206054688
-            ], 
-            "background N": [
-                7, 
-                6, 
-                5, 
-                6, 
-                9
-            ], 
-            "background sigma": [
-                367.71971409273874, 
-                62.979012977024063, 
-                12.315172346379571, 
-                12.563841224336931, 
-                4.0022296704141702
-            ]
-        }, 
-        "camera": "WFPC2", 
-        "plot limits": {
-            "max": 960.1267242431641, 
-            "min": -158.23291015625
-        }, 
-        "shell center": {
-            "N": 13, 
-            "value": 769.3526611328125, 
-            "delta": 16.260009765625
-        }, 
-        "background": {
-            "N": 22, 
-            "value": 811.5798950195312, 
-            "delta": 323.27093505859375
-        }, 
-        "date": "1995-03-21"
-    }, 
-    "thickness": {
-        "h0": 0.20967596501982888
     }, 
     "inner": {
         "PA0": 328.0977726289323, 
@@ -583,14 +694,94 @@
             57.421452794720395
         ]
     }, 
-    "star": {
-        "Dec_dg": -5.390644444444445, 
-        "D": 7.711885308746633, 
-        "PA": 299.4594268020983, 
-        "RA": "5:35:16.839", 
-        "Dec": "-5:23:26.32", 
-        "RA_dg": 83.82016249999997, 
-        "id": "168-326"
+    "WFC_mosaic_f502": {
+        "shell": {
+            "N": 31, 
+            "value": 843.0088500976562, 
+            "delta": 58.4222412109375
+        }, 
+        "extracted FITS file": "168-326-WFC_mosaic_f502-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf502-fixw-align.fits", 
+        "filter": "F547M", 
+        "binned": {
+            "theta": [
+                -54.545454545454547, 
+                -43.63636363636364, 
+                -32.727272727272734, 
+                -21.81818181818182, 
+                -10.909090909090914, 
+                -3.5527136788005009e-15, 
+                10.909090909090907, 
+                21.818181818181813, 
+                32.72727272727272, 
+                43.636363636363626, 
+                54.54545454545454
+            ], 
+            "shell": [
+                670.58734130859375, 
+                720.58840942382812, 
+                782.96890258789062, 
+                NaN, 
+                871.9771728515625, 
+                906.69873046875, 
+                870.0777587890625, 
+                876.43238830566406, 
+                NaN, 
+                824.9444580078125, 
+                773.42179870605469
+            ], 
+            "background": [
+                617.62087249755859, 
+                623.76828765869141, 
+                658.75848388671875, 
+                743.28217315673828, 
+                738.94477081298828, 
+                761.88877105712891, 
+                711.63973999023438, 
+                669.9384765625, 
+                716.71559143066406, 
+                717.69783020019531, 
+                739.55120468139648
+            ], 
+            "background N": [
+                3, 
+                3, 
+                2, 
+                3, 
+                3, 
+                3, 
+                2, 
+                2, 
+                3, 
+                4, 
+                4
+            ], 
+            "background sigma": [
+                4.1916044136256936, 
+                12.799547286876754, 
+                16.277269321242763, 
+                26.188936609323221, 
+                20.150029196483171, 
+                28.909679993276995, 
+                12.103672588371623, 
+                10.719547046153174, 
+                32.380886685862464, 
+                24.699977408038684, 
+                59.18304590620744
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "shell center": {
+            "N": 17, 
+            "value": 850.2078552246094, 
+            "delta": 61.186767578125
+        }, 
+        "background": {
+            "N": 23, 
+            "value": 715.8785934448242, 
+            "delta": 71.74673461914062
+        }, 
+        "date": "1995-03-21"
     }, 
     "Bally_01": {
         "shell": {

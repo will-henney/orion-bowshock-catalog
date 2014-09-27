@@ -10,8 +10,6 @@ pattern = "j8oc??010_wcs/*-arcdata.json"
 
 file_list = glob.glob(pattern)
 
-no_wfcp2 = ["117-421", "042-628", "074-421"]
-
 Sfactor_ACS = 0.0025030687604156482
 Sfactor_WFPC2 = 0.16895605909108011
 

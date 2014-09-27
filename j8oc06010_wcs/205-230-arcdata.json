@@ -1,96 +1,61 @@
 {
-    "Robberto_WFPC2_39_f656n": {
-        "shell": {
-            "N": 39, 
-            "value": 0.3245561271905899, 
-            "delta": 0.03400537371635437
-        }, 
-        "extracted FITS file": "205-230-Robberto_WFPC2_39_f656n-extract.fits", 
-        "original FITS file": "$LARGE_FITS_DIR/wfpc2/hlsp_orion_hst_wfpc2_39_f656n_v1_sci.fits", 
-        "filter": "F656N", 
-        "binned": {
-            "theta": [
-                -54.545454545454547, 
-                -43.63636363636364, 
-                -32.727272727272734, 
-                -21.81818181818182, 
-                -10.909090909090914, 
-                -3.5527136788005009e-15, 
-                10.909090909090907, 
-                21.818181818181813, 
-                32.72727272727272, 
-                43.636363636363626, 
-                54.54545454545454
-            ], 
-            "shell": [
-                0.29814611747860909, 
-                0.31937900930643082, 
-                0.32725271955132484, 
-                0.34233775734901428, 
-                0.34355294704437256, 
-                0.34136392176151276, 
-                0.33120305836200714, 
-                0.30623454973101616, 
-                0.29753102362155914, 
-                0.27875466644763947, 
-                0.26678541488945484
-            ], 
-            "background": [
-                0.26671251282095909, 
-                0.31584352813661098, 
-                0.34532621502876282, 
-                0.40346120297908783, 
-                0.36277881450951099, 
-                0.33503926731646061, 
-                0.31085153855383396, 
-                0.28024684265255928, 
-                0.26886913552880287, 
-                0.26509418338537216, 
-                0.24591397680342197
-            ], 
-            "background N": [
-                7, 
-                6, 
-                5, 
-                3, 
-                4, 
-                4, 
-                4, 
-                3, 
-                6, 
-                5, 
-                8
-            ], 
-            "background sigma": [
-                0.011491665152925278, 
-                0.025182047173459694, 
-                0.0083997873887123892, 
-                0.01728786309405328, 
-                0.0029850881682259634, 
-                0.0094710690233858735, 
-                0.011476261161034534, 
-                0.0094442211192693783, 
-                0.0021526264006574503, 
-                0.0080179186187855234, 
-                0.0078388865653117121
-            ]
-        }, 
-        "camera": "WFPC2", 
-        "plot limits": {
-            "max": 0.4273514077067375, 
-            "min": 0.08869844488799572
-        }, 
-        "shell center": {
-            "N": 19, 
-            "value": 0.3253352865576744, 
-            "delta": 0.03345292806625366
-        }, 
-        "background": {
-            "N": 36, 
-            "value": 0.31861706636846066, 
-            "delta": 0.07663954049348831
-        }, 
-        "date": "2005-04-10"
+    "info": {
+        "region": "205-230-forma.reg", 
+        "description": "JSON data file for stationary bowshock arcs", 
+        "history": [
+            "Initially created by find-xy-shell.py: <angel@crya> 2014-03-12 15:32", 
+            "Circle fits added by fit-circle-shell.py: <angel@crya> 2014-03-12 15:32", 
+            "Image Bally_06 added by extract-image.py: <angel@crya> 2014-03-12 15:33", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:33", 
+            "Image Robberto_WFPC2_f656n_39 added by extract-image.py: <angel@crya> 2014-03-12 15:37", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:37", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:38", 
+            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:20", 
+            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:21", 
+            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:21", 
+            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:53", 
+            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:54", 
+            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:55", 
+            "Plot limits modified for Robberto_WFPC2_f656n_39 plot-image.py: <angel@crya> 2014-07-02 23:19", 
+            "Image Robberto_WFPC2_39_f656n added by extract-image.py: <angel@crya> 2014-07-05 17:39", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
+            "Plot limits modified for Robberto_WFPC2_39_f656n plot-image.py: <angel@crya> 2014-07-05 17:46", 
+            "Image WFC_mosaic_f656 added by extract-image.py: <angel@crya> 2014-07-16 20:29", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:30", 
+            "Plot limits modified for WFC_mosaic_f656 plot-image.py: <angel@crya> 2014-07-16 20:33", 
+            "Image WFC_mosaic_f658 added by extract-image.py: <angel@crya> 2014-07-16 20:35", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:36", 
+            "Plot limits modified for WFC_mosaic_f658 plot-image.py: <angel@crya> 2014-07-16 20:38", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
+            "Image WFC_mosaic_f547 added by extract-image.py: <angel@crya> 2014-07-30 17:39", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Shell data for WFC_mosaic_f547 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-30 17:40", 
+            "Image WFC_mosaic_f502 added by extract-image.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for WFC_mosaic_f502 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for WFC_mosaic_f547 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43", 
+            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:43"
+        ]
     }, 
     "star": {
         "Dec_dg": -5.39166875, 
@@ -227,48 +192,142 @@
         }, 
         "date": "1995-03-21"
     }, 
-    "info": {
-        "region": "205-230-forma.reg", 
-        "description": "JSON data file for stationary bowshock arcs", 
-        "history": [
-            "Initially created by find-xy-shell.py: <angel@crya> 2014-03-12 15:32", 
-            "Circle fits added by fit-circle-shell.py: <angel@crya> 2014-03-12 15:32", 
-            "Image Bally_06 added by extract-image.py: <angel@crya> 2014-03-12 15:33", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:33", 
-            "Image Robberto_WFPC2_f656n_39 added by extract-image.py: <angel@crya> 2014-03-12 15:37", 
-            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:37", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-03-12 15:38", 
-            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:20", 
-            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:21", 
-            "Plot limits modified for Bally_06 plot-image.py: <angel@crya> 2014-05-08 22:21", 
-            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:53", 
-            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:54", 
-            "Plot limits modified for Bally_06 plot-image.py: <will@mac> 2014-05-14 09:55", 
-            "Plot limits modified for Robberto_WFPC2_f656n_39 plot-image.py: <angel@crya> 2014-07-02 23:19", 
-            "Image Robberto_WFPC2_39_f656n added by extract-image.py: <angel@crya> 2014-07-05 17:39", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
-            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-05 17:42", 
-            "Plot limits modified for Robberto_WFPC2_39_f656n plot-image.py: <angel@crya> 2014-07-05 17:46", 
-            "Image WFC_mosaic_f656 added by extract-image.py: <angel@crya> 2014-07-16 20:29", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
-            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
-            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:29", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:30", 
-            "Plot limits modified for WFC_mosaic_f656 plot-image.py: <angel@crya> 2014-07-16 20:33", 
-            "Image WFC_mosaic_f658 added by extract-image.py: <angel@crya> 2014-07-16 20:35", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
-            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
-            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
-            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:35", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-16 20:36", 
-            "Plot limits modified for WFC_mosaic_f658 plot-image.py: <angel@crya> 2014-07-16 20:38", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
-            "Shell data for WFC_mosaic_f656 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
-            "Shell data for WFC_mosaic_f658 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
-            "Shell data for Robberto_WFPC2_f656n_39 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32", 
-            "Shell data for Bally_06 added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:32"
-        ]
+    "WFC_mosaic_f547": {
+        "shell": {
+            "N": 7, 
+            "value": 30.275282621383667, 
+            "delta": 2.581221580505371
+        }, 
+        "extracted FITS file": "205-230-WFC_mosaic_f547-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf547-fixw-align.fits", 
+        "filter": "F547M", 
+        "binned": {
+            "theta": [
+                -30.0, 
+                30.0
+            ], 
+            "shell": [
+                32.482255935668945, 
+                28.059453964233398
+            ], 
+            "background": [
+                40.92685604095459, 
+                28.60846471786499
+            ], 
+            "background N": [
+                5, 
+                7
+            ], 
+            "background sigma": [
+                7.3969574487397551, 
+                3.2482075260052192
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "shell center": {
+            "N": 4, 
+            "value": 29.99434530735016, 
+            "delta": 1.722588062286377
+        }, 
+        "background": {
+            "N": 8, 
+            "value": 35.135013580322266, 
+            "delta": 5.829616546630859
+        }, 
+        "date": "1995-03-21"
+    }, 
+    "Robberto_WFPC2_39_f656n": {
+        "shell": {
+            "N": 39, 
+            "value": 0.3245561271905899, 
+            "delta": 0.03400537371635437
+        }, 
+        "extracted FITS file": "205-230-Robberto_WFPC2_39_f656n-extract.fits", 
+        "original FITS file": "$LARGE_FITS_DIR/wfpc2/hlsp_orion_hst_wfpc2_39_f656n_v1_sci.fits", 
+        "filter": "F656N", 
+        "binned": {
+            "theta": [
+                -54.545454545454547, 
+                -43.63636363636364, 
+                -32.727272727272734, 
+                -21.81818181818182, 
+                -10.909090909090914, 
+                -3.5527136788005009e-15, 
+                10.909090909090907, 
+                21.818181818181813, 
+                32.72727272727272, 
+                43.636363636363626, 
+                54.54545454545454
+            ], 
+            "shell": [
+                0.29814611747860909, 
+                0.31937900930643082, 
+                0.32725271955132484, 
+                0.34233775734901428, 
+                0.34355294704437256, 
+                0.34136392176151276, 
+                0.33120305836200714, 
+                0.30623454973101616, 
+                0.29753102362155914, 
+                0.27875466644763947, 
+                0.26678541488945484
+            ], 
+            "background": [
+                0.26671251282095909, 
+                0.31584352813661098, 
+                0.34532621502876282, 
+                0.40346120297908783, 
+                0.36277881450951099, 
+                0.33503926731646061, 
+                0.31085153855383396, 
+                0.28024684265255928, 
+                0.26886913552880287, 
+                0.26509418338537216, 
+                0.24591397680342197
+            ], 
+            "background N": [
+                7, 
+                6, 
+                5, 
+                3, 
+                4, 
+                4, 
+                4, 
+                3, 
+                6, 
+                5, 
+                8
+            ], 
+            "background sigma": [
+                0.011491665152925278, 
+                0.025182047173459694, 
+                0.0083997873887123892, 
+                0.01728786309405328, 
+                0.0029850881682259634, 
+                0.0094710690233858735, 
+                0.011476261161034534, 
+                0.0094442211192693783, 
+                0.0021526264006574503, 
+                0.0080179186187855234, 
+                0.0078388865653117121
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "plot limits": {
+            "max": 0.4273514077067375, 
+            "min": 0.08869844488799572
+        }, 
+        "shell center": {
+            "N": 19, 
+            "value": 0.3253352865576744, 
+            "delta": 0.03345292806625366
+        }, 
+        "background": {
+            "N": 36, 
+            "value": 0.31861706636846066, 
+            "delta": 0.07663954049348831
+        }, 
+        "date": "2005-04-10"
     }, 
     "outer": {
         "PA0": 115.74568842909285, 
@@ -477,6 +536,50 @@
             -66.255549130768, 
             -39.93847190125067
         ]
+    }, 
+    "WFC_mosaic_f502": {
+        "shell": {
+            "N": 7, 
+            "value": 113.51712131500244, 
+            "delta": 3.3267555236816406
+        }, 
+        "extracted FITS file": "205-230-WFC_mosaic_f502-extract.fits", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf502-fixw-align.fits", 
+        "filter": "F547M", 
+        "binned": {
+            "theta": [
+                -30.0, 
+                30.0
+            ], 
+            "shell": [
+                119.06456756591797, 
+                111.12120151519775
+            ], 
+            "background": [
+                120.68629360198975, 
+                109.507643699646
+            ], 
+            "background N": [
+                6, 
+                7
+            ], 
+            "background sigma": [
+                6.2309233579712879, 
+                2.2134431501341729
+            ]
+        }, 
+        "camera": "WFPC2", 
+        "shell center": {
+            "N": 4, 
+            "value": 114.71048784255981, 
+            "delta": 3.911191940307617
+        }, 
+        "background": {
+            "N": 9, 
+            "value": 112.9827938079834, 
+            "delta": 8.444786071777344
+        }, 
+        "date": "1995-03-21"
     }, 
     "Bally_06": {
         "shell": {

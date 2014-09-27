@@ -18,7 +18,11 @@
             "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 18:31", 
             "Image WFC_mosaic_f658 added by extract-image.py: <angel@crya> 2014-07-16 18:55", 
             "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-16 19:11", 
-            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25"
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-22 17:25", 
+            "Image WFC_mosaic_f547 added by extract-image.py: <angel@crya> 2014-07-30 16:42", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-30 16:49", 
+            "Image WFC_mosaic_f502 added by extract-image.py: <angel@crya> 2014-07-31 16:22", 
+            "Shell data for Robberto_WFPC2_39_f656n added/modified by arc_brightness.py: <angel@crya> 2014-07-31 16:29"
         ]
     }, 
     "star": {
@@ -231,6 +235,9 @@
             "N": 388
         }, 
         "date": "2005-04-10"
+    }, 
+    "thickness": {
+        "h0": 0.5142069216904154
     }, 
     "Robberto_WFPC2_39_f656n": {
         "shell": {
@@ -452,8 +459,12 @@
             136.7245887831282
         ]
     }, 
-    "thickness": {
-        "h0": 0.5142069216904154
+    "WFC_mosaic_f547": {
+        "filter": "F547M", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf547-fixw-align.fits", 
+        "camera": "WFPC2", 
+        "date": "1995-03-21", 
+        "extracted FITS file": "167-317-WFC_mosaic_f547-extract.fits"
     }, 
     "inner": {
         "PA0": 104.75913831731813, 
@@ -504,6 +515,13 @@
             136.02818232415325, 
             144.8690062671532
         ]
+    }, 
+    "WFC_mosaic_f502": {
+        "filter": "F547M", 
+        "original FITS file": "$SMALL_FITS_DIR/mosaicf502-fixw-align.fits", 
+        "camera": "WFPC2", 
+        "date": "1995-03-21", 
+        "extracted FITS file": "167-317-WFC_mosaic_f502-extract.fits"
     }, 
     "Bally_01": {
         "shell": {
