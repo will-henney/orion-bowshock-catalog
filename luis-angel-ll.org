@@ -1620,6 +1620,332 @@ Three categories:
 
 * Final tasks to finish the thesis
 
+** Histograms of stars, proplyds, and LL objects
+
+*** First make some better tables
+#+BEGIN_SRC sh
+mkdir Radial-Distribution
+#+END_SRC
+
+#+BEGIN_SRC python :results output verbatim
+import astropy.coordinates as coord
+c0 = coord.get_icrs_coordinates('tet01 ori c')
+print(c0.ra.hms)
+print(c0.dec.dms)
+#+END_SRC
+
+#+RESULTS:
+: hms_tuple(h=5.0, m=35.0, s=16.463754480003558)
+: dms_tuple(d=-5.0, m=-23.0, s=-22.848554399998804)
+
+**** The stars
+#+BEGIN_SRC python :return tabfile :results file
+  import numpy as np
+  from astropy.table import Table
+  import astropy.coordinates as coord
+
+  def ra_ow(ra):
+      """Convert astropy.coordinates RA to OW96 scheme"""
+      h, m, s = ra.hms
+      assert(int(h) == 5 and int(m/10) == 3)
+      ra_code = "{:04d}".format(int((m - 30)*1000 + 10*(s + 0.05)))
+      if ra_code.startswith('5'):
+          ra_code = ra_code[1:]
+      return ra_code
+
+  def dec_ow(dec):
+      """Convert astropy.coordinates Dec to OW96 scheme"""
+      d, m, s = dec.dms
+      assert(int(d) == -5)
+      dec_code = "{:04d}".format(int(abs(m)*100 + abs(s) + 0.5))
+      if dec_code.startswith('2'):
+          dec_code = dec_code[1:]
+      return dec_code
+
+
+  def ow_from_coord(c):
+      return "{}-{}".format(ra_ow(c.ra), dec_ow(c.dec))
+
+  # Position of th1c
+  c0 = coord.get_icrs_coordinates('tet01 ori c')
+
+  ###
+  ### Database of stars from Robberto 2013
+  ###
+  sdata = Table.read("Robberto2013/table5.dat", format='ascii')
+  # Mask of the first entry for each unique source
+  m_uniq = sdata['Seq'] == sdata['oncacs']
+  # Winnow down the table
+  sdata = sdata[m_uniq]
+
+  # Get rid of masked arrays
+  sdata = sdata.filled(0)
+
+  # Now eliminate galaxies and HH objects
+  source_types = ['not measured', 'single', 'close double', 'wide double', 
+                  '???', 'disk', 'ionized', 'galaxy', 'herbig haro']
+  sdata = sdata[(sdata['type'] > 0) & (sdata['type'] < 7)]
+
+  # Combine the 6 columns used for coordinates into a single RA-Dec string:
+  sdata["coordstring"] = ["{} {} {} -{} {} {}".format(*args)
+                    for args in zip(*[sdata[col] for col in 
+                                      ["RAh", "RAm", "RAs", "DEd", "DEm", "DEs"]])]
+  # And convert to a SkyCoord object
+  sdata["coord"] = coord.SkyCoord(sdata["coordstring"], unit=("hourangle", "deg"))
+
+  # Find distance from th1C
+  sdata['Dprime'] = [c0.separation(c).arcsec for c in sdata["coord"]]
+
+  sdata["Object"] = [ow_from_coord(c) for c in sdata["coord"]]
+
+  sdata.sort('Dprime')
+  scols = ['Seq', 'Object', 'Dprime']
+  tabfile = 'Radial-Distribution/stars.tab'
+  sdata[scols].write(tabfile, format='ascii.tab')
+#+END_SRC
+
+#+RESULTS:
+[[file:Radial-Distribution/stars.tab]]
+
+**** The proplyds
+#+BEGIN_SRC python :return tabfile :results file
+  import numpy as np
+  from astropy.table import Table
+  import astropy.coordinates as coord
+
+  # Position of th1c
+  c0 = coord.get_icrs_coordinates('tet01 ori c')
+
+  ###
+  ### Database of proplyds from Ricci 2008
+  ###
+  rdata = Table.read("ricci-2008.dat", format='ascii')
+  rdata.remove_row(0) # First row is rubbish
+  # Get rid of masked arrays
+  rdata = rdata.filled(np.nan)
+
+  # Both bright and dark proplyds
+  rdata = rdata[(rdata['Type'] == 'i') | (rdata['Type'] == 'd')]
+
+  # Add column with SkyCoord object for coordinates
+  rdata["coord"] = coord.SkyCoord(ra=rdata["RAJ2000"], dec=rdata["DEJ2000"],
+                                  unit=("hourangle", "deg"))
+  # Add column with separation from th1c
+  rdata['Dprime'] = [c0.separation(c).arcsec for c in rdata["coord"]]
+  rdata.rename_column('Name', 'Object')
+  rdata.sort('Dprime')
+
+  rcols = ['Object', 'Dprime', 'Type']
+  tabfile = 'Radial-Distribution/proplyds.tab'
+  rdata[rcols].write(tabfile, format='ascii.tab')
+
+#+END_SRC
+
+#+RESULTS:
+[[file:Radial-Distribution/proplyds.tab]]
+
+**** The bowshocks
+#+BEGIN_SRC python :return tabfile :results file
+  import numpy as np
+  import json
+  from astropy.table import Table
+  import astropy.coordinates as coord
+
+  # Position of th1c
+  c0 = coord.get_icrs_coordinates('tet01 ori c')
+
+  ###
+  ### Database of LL objects
+  ###
+  lldata = Table.read("luis-programas/arcs-summary-merge.tab",
+                     format="ascii.commented_header", delimiter="\t",
+                     fill_values=('--', np.nan) )
+  lldata.rename_column('D', 'Dprime')
+
+  # Remove problematic sources and interproplyd shocks
+  with open("luis-programas/problem-sources.txt") as f:
+      problem_sources = f.read().split('\n')
+  with open("luis-programas/interproplyd.txt") as f:
+      problem_sources += f.read().split('\n')
+  m =  np.array([not source in problem_sources for source in lldata['Object']])
+  lldata = lldata[m]
+
+  with open("ll-data.json") as f:
+      db = json.load(f)
+  is_proplyd = {}
+  for data in db.values():
+      if "LL" in data["bname"]:
+          key = data["bname"]
+      elif data["oname"]:
+          key = data["oname"].split()[-1]
+      else:
+          continue
+      if "proplyd?" in data["Notes"]:
+          is_proplyd[key] = 0
+      elif "proplyd" in data["Notes"]:
+          is_proplyd[key] = 1
+      else:
+          is_proplyd[key] = -1
+
+  lldata["IsProplyd?"] = [is_proplyd[source] for source in lldata['Object']]
+  lldata.sort('Dprime')
+  llcols = ['Object', 'Dprime', 'IsProplyd?']
+  tabfile = 'Radial-Distribution/bowshocks.tab'
+  lldata[llcols].write(tabfile, format='ascii.tab')
+#+END_SRC
+
+#+RESULTS:
+[[file:Radial-Distribution/bowshocks.tab]]
+
+*** Then make the histograms
+#+BEGIN_SRC python
+  import numpy as np
+  from astropy.table import Table
+
+  star_data = Table.read('Radial-Distribution/stars.tab',
+                         format='ascii')
+  prop_data = Table.read('Radial-Distribution/proplyds.tab',
+                         format='ascii')
+  bow_data = Table.read('Radial-Distribution/bowshocks.tab',
+                         format='ascii')
+
+  # Mask for only bright ionized proplyds
+  m = prop_data['Type'] == 'i'
+
+  # Mask for only those bows that look like they might be proplyds
+  mm = bow_data['IsProplyd?'] >= 0
+  # And the subset that look like proplyds but are not in Ricci
+  mmm = bow_data['IsProplyd?'] == 0
+
+  # Add in the ones that seem to be missing from Ricci
+  prop_Dprime = np.r_[prop_data[m]['Dprime'], bow_data[mmm]['Dprime']]
+
+  ###
+  ### Histograms
+  ###
+  Drange = 0.0, 600.0
+  for nbins in 5, 10, 20, 40:
+      tabname = 'Dprime-histogram-N{:02d}.tab'.format(nbins)
+      star_hist, edges = np.histogram(star_data['Dprime'],
+                                      bins=nbins, range=Drange)
+      prop_hist, edges = np.histogram(prop_Dprime,
+                                      bins=nbins, range=Drange)
+      dark_hist, edges = np.histogram(prop_data[~m]['Dprime'],
+                                      bins=nbins, range=Drange)
+      bow_hist, edges = np.histogram(bow_data['Dprime'],
+                                     bins=nbins, range=Drange)
+      bowp_hist, edges = np.histogram(bow_data[mm]['Dprime'],
+                                     bins=nbins, range=Drange)
+
+      left, right = edges[:-1], edges[1:]
+      htab = Table(
+          data=[left, right,
+                star_hist, prop_hist, dark_hist, bow_hist, bowp_hist],
+          names=["Dp_1", "Dp_2",
+                 "N_star", "N_proplyd", "N_dark", "N_bowshock", "N_bowprop"]
+      )
+      htab.write(tabname, format='ascii.tab')
+
+  ###
+  ### Smart histograms
+  ###
+
+  # Split bowshock distances into 10 equal sections
+  nsplit = 10
+  Dp_splits = np.array_split(bow_data['Dprime'], nsplit)
+
+  # And use those for defining the histogram edges
+  edges = np.array([Drange[0]]
+                   + [0.5*(Dp_splits[i][-1] + Dp_splits[i+1][0])
+                      for i in range(nsplit - 1)]
+                   + [Drange[-1]])
+
+  tabname = 'Dprime-histogram-smart.tab'
+  star_hist, _ = np.histogram(star_data['Dprime'], bins=edges, range=Drange)
+  prop_hist, _ = np.histogram(prop_Dprime, bins=edges, range=Drange)
+  dark_hist, _ = np.histogram(prop_data[~m]['Dprime'], bins=edges, range=Drange)
+  bow_hist, _ = np.histogram(bow_data['Dprime'], bins=edges, range=Drange)
+  bowp_hist, _ = np.histogram(bow_data[mm]['Dprime'], bins=edges, range=Drange)
+  left, right = edges[:-1], edges[1:]
+  htab = Table(
+      data=[left, right,
+            star_hist, prop_hist, dark_hist, bow_hist, bowp_hist],
+      names=["Dp_1", "Dp_2",
+             "N_star", "N_proplyd", "N_dark", "N_bowshock", "N_bowprop"]
+  )
+  htab.write(tabname, format='ascii.tab')
+
+#+END_SRC
+
+#+RESULTS:
+: None
+
+*** Plot the histograms
+#+BEGIN_SRC python :results file :return pltfile
+  import numpy as np
+  from astropy.table import Table
+  from matplotlib import pyplot as plt
+  import seaborn as sns
+
+  sns.set_palette('Purples_d', 2, 0.7)
+  pltfile = 'bowshock-proplyd-ratio.pdf'
+
+  tab = Table.read('Dprime-histogram-smart.tab', format='ascii.tab')
+  Dprime = 0.5*(tab['Dp_1'] + tab['Dp_2']) / 60.0
+  dDp = 0.5*(tab['Dp_2'] - tab['Dp_1']) / 60.0
+  ratio = tab['N_bowshock']/tab['N_proplyd']
+  drat = ratio/np.sqrt(tab['N_bowshock'])
+  ratio2 = tab['N_bowprop']/tab['N_proplyd']
+  drat2 = ratio2/np.sqrt(tab['N_bowprop'])
+  ebkws = dict(xerr=dDp, capsize=3, capthick=1, alpha=0.8)
+  plt.errorbar(Dprime, ratio, yerr=drat, fmt='o', zorder=50,
+               label='All bow shocks', **ebkws)
+  plt.errorbar(Dprime, ratio2, yerr=drat2, fmt='s',
+               label='Bow shocks identified with proplyds', **ebkws)
+  plt.ylim(0.0, 3.7)
+  plt.xlim(0.0, 10.0)
+  plt.legend(loc='upper left')
+  plt.xlabel('Projected distance from Trapezium, arcmin')
+  plt.ylabel('N(bowshocks) / N(proplyds)')
+  plt.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:bowshock-proplyd-ratio.pdf]]
+
+#+BEGIN_SRC python :results file :return pltfile
+  import numpy as np
+  from astropy.table import Table
+  from matplotlib import pyplot as plt
+  import seaborn as sns
+
+  sns.set_palette('Reds_d', 2, 0.7)
+  pltfile = 'proplyd-star-ratio.pdf'
+
+  tab = Table.read('Dprime-histogram-smart.tab', format='ascii.tab')
+  Dprime = 0.5*(tab['Dp_1'] + tab['Dp_2']) / 60.0
+  dDp = 0.5*(tab['Dp_2'] - tab['Dp_1']) / 60.0
+  ratio = tab['N_proplyd']/tab['N_star']
+  drat = ratio/np.sqrt(tab['N_proplyd'])
+  ratio2 = tab['N_bowshock']/tab['N_star']
+  drat2 = ratio2/np.sqrt(tab['N_bowshock'])
+  ebkws = dict(xerr=dDp, capsize=3, capthick=1, alpha=0.8)
+  plt.errorbar(Dprime, ratio, yerr=drat, fmt='o', zorder=50,
+               label='Proplyds', **ebkws)
+  plt.errorbar(Dprime, ratio2, yerr=drat2, fmt='s',
+               label='Bow shocks', **ebkws)
+  plt.ylim(0.0, 0.8)
+  plt.xlim(0.0, 10.0)
+  plt.legend(loc='upper right')
+  plt.xlabel('Projected distance from Trapezium, arcmin')
+  plt.ylabel('N(sample) / N(stars)')
+  plt.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:proplyd-star-ratio.pdf]]
+
+
 ** Correction to WFPC2 alignments
 :LOGBOOK:
 CLOCK: [2014-07-04 Fri 12:45]--[2014-07-04 Fri 14:35] =>  1:50
