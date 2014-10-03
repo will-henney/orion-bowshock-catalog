@@ -3,7 +3,7 @@ import glob
 import json
 import numpy as np
 
-pattern = "j8oc??010_wcs/*-arcdata.json"
+pattern = "../*/*-arcdata.json"
 
 file_list = glob.glob(pattern)
 

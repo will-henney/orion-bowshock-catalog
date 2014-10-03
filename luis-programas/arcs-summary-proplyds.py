@@ -2,7 +2,7 @@ from __future__ import print_function
 import glob
 import json
 
-pattern = "../../JorgeBowshocks/Jorge_prop/PC-correct/*/*-arcdata.json"
+pattern = "../../JorgeBowshocks/Jorge_prop/PC-will/*-arcdata.json"
 
 file_list = glob.glob(pattern)
 
