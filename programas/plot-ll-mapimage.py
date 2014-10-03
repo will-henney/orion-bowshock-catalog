@@ -1,12 +1,13 @@
 from __future__ import print_function
-import astropy.units as u
-import astropy.coordinates as coord
-from astropy.table import Table
-import numpy as np
-import matplotlib.pyplot as plt
 import json
 import os
-
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.table import Table
+import astropy.units as u
+import astropy.coordinates as coord
+import aplpy
+from misc_utils import expand_fits_path
 
 nicknames = {
     "166-316": "LV2b", 
@@ -28,15 +29,34 @@ def find(name, path):
     return None
             
 
-def plot_map(limits, figname, canvas_size, innerbox=None, arrowscale=1.0):
-    plt.clf()
-    c = coord.SkyCoord(RAs, Decs, unit=(u.hourangle, u.degree))
-    x, y = c.ra.deg, c.dec.deg
-    x = -(x - x0)*np.cos(c.dec.radian)*3600.0
-    y = (y - y0)*3600.0
+def plot_map(limits, figname, canvas_size,
+             fitsfile='$LARGE_FITS_DIR/wfi/Orion_H_A_shallow.fits',
+             north=False,
+             vmin=0.0, vmax=None, stretch='linear',
+             innerbox=None, arrowscale=1.0):
+    # Use an image as a backdrop
+    fig = aplpy.FITSFigure(expand_fits_path(fitsfile),
+                           figsize=canvas_size, north=north)
+    # Set the viewport
+    xc, yc = (limits[0] + limits[1])/2, (limits[2] + limits[3])/2
+    w, h = limits[1] - limits[0], limits[3] - limits[2]
+    fig.recenter(c0.ra.deg - xc/3600, c0.dec.deg + yc/3600,
+                 width=w/3600, height=h/3600)
+    fig.show_grayscale(vmin=vmin, vmax=vmax, invert=True,
+                       stretch=stretch, interpolation='none')
+    ax = fig._ax1
 
-    print(x, y)
-    plt.plot(x, y, "o", alpha=0.2)
+
+    c = coord.SkyCoord(RAs, Decs, unit=(u.hourangle, u.degree))
+    # Cartesian pixel coordinates of each source
+    x, y = fig.world2pixel(c.ra.deg, c.dec.deg)
+
+    # Pixel size in degrees
+    pix_scale = aplpy.wcs_util.celestial_pixel_scale(fig._wcs)
+    # Convert to arcsec
+    pix_scale *= 3600
+
+    ax.plot(x, y, "o", alpha=0.2)
     for label, xx, yy in zip(names, x, y):
         
         #
@@ -63,46 +83,42 @@ def plot_map(limits, figname, canvas_size, innerbox=None, arrowscale=1.0):
         arc_data = json.load(f)
 
         # Second, load in the data and draw the arcs
-        small_A = []
         for arc, color in ["inner", "m"], ["outer", "g"]:
             if arc in arc_data:
-                dx = np.array(arc_data[arc]["x"])
-                dy = np.array(arc_data[arc]["y"])
-                plt.plot(xx - dx, yy + dy, "-" + color, lw=1.0, alpha=0.6)
+                dx = np.array(arc_data[arc]["x"])/pix_scale
+                dy = np.array(arc_data[arc]["y"])/pix_scale
+                ax.plot(xx - dx, yy + dy, "-" + color, lw=1.0, alpha=0.6)
                 print("Plotted {} arc for {}".format(arc, found))
                 if "Rc" in arc_data[arc]:
-                    xc = arc_data[arc]["xc"]
-                    yc = arc_data[arc]["yc"]
-                    Rc = arc_data[arc]["Rc"]
+                    xc = arc_data[arc]["xc"]/pix_scale
+                    yc = arc_data[arc]["yc"]/pix_scale
+                    Rc = arc_data[arc]["Rc"]/pix_scale
                     PAc = np.radians(arc_data[arc]["PAc"])
-                    if arc_data[arc]["Rc"] < arc_data[arc]["R0"]:
-                        # Flip the arrow for Rc < R0
-                        PAc += np.pi
-                    if arc_data[arc]["Rc"] < 1.5*arc_data[arc]["R0"]:
-                        small_A.append(arc)
-                        PAm = np.radians(arc_data[arc]["PA0"]
-                                         + np.mean(arc_data[arc]["theta"]))
-                    else:
-                        PAm = None
+                    PAm = np.radians(arc_data[arc]["PA0"]
+                                     + np.mean(arc_data[arc]["theta"]))
+
                     # Plot the fitted circle if present
-                    plt.plot(xx - xc, yy + yc, "+k", ms=2.0)
+                    ax.plot(xx - xc, yy + yc, "+k", ms=2.0)
                     c = plt.Circle((xx - xc, yy + yc), radius=Rc, fc='none', ec="k", alpha=0.2, lw=0.2)
-                    plt.gca().add_patch(c)
-                    PA = PAc if PAm is None else PAm
-                    ax = -0.5*Rc*np.sin(PA)
-                    ay = 0.5*Rc*np.cos(PA)
-                    plt.arrow(xx-xc, yy+yc, 4*ax*arrowscale, 4*ay*arrowscale,
-                              fc='none', ec=color, 
-                              width=0.001, alpha=0.8, lw=1.5,
-                              head_width=2.0*arrowscale, head_length=4.0*arrowscale,
-                          )
+                    ax.add_patch(c)
+                    PA = PAm if arc_data[arc]["Rc"] < 1.5*arc_data[arc]["R0"] else PAc
+                    arrowx = -0.5*Rc*np.sin(PA)
+                    arrowy = 0.5*Rc*np.cos(PA)
+                    ax.arrow(xx-xc, yy+yc, 4*arrowx*arrowscale, 4*arrowy*arrowscale,
+                             fc='none', ec=color, 
+                             width=0.001, alpha=0.8, lw=1.5,
+                             head_width=8.0*arrowscale, head_length=16.0*arrowscale,
+                         )
 
         if innerbox is None:
             skip_annotation = False
         else:
-            x1, x2, y1, y2 = innerbox
+            x1, y1 = fig.world2pixel(c0.ra.deg - innerbox[0]/3600,
+                                     c0.dec.deg + innerbox[2]/3600)
+            x2, y2 = fig.world2pixel(c0.ra.deg - innerbox[1]/3600,
+                                     c0.dec.deg + innerbox[3]/3600)
             skip_annotation = (x1 <= xx <= x2) and (y1 <= yy <= y2)
-        
+            
         # Order of octants is anticlockwise around square starting at top:
         #    1 0 7
         #    2 * 6
@@ -119,46 +135,30 @@ def plot_map(limits, figname, canvas_size, innerbox=None, arrowscale=1.0):
         ]
         if not skip_annotation:
             boxcolor = 'orange' if name in interprop_sources else 'white'
-            if len(small_A) == 2:
-                labelcolor = 'red'
-            elif 'inner' in small_A:
-                labelcolor = 'magenta'
-            elif 'outer' in small_A:
-                labelcolor = 'green'
-            else:
-                labelcolor = 'black'
             PA = np.radians(arc_data["star"]["PA"] + 180.0)
             ioctant = int(((np.degrees(PA) + 22.5) % 360)*8/360)
             print('Octant:', ioctant, 'PA:', np.degrees(PA))
             ha, va = alignment_by_octant[ioctant]
             xytext = (-3*np.sin(PA), 3*np.cos(PA))
-            plt.annotate(label, (xx, yy), alpha=0.8, size=5, color=labelcolor,
-                         xytext=xytext, textcoords='offset points',
-                         ha=ha, va=va,
-                         bbox={'facecolor': boxcolor, 
-                               'alpha': 0.5,
-                               'pad': 2,
-                               'linewidth': 0.1,
-                           },
+            ax.annotate(label, (xx, yy), alpha=0.8, size=5,
+                        xytext=xytext, textcoords='offset points',
+                        ha=ha, va=va,
+                        bbox={'facecolor': boxcolor, 
+                              'alpha': 0.5,
+                              'pad': 2,
+                              'linewidth': 0.1,
+                          },
             )
 
     c = coord.SkyCoord(pRAs, pDecs, unit=(u.hourangle, u.degree))
-    x, y = c.ra.deg, c.dec.deg
-    x = -(x - x0)*np.cos(c.dec.radian)*3600.0
-    y = (y - y0)*3600.0
-    plt.scatter(x, y, c=pColors, s=pSizes, edgecolors='none', alpha=0.5, zorder=100)
+    x, y = fig.world2pixel(c.ra.deg, c.dec.deg)
+    ax.scatter(x, y, c=pColors, s=pSizes, edgecolors='none', alpha=0.5, zorder=100)
 
     if innerbox is not None:
-        plt.fill_between([x1, x2], [y1, y1], [y2, y2],
-                         edgecolor='none', facecolor='k', alpha=0.1)
-    plt.axis("equal")
-    plt.axis(limits)
-    plt.xlabel("RA offset, arcsec")
-    plt.ylabel("Dec offset, arcsec")
-    plt.title("Positions of LL objects in the Orion Nebula")
-    plt.grid()
-    plt.gcf().set_size_inches(canvas_size)
-    plt.savefig(figname)
+        ax.fill_between([x1, x2], [y1, y1], [y2, y2],
+                         edgecolor='black', lw=0.5, facecolor='yellow', alpha=0.3)
+
+    fig.save(figname)
 
 
 if __name__ == "__main__":
@@ -166,21 +166,12 @@ if __name__ == "__main__":
     #
     # Set up arc data
     #
-
     table = Table.read("luis-programas/arcs-summary-merge.tab", 
                      format="ascii.commented_header", delimiter="\t",
                      fill_values=('--', np.nan) ).filled(np.nan)
     names = table["Object"].data
     RAs = table["RA"].data
     Decs = table["Dec"].data
-
-    # TABLE_FILE = "ll-data.json"
-    # table = json.load(open(TABLE_FILE))
-
-    # names = table.keys()
-    # RAs = [v["RA"] for v in table.values()]
-    # Decs = [v["Dec"] for v in table.values()]
-    # Fields = [v["Bally"] for v in table.values()]
 
     #
     # Set up proplyd data 
@@ -208,12 +199,17 @@ if __name__ == "__main__":
 
     c0 = coord.SkyCoord("05:35:16.463", "-05:23:23.18",
                         unit=(u.hourangle, u.degree))
-    x0, y0 = c0.ra.deg, c0.dec.deg
 
     zoombox = [-50, 50, -35, 65]
-    fullbox = [-350, 600, -650, 200]
-    plot_map(fullbox, "ll-positions.pdf", (10, 10), innerbox=zoombox, arrowscale=2.0)
-    plot_map(zoombox, "ll-positions-zoom.pdf", (10, 10), arrowscale=0.7)
+    fullbox = [-350, 600, -700, 250]
+    plot_map(fullbox, "ll-pos-image.pdf", (10, 10),
+             vmin=5.0, vmax=2000.0, stretch='sqrt',
+             innerbox=zoombox, arrowscale=2.0)
+    plot_map(zoombox, "ll-pos-image-zoom.pdf", (10, 10),
+             fitsfile='$LARGE_FITS_DIR/acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits',
+             north=False,
+             vmin=8.0, vmax=400.0,
+             arrowscale=0.7)
 
 
 

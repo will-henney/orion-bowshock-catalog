@@ -1213,9 +1213,17 @@ This is a good example of a high-incliation object, giving rise to low value of 
 
 ** Make a table of Jorge's measurements
 + JSON files read by [[file:luis-programas/arcs-summary-proplyds.py]]
-+ Writes table to [[file:luis-programas/arcs-summary-proplyds.tab]]
+  #+BEGIN_SRC sh :dir luis-programas :results silent
+python arcs-summary-proplyds.py
+  #+END_SRC
+  + Writes table to [[file:luis-programas/arcs-summary-proplyds.tab]]
++ Note that the other table is made with [[file:luis-programas/arcs-summary.py]], which is now the canonical version.   There was an earlier version in =programas= that came from [[file:~/Work/Bowshocks/Jorge/bowshock-shape/read-shapes-LL]] but that has now been deleted. 
+  #+BEGIN_SRC sh :dir luis-programas :results silent
+python arcs-summary.py
+  #+END_SRC
+  + Writes table to [[file:luis-programas/arcs-summary.tab]]
 + Next, merge the two tables, giving priority to the Jorge measurements
-#+BEGIN_SRC python :dir luis-programas :results output
+  #+BEGIN_SRC python :dir luis-programas :results output
   import numpy as np
   from  astropy.table import Table
   import json
@@ -1229,22 +1237,32 @@ This is a good example of a high-incliation object, giving rise to low value of 
       db = json.load(f)
 
   for source, data in db.items():
-      if data["bname"] in ptab["Object"]:
-          print("Updating", data["bname"], data["oname"])
-          for colname in ptab.colnames[1:]:
-              tab[colname][tab["Object"]==data["oname"]] = ptab[colname][ptab["Object"]==data["bname"]] 
+      for name in [data["bname"], data["oname"]]:
+          if name in ptab["Object"]:
+              print("Updating", name, data["oname"])
+              for colname in ptab.colnames[1:]:
+                  tab[colname][tab["Object"]==data["oname"]] = ptab[colname][ptab["Object"]==name] 
 
   tab.write("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t")
 
-#+END_SRC
+  #+END_SRC
 
-#+RESULTS:
-: Updating LV2b 166-316
-: Updating HST1 177-341
-: Updating LV2 167-317
-: Updating LV3 163-317
-: Updating LV4 161-324
-: Updating LV5 158-323
+  #+RESULTS:
+  #+begin_example
+  Updating 173-342 173-342
+  Updating LV2 167-317
+  Updating HST1 177-341
+  Updating 170-249 170-249
+  Updating 180-331 180-331
+  Updating LV2b 166-316
+  Updating 173-236 173-236
+  Updating LV5 158-323
+  Updating LV4 161-324
+  Updating LV3 163-317
+  Updating 168-328 168-328
+  Updating 169-338 169-338
+  #+end_example
+  + This write the final table to [[file:luis-programas/arcs-summary-merge.tab]]
 
 ** Look at correlations
 :PROPERTIES:
@@ -1887,7 +1905,8 @@ print(c0.dec.dms)
   from matplotlib import pyplot as plt
   import seaborn as sns
 
-  sns.set_palette('Purples_d', 2, 0.7)
+  sns.set_palette('Purples_d', 2, 0.8)
+  sns.set_context("paper", font_scale=1.4)
   pltfile = 'bowshock-proplyd-ratio.pdf'
 
   tab = Table.read('Dprime-histogram-smart.tab', format='ascii.tab')
@@ -1907,6 +1926,7 @@ print(c0.dec.dms)
   plt.legend(loc='upper left')
   plt.xlabel('Projected distance from Trapezium, arcmin')
   plt.ylabel('N(bowshocks) / N(proplyds)')
+  plt.subplots_adjust(0.125, 0.125, 0.975, 0.95)
   plt.savefig(pltfile)
 #+END_SRC
 
@@ -1920,6 +1940,7 @@ print(c0.dec.dms)
   import seaborn as sns
 
   sns.set_palette('Reds_d', 2, 0.7)
+  sns.set_context("paper", font_scale=1.4)
   pltfile = 'proplyd-star-ratio.pdf'
 
   tab = Table.read('Dprime-histogram-smart.tab', format='ascii.tab')
@@ -1943,6 +1964,7 @@ print(c0.dec.dms)
   plt.legend(loc='upper right')
   plt.xlabel('Projected distance from Trapezium, arcmin')
   plt.ylabel('N(sample) / N(stars)')
+  plt.subplots_adjust(0.125, 0.125, 0.975, 0.95)
   plt.savefig(pltfile)
 #+END_SRC
 
@@ -2859,7 +2881,7 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
   db = {}
   dbfile = "ll-data.json"
   top40list = []
-  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc, Top40 in table[:-1]:
+  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc, Top40 in table[1:-1]:
       key = bname or oname or sname
       if key == oname:
           key = key.split()[-1]
