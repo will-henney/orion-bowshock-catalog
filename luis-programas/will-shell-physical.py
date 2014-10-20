@@ -74,7 +74,7 @@ Ain = tab['Rc_in']/tab['R_in']
 H = (tab['R_out'] - tab['R_in'])/tab['R_out']
 D60 = tab['D']/60
 contrast = np.log10(tab['Dif_Bally']/tab['Value_bg_Bally'])
-q = tab['R_out']/tab['D']
+q = tab['R_out'].data/tab['D'].data
 PA_star = (tab['PA_star'] - 180.0) % 360.0
 dPA = ((tab ['PA_out'] - tab ['PA_star'] + 180.0) % 360.0) - 180.0
 with open("../ll-data.json") as f:

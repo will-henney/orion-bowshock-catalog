@@ -37,7 +37,7 @@ Ain = tab['Rc_in']/tab['R_in']
 H = (tab['R_out'] - tab['R_in'])/tab['R_out']
 D60 = tab['D']/60
 contrast = np.log10(tab['Dif_Bally']/tab['Value_bg_Bally'])
-q = tab['R_out']/tab['D']
+q = tab['R_out'].data/tab['D'].data
 PA_star = (tab['PA_star'] - 180.0) % 360.0
 dPA = ((tab ['PA_out'] - tab ['PA_star'] + 180.0) % 360.0) - 180.0
  
@@ -53,6 +53,7 @@ cb.set_label('Projected distance from Trapezium, D / arcmin')
 plt.xlabel('Bowshock fractional size, q = r0/D')
 plt.ylabel('Bowshock bluntness, A = Rc/r0')
 ax.set_xscale('log')
+ax.set_xlim(0.001, 1.0)
 fig.savefig(pltfile)
 figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
@@ -78,6 +79,7 @@ cb.set_label('Projected distance from Trapezium, D / arcmin')
 plt.xlabel('Bowshock fractional size, q = r0/D')
 plt.ylabel('Shell relative thickness, H = h/r0')
 ax.set_xscale('log')
+ax.set_xlim(0.001, 1.0)
 fig.savefig(pltfile)
 figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
@@ -91,6 +93,7 @@ cb.set_label('Shell/background brightness contrast')
 plt.xlabel('Projected distance from Trapezium, D / arcmin')
 plt.ylabel('Bowshock fractional size, q = r0/D')
 ax.set_xlim(0.05, 20.0)
+ax.set_ylim(0.001, 1.0)
 ax.set_xscale('log')
 ax.set_yscale('log')
 fig.savefig(pltfile)
