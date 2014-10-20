@@ -1,40 +1,25 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{natbib}
-\usepackage{graphicx}
-\usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
-\usepackage[spanish, es-minimal]{babel}
-\bibliographystyle{apj}
-\newcommand\U[1]{\ensuremath{\mathrm{#1}}}
-\newcommand\K{\U{K}}
-\newcommand\cm{\U{cm}}
-\newcommand\AU{\U{AU}}
-\newcommand\g{\U{g}}
-\newcommand\msolagno{M_\odot\,\U{yr^{-1}}}
+% \documentclass{article}
+% \usepackage[utf8]{inputenc}
+% \usepackage{amsmath}
+% \usepackage{natbib}
+% \usepackage{graphicx}
+% \usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
+% \usepackage[spanish, es-minimal]{babel}
+% \bibliographystyle{apj}
 
-\newcommand\acre{\ensuremath{_{\mathrm{acre}}}}
-\newcommand\eff{\ensuremath{_{\mathrm{eff}}}}
-\newcommand\Ext{\ensuremath{_{\mathrm{Ext}}}}
-\newcommand\Int{\ensuremath{_{\mathrm{Int}}}}
-\newcommand\ha{\ensuremath{\mathrm{H}\alpha}}
-\newcommand\nii{\ensuremath{\mathrm{[N\,II]}}}
-\newcommand\oiii{\ensuremath{\mathrm{[O\,III]}}}
-\newcommand\sii{\ensuremath{\mathrm{[S\,II]}}}
-\newcommand\A{\ensuremath{\text{\AA{}}}}
 
-\title{Catalog of stationary bowshock arcs in the Orion Nebula}
+% \title{Catalog of stationary bowshock arcs in the Orion Nebula}
 
-\begin{document}
-\maketitle
+% \begin{document}
+% \maketitle
 
-\section{Observaciones y descricción de los datos }
-\label{sec:datos}
+% \section{Observaciones y descricción de los datos }
 
+\label{chap:datos}
 
 Para este estudio se usaron observaciones del \textit{Telescopio Espacial Hubble} (\textit{HST}), debido a que este brinda las posibilidades de obtener imágenes concretas de la Nebulosa de Orión, permitiendo en este sentido examinar sus componentes estelares, como es el caso de los objetos LL que presentan fuertes líneas de emisión de \ha{} y \oiii{}. Donde se tiene que en las imágenes tomadas por el \textit{HST} los choques de proa resultan ser muy visibles en el óptco que en cualquier otras líneas de emisión, puesto que en la cáscara chocada domina la emisión de líneas de recombinación tales como \ha{} y para el caso de líneas generadas a patir de la excitación por colisión domina esencialmente \oiii{}. Por tanto en este trabajo se han usado las imágenes tomadas con la cámara \textit{Avanced Camera Survey} (ACS) y la cámara planetaria (PC por sus siglas en inglés) \textit{Wide Field Planetary Camera 2} (WFPC2). 
 
-\subsection{Cámara  WFC-ACS , el programa GO-9825 y el filtro F658N }
+\section{Cámara  WFC-ACS , el programa GO-9825 y el filtro F658N }
 \label{sec:acs}
 
 En primer lugar  hemos trabajado con las imágenes de \citet{Bally:2006a}, las cuales son observaciones que han sido obtenidas con la cámara \textit{Wide Field Camera} (WFC) ACS abordo del \textit{HST}, durante el ciclo 12 del programa GO-9825, donde se obtuvieron 26 imágenes que cubren gran parte de la Nebulosa de Orión, cada imagen fue tomada durante una órbita del \textit{HST}. Las áreas cubierta fueron observadas usando el filtro F658N (\(\ha+\nii\)) y tiempos de exposición de 500 s por punto observado en la nebulosa. Dos posiciones, separadas por \(96''.8\) en el eje-y de los detectores del ACS fueron observados durante cada órbita \citep{Bally:2006a}. Se tiene que esta cámara está basada en un mosaico de dos detectores CCD de \(2046 \times 4096\) pixel, correspondiendo a un campo de visión de aproximadamente \(100'' \times 200'' \) para cada imágen resultante. En este sentido las distintas imágenes de la Nebulosa de Orión tomadas durante las 26 órbitas cubrieron un área total de aproximadamente 415 \(\text{arcmin}^{2}\). La figura \ref{fig:fields} muestra la ubicación de cada uno de los 26 campos (visitas) del ACS, donde se han superpuesto en una imagen de \sii{} tomada por el telescopio reflector Mayall ubicado en Kitt Peak cerca de Tucson, para mayor información hechar un vistaso al artículo de \citet{Bally:2001a}. Cada rectángulo representa el campo de cada visita del \textit{HST}.\\
@@ -48,7 +33,7 @@ En primer lugar  hemos trabajado con las imágenes de \citet{Bally:2006a}, las c
 
 La importancia de utilizar las imágenes de Bally radica en que la señal a ruido es muy buena, debido a que tienen tiempos más largos de exposición, con esto se logró que el detector CCD recojiera el mayor número de fotones posibles por pixel, implicando que la señal sea muy alta en comparación al ruido.\\
 
-Por otro lado, como ya se dijo arriba esta cámara (ACS) contiene el filtro F658N, el cual es un filtro de banda ancha (\(50 \text{Å}\)), que permite obtener imágenes de \ha{} + \nii{}, donde principalmente domina las líneas de \ha{} y en menor grado las líneas de \nii{}. Para nuestro trabajo vamos a utilizar estas imágenes para trazar los arcos radiativos de las estrellas LL ori, debido a que con este filtro es posible mapear el material que rodea a las estrellas con la más alta resolución posible y de la misma forma permite discriminar fuentes extendidas de emisión. Sin embargo, la desventaja de utilizar estas observaciones es que no tiene una cobertura completa de la Nebulosa de Orión \footnote{Es el caso de  LL7. Este objeto queda por fuera de los campos de Bally.} y además estas observaciones están contaminadas por líneas de \nii{}. Por último es importante señalar que de los 26 campos del ACS-F658N que mapean la región, nuestros objetos se encuentran repartidos en los campos: 01, 02, 06, 07, 08, 09, 14, 16, 17 y 24. En la figura \ref{fig:field-01} se muestra como es la apariencia de uno de estos campos (visita), que como ya se sabe es una imagen de \ha{} + \nii{}.\\
+Por otro lado, como ya se dijo arriba esta cámara (ACS) contiene el filtro F658N, el cual es un filtro de banda ancha (\(50 \text{Å}\)), que permite obtener imágenes de \ha{} + \nii{}, donde principalmente domina las líneas de \ha{} y en menor grado las líneas de \nii{}. Para nuestro trabajo vamos a utilizar estas imágenes para trazar los arcos radiativos de las estrellas LL ori, debido a que con este filtro es posible mapear el material que rodea a las estrellas con la más alta resolución posible y de la misma forma permite discriminar fuentes extendidas de emisión. Sin embargo, la desventaja de utilizar estas observaciones es que no tiene una cobertura completa de la Nebulosa de Orión\footnote{Es el caso de  LL7. Este objeto queda por fuera de los campos de Bally.} y además estas observaciones están contaminadas por líneas de \nii{}. Por último es importante señalar que de los 26 campos del ACS-F658N que mapean la región, nuestros objetos se encuentran repartidos en los campos: 01, 02, 06, 07, 08, 09, 14, 16, 17 y 24. En la figura \ref{fig:field-01} se muestra como es la apariencia de uno de estos campos (visita), que como ya se sabe es una imagen de \ha{} + \nii{}.\\
 
 \begin{figure}
   \centering
@@ -57,7 +42,7 @@ Por otro lado, como ya se dijo arriba esta cámara (ACS) contiene el filtro F658
   \label{fig:field-01}
 \end{figure}
 
-\subsection{La cámara WFPC2 y el filtro F656N}
+\section{La cámara WFPC2 y el filtro F656N}
 \label{sec:wfpc2}
 
 Un compendio de imágenes tomadas con la cámara planetaria (PC) WFPC2, han de brindar otra oportunidad de estudiar los arcos LL de la Nebulosa de Orión. Puesto que la ya mencionada WFPC2, que entre otras cosa utiliza cuatro CCDs de $800\times800$ pixel a bordo del \textit{HST}, ha tomado un conjunto de imágenes que cubren en su mayoría a la Nebulosa de Orión a diferencia de las imágenes de Bally que no tienen una cubertura total de la misma. Se han usado 104 órbitas del \textit{HST} para dicho fin, como parte del \textit{Programa Treasury} \citep{Robberto:2013a}. En la figura \ref{fig:fields-robberto} se pueden apreciar los campos (visitas) del WFPC2, que entre otras cosas cubren un área total de 570.5 \(\text{arcmin}^{2}\).\\
@@ -73,7 +58,7 @@ Uno de los \textit{Filtros} usados en este ambicioso programa es el filtro F656N
 
  En este sentido hemos de utilizar estos dos filtros porque de esta manera, será posible separar las emisiones de \ha{} de \nii{} y así poder utilizar las imagenes de ACS para determinar los parámetros observacioneles y astrofísicos de los choques estacionarios, puestos que estas tienen mejor resolución y así utilizar el brillo superficial de \ha{} para determinar el producto \(Mv\) de los LL~Ori.
 
-\subsection{Otras observaciones de la cámara WFPC2:  viejos mosaicos}
+\section{Otras observaciones de la cámara WFPC2:  viejos mosaicos}
 \label{sec:mosaic}
 
 Para este estudio también se cuenta con unas observaciones, un poco más viejas que mapean una región particular de la Nebulosa de Orión. Estas observaciones son el resultado de dos pragramas del \textit{HST}, el primero de estos es el programa GTO-5085 (Guaranteed Time Observer  por su nombre en inglés) cuyo principales investigadores fueron  \citet{Odell:1996} y el segundo corresponde al programa GO-5469 (General Observer por su nombre en inglés) con Jhon Bally como principal investigador. Las imágenes proporcionadas por el programa de Bally fueron usadas principalmente para el estudio de proplyds con una  alta resolución espacial, usando la cámara planetaria (PC) WFPC2 abordo del \textit{HST}. En estas imágenes el tamaño de lo pixeles es de \(0.0996''\) algo muy característico de las cámaras WF \citep{Holtzman:1995}. Los campos seleccionados para la formación de las imágenes se determinaron de tal manera que tengan una cobertura continua de un área en la parte central de la Nebulosa de Orión, en este sentido se tiene una superposición de los campos, que representados através de unos  masaicos de la cámara WFPC2, se hablan de varios mosaicos puesto que se utilizaron multpliples filtros del programa GTO-5085 para registrar diferentes líneas de emisión. Los extremos de la región mapeada fueron elegidos con el propósito de incluir objetos de particular interés, tales como objetos Herbig-Haro en el norte y los choques de proa en el suroeste \citep{Odell:1996}.\\
@@ -82,6 +67,6 @@ Para este estudio también se cuenta con unas observaciones, un poco más viejas
 
 
 
-\bibliography{luis-ref}
+% \bibliography{luis-ref}
 
-\end{document}
+% \end{document}

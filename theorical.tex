@@ -1,38 +1,21 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{natbib}
-\usepackage{graphicx}
-\usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
-\usepackage[spanish, es-minimal]{babel}
-\bibliographystyle{apj}
-\newcommand\U[1]{\ensuremath{\mathrm{#1}}}
-\newcommand\K{\U{K}}
-\newcommand\cm{\U{cm}}
-\newcommand\AU{\U{AU}}
-\newcommand\g{\U{g}}
-\newcommand\msolagno{M_\odot\,\U{yr^{-1}}}
+% \documentclass{article}
+% \usepackage[utf8]{inputenc}
+% \usepackage{amsmath}
+% \usepackage{natbib}
+% \usepackage{graphicx}
+% \usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
+% \usepackage[spanish, es-minimal]{babel}
+% \bibliographystyle{apj}
 
-\newcommand\thC{\ensuremath{\mathrm{\theta^1\,Ori~C}}}
-\newcommand\acre{\ensuremath{_{\mathrm{acre}}}}
-\newcommand\eff{\ensuremath{_{\mathrm{eff}}}}
-\newcommand\Ext{\ensuremath{_{\mathrm{Ext}}}}
-\newcommand\Int{\ensuremath{_{\mathrm{Int}}}}
-\newcommand\ha{\ensuremath{\mathrm{H}\alpha}}
-\newcommand\nii{\ensuremath{\mathrm{[N\,II]}}}
-\newcommand\oiii{\ensuremath{\mathrm{[O\,III]}}}
-\newcommand\Out{\ensuremath{\mathrm{out}}}
-\newcommand\In{\ensuremath{\mathrm{in}}}
-\newcommand\A{\ensuremath{\mathrm{\AA{}}}}
-\title{Tratamiento teórico}
 
-\author{
-  Alumno: Luis Angel Gutiérrez Soto\\
-  Tutor: Dr. William Henney
-}
+% \title{Catalog of stationary bowshock arcs in the Orion Nebula}
 
-\begin{document}
-\maketitle
+% \begin{document}
+% \maketitle
+
+% \section{Observaciones y descricción de los datos }
+
+\label{chap:theori}
 
 \section{Interacción de dos vientos}
 \label{sec:interaction}
@@ -42,7 +25,7 @@ La interacción de dos flujos da como resultado una cáscara limita por dos choq
 \begin{enumerate}
 \item Las cáscaras chocadas están en estado estacionario (tiempo dinámico \(\ll\) tiempo evolutivo)
 \item No hay aceleración ni gravedad.
-\item En el viento externo e interno al choque domina la presión hidrodinámica, mientras que en la cásscara chocada domina la presión térmica (ver figura ~\ref{fig:interaction}).  
+\item En el viento externo e interno al choque domina la presión hidrodinámica, mientras que en la cásscara chocada domina la presión térmica (ver figura~\ref{fig:interaction}).  
 \end{enumerate}
 
 Con estas suposiciones es posible determinar las presiones en cada una de estas zonas y el flujo de momento como podremos ver a cantinuación.
@@ -81,19 +64,19 @@ si combinamos las ecuaciones \ref{eq:perdida-masa} y \ref{eq:presion-viento} obt
 En general esta (Eq.~\ref{eq:presin-interna}) es la presión para un flujo de partículas en términos de \(\dot{M}\) y \(v\). Particularmente para nuestro modelo tendremos  dos tipos de presiones hidrodinámicas; una que corresponde a la región externa al choque dada por
 
 \begin{equation}
-  \label{eq:presin-interna}
-   P_{\text{Hyd}}(\Out{})=\frac{\dot{M}(\Out{}) v(\Out)}{4 \pi D^{2}}
+  \label{eq:presion-externa}
+   P_{\text{Hyd}}(\Out{})=\frac{\dot{M}v}{4 \pi D^{2}}
 \end{equation}
 
-donde \(D\) es la distancia de la fuente a \thC{}, \(\dot{M}(\Out{})\) es la tasa de pérdida de masa externa y \(v(\Out{})\) es la velocidad del viento estelar externo. Y la otra que corresponde a la región interna al choque esto es
+donde \(D\) es la distancia de la fuente a \thC{}, \(\dot{M}\) es la tasa de pérdida de masa de estrella masiva del Trapecio y \(v\) es la velocidad del viento estelar externo. Y otra que corresponde a la región interna al choque esto es
 
  
 \begin{equation}
-  \label{eq:presin-interna}
-  P_{\text{Hyd}}(\In{})=\frac{\dot{M}(\In{}) v(\In)}{4 \pi R_{0}(\In{})^{2}}.
+  \label{eq:presion-interna}
+  P_{\text{Hyd}}(\In{})=\frac{\dot{M}_{w} V_{w}}{4 \pi R_{0}(\In{})^{2}}.
 \end{equation}
 
-Las variables de ecuación anterior se refieren a la componente interna al choque, además de esto \(R_{0}(\In{})\) representa la distancia de la estrella o proplyd al choque interno.
+Las variables de ecuación anterior se refieren a la tasa de pérdida de masa y la velocidad del viento interno, además de esto \(R_{0}(\In{})\) representa la distancia de la estrella o proplyd al choque interno.
 
 \subsection{Presión Térmica}
 \label{sec:pressur-thermal}
@@ -105,7 +88,7 @@ Como se dijo arriba, en la cáscara chocada la presión dominante es la presión
   P_{\text{Termica}}=2 n k T 
 \end{equation}
  
-Donde \(n\) es la densidad total de núcleos de hidrógeno \footnote{Más adelante veremos como obtener \(n\) a partir de \(S_{\ha{}}\). }, \(k\) la constante de Boltzmann y \(T\) es la temperatura en la cáscara chocada, para la cuál se considera \(T\simeq10^{4}~\K\). Si se incluye la contribución de helio entonces la densidad total de partículas es,
+Donde \(n\) es la densidad total de núcleos de hidrógeno\footnote{Más adelante veremos como obtener \(n\) a partir de \(S_{\ha{}}\). }, \(k\) la constante de Boltzmann y \(T\) es la temperatura en la cáscara chocada, para la cuál se considera \(T\simeq10^{4}~\K\). Si se incluye la contribución de helio entonces la densidad total de partículas es,
 
 \begin{equation*}
   \label{eq:particulas}
@@ -140,7 +123,7 @@ Aquí \(x_{\text{H}^{+}}\) y \(x_{\text{He}^{+}}\) representan el grado de ioniz
 \subsection{Densidad }
 \label{sec:densinty}
 
-La ecuación~\ref{eq:presion-cascara} está en términos de la densinad numérica \(n\) que hasta el momento es una variable desconocida para nosotros. Así que para determinar la densidad en los choques LL es necesario utilizar los parámetros observacionales \(S_{\ha{}}\) y \(\zeta\). No obstante como se ha dicho en la sección (tal) en la cáscara chocada domina la emisión por las líneas de recombinación tales como \ha{}, por ello hemos de utilizar el brillo superficial de \ha{} para este fin. Es pertinente antes de continuar con nuestro análisis abrir un pequeño paréntesis, para hablar un poco de la naturaleza de la línea de recombinación; Balmer-\ha{}.\\
+La ecuación~\ref{eq:presion-cascara} está en términos de la densinad numérica \(n\) que hasta el momento es una variable desconocida para nosotros. Así que para determinar la densidad en los choques LL es necesario utilizar los parámetros observacionales \(S_{\ha{}}\) y \(\zeta\). No obstante como se ha dicho en el capítulo~\ref{chap:introduction} en la cáscara chocada domina la emisión por las líneas de recombinación tales como \ha{}, por ello hemos de utilizar el brillo superficial de \ha{} para este fin. Es pertinente antes de continuar con nuestro análisis abrir un pequeño paréntesis, para hablar un poco de la naturaleza de la línea de recombinación; Balmer-\ha{}.\\
 
 \subsubsection{Líneas de recombinación de \ha{}}
 \label{sec:lines-ha}
@@ -191,7 +174,7 @@ Empezemos por escribir la relación de brillo superficial, suponiendo que no hay
     \eta_{\ha} = \frac{n(H^0_{\text{n}=3})A_{32}}{4 \pi} \left(\frac{hc}{\lambda_{32}}\right) 
   \end{equation}
 
- Si la tasa de recombinaciones por volumen que producen \ha{}  es 
+ Si la tasa de recombinaciones por volumen que producen \ha{} es 
 \begin{equation}
   \label{eq:recombinaciones}
   \alpha_{\ha} n_{e}n_{H^{+}}=n(H^0_{\text{n}=3})A_{32}
@@ -234,29 +217,29 @@ Entonces como la geometría de la cáscara en xz (ver figura~\ref{fig:geometria1
 \begin{figure}
   \centering
   \includegraphics[width=.8\linewidth, clip]{figuras-tesis/geometry-shock2.jpg}
-  \caption{Geometría de la cáscara en el plano xz, que entre otras cosas es igual al plano xy.}
+  \caption{Geometría de la cáscara en el plano xz, que es igual al plano xy.}
   \label{fig:geometria1}
 \end{figure}
 
-\subsection{Flujo de momento \(\dot{M}v\) del viento interno}
+\subsection{Flujo de momento \(\dot{M}_{w}V_{w}\) del viento interno}
 \label{sec:momento}
 
 Deacuerdo a la suposición 1, existe un equilibrio de presiones de tal manera que podemos establecer;
  
 \begin{equation}
   \label{eq:igualda-presion}
-  P_{\text{Hyd}}(\Out{})=P_{\text{Termica}}=P_{\text{Hyd}}(\In{})
+  P_{\text{Hyd}}(\Out{})=P_{\text{Termica}}=P_{\text{Hyd}}(\In{}).
 \end{equation}
 
-Ahora si sustituimos la ec~\ref{eq:presin-interna} en la anterior ecuación obtenemos que,
+Ahora si sustituimos la Ec.~\ref{eq:presin-interna} en la anterior ecuación obtenemos que,
 
 \begin{equation}
   \label{eq:momentum}
-   \dot{M}v = 4 \pi  R_{0}(\In{})^{2}  P_{\text{Termica}}. 
+   \dot{M}_{w}V_{w} = 4 \pi  R_{0}(\In{})^{2}  P_{\text{Termica}}. 
 \end{equation}
 
 Donde \(P_{\text{Termica}}\) está dada por la ec~\ref{eq:presion-cascara}. 
 
-\bibliography{luis-ref}
+%\bibliography{luis-ref}
 
-\end{document}
+%\end{document}

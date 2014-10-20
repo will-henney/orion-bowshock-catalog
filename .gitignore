@@ -22,5 +22,5 @@
 !*/*.png
 *conflicted*copy*
 
-/programas/extract-image_flymake.py
+*_flymake.py
 /_region_.tex

@@ -1,0 +1,70 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{astrojournals} % Necesario para nombres de revistas en luis-ref.bib
+%\usepackage[spanish, es-minimal]{babel}
+\usepackage[vmargin=1in, hmargin=1.5in]{geometry}
+\usepackage{longtable}
+\usepackage{fixltx2e}
+
+
+
+\bibliographystyle{apj}
+
+
+\title{Catalog of stationary bowshock arcs in the Orion Nebula}
+
+\author{
+  Luis Angel Gutiérrez Soto\\
+  Tesis de Maestría, Posgrado de Astrofísica, UNAM\\
+  Asesor: Dr. William Henney, CRyA, UNAM
+}
+
+\newcommand\U[1]{\ensuremath{\mathrm{#1}}}
+\newcommand\K{\U{K}}
+\newcommand\cm{\U{cm}}
+\newcommand\AU{\U{AU}}
+\newcommand\g{\U{g}}
+\newcommand\msolagno{M_\odot\,\U{yr^{-1}}}
+
+\newcommand\thC{\ensuremath{\mathrm{\theta^1\,Ori~C}}}
+\newcommand\acre{\ensuremath{_{\mathrm{acre}}}}
+\newcommand\eff{\ensuremath{_{\mathrm{eff}}}}
+\newcommand\Ext{\ensuremath{_{\mathrm{Ext}}}}
+\newcommand\Int{\ensuremath{_{\mathrm{Int}}}}
+\newcommand\ha{\ensuremath{\mathrm{H}\alpha}}
+\newcommand\nii{\ensuremath{\mathrm{[N\,II]}}}
+\newcommand\oiii{\ensuremath{\mathrm{[O\,III]}}}
+\newcommand\sii{\ensuremath{\mathrm{[S\,II]}}}
+\newcommand\Out{\ensuremath{\mathrm{out}}}
+\newcommand\In{\ensuremath{\mathrm{in}}}
+\newcommand\A{\ensuremath{\text{\AA{}}}}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+ En esta tesis presentamos una lista completa de todos los arcos estacionarios de líneas de emisión (objetos LL y choques de proa de los proplyds) encontrados en unas imágenes de unos archivos del Telescopio Espacial Hubble (HST por sus siglas en inglés) de la Nebulosa de Orión. El número total de objetos detectado es de 73, de los cuales 20 no han sido reportados previamente en la literatura. Clasificamos la forma de los arcos radiactivos, mediante el ajuste de secciones cónicas en los límites internos y externos de la cáscara chocada y calculamos el brillo superficial de H alpha corregido por el fondo para cada objeto. Encontramos diferencias significativas en la forma de las cáscaras entre los objetos que se encuentran más cerca de las estrellas ionizantes y los que están más lejos. El grupo cercano, que constituyen auténticas interacciones de los proplyds con el viento estelar hipersónico, tienen formas relativamente cerradas, mientras que el grupo más lejano, que se origina debido a la interacción con el transónico flujo de champaña de gas ionizado en la nebulosa, son más abierto e hiperbólicos. Aunque algunos de estos últimos son también proplyds conocidos, muchos no lo son, los arcos más grandes y más brillantes tienden a estar asociados con luminosas estrellas jóvenes, lo que sugiere que el viento intrínsico del disco de las estrellas T Tauri podrían  jugar un papel importante. La orientación de los arcos, junto con las presiones de estancamiento estimadas a partir del brillo superficial, permiten que el campo de velocidades interno de la región H II sean probados. También  encontramos que el flujo  del núcleo de la nebulosa es aproximadamente radial y por tanto domina sobre un flujo turbulento y desordenado.
+\end{abstract}
+
+
+\chapter{Introducción}
+\input{introduction}
+\chapter{Descripción de las observaciones empleadas}
+\input{observations}
+\chapter{Metodología observacional}
+\input{methodology}
+\chapter{Metodología teórica}
+\input{theorical}
+\chapter{Resultados}
+\input{results}
+\chapter{Conclusiones}
+\input{conclusion}
+
+\bibliography{luis-ref}
+
+\end{document}
