@@ -10,6 +10,7 @@
 \usepackage{fixltx2e}
 \bibliographystyle{apj}
 \usepackage{hyperref}
+%\def\fnum@table{Tabla~\thetable}
 
 \title{BORRADOR PRELIMINAR DE LA TESIS:\\
 Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
@@ -36,11 +37,15 @@ Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 \newcommand\ha{\ensuremath{\mathrm{H}\alpha}}
 \newcommand\nii{\ensuremath{\mathrm{[N\,II]}}}
 \newcommand\oiii{\ensuremath{\mathrm{[O\,III]}}}
+\newcommand\oii{\ensuremath{\mathrm{[O\,II]}}}
+\newcommand\oi{\ensuremath{\mathrm{[O\,I]}}}
 \newcommand\sii{\ensuremath{\mathrm{[S\,II]}}}
+\newcommand\ciii{\ensuremath{\mathrm{[C\,III]}}}
 \newcommand\Out{\ensuremath{\mathrm{out}}}
 \newcommand\In{\ensuremath{\mathrm{in}}}
 \newcommand\A{\ensuremath{\text{\AA{}}}}
 
+%\renewcommand{\tablename}{Tabla}
 
 \begin{document}
 \maketitle
@@ -48,7 +53,7 @@ Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 \tableofcontents
 
 \begin{abstract}
- En esta tesis presentamos una lista completa de todos los arcos estacionarios de líneas de emisión (objetos LL y choques de proa de los proplyds) encontrados en unas imágenes  del Telescopio Espacial Hubble (HST por sus siglas en inglés) de la Nebulosa de Orión. El número total de objetos detectado es de 73, de los cuales 20 no han sido reportados previamente en la literatura. Clasificamos la forma de los arcos radiactivos, mediante el ajuste de secciones cónicas en los límites internos y externos de la cáscara chocada y calculamos el brillo superficial de \ha{} corregido por el fondo para cada objeto. Encontramos diferencias significativas en la forma de las cáscaras entre los objetos que se encuentran más cerca de las estrellas ionizantes y los que están más lejos. El grupo cercano, que constituyen auténticas interacciones de los proplyds con el viento estelar hipersónico, tienen formas relativamente cerradas, mientras que el grupo más lejano, que se origina debido a la interacción con el transónico flujo de champaña de gas ionizado en la nebulosa, son más abierto e hiperbólicos. Aunque algunos de estos últimos son también proplyds conocidos, muchos no lo son, los arcos más grandes y más brillantes tienden a estar asociados con luminosas estrellas jóvenes, lo que sugiere que el viento intrínsico del disco de las estrellas T-Tauri podrían jugar un papel importante. La orientación de los arcos, junto con las presiones de estancamiento estimadas a partir del brillo superficial, permiten que el campo de velocidades interno de la región HII sean probados. También  encontramos que el flujo del núcleo de la nebulosa es aproximadamente radial y por tanto domina sobre un flujo turbulento y desordenado.
+En esta tesis presentamos una lista completa de todos los arcos estacionarios de líneas de emisión (objetos LL y choques de proa de los proplyds) encontradosen unos archivos de unas imágenes  del Telescopio Espacial Hubble (HST por sus siglas en inglés) de la Nebulosa de Orión. El número total de objetos detectado es de 73, de los cuales 20 no han sido reportados previamente en la literatura. Clasificamos la forma de los arcos radiactivos, mediante el ajuste de secciones cónicas en los límites internos y externos de la cáscara chocada y calculamos el brillo superficial de \ha{} corregido por el fondo para cada objeto. Encontramos diferencias significativas en la forma de las cáscaras entre los objetos que se encuentran más cerca de las estrellas ionizantes y los que están más lejos. El grupo cercano, que constituyen auténticas interacciones de los proplyds con el viento estelar hipersónico, tienen formas relativamente cerradas, mientras que el grupo más lejano, que se origina debido a la interacción con el transónico flujo de champaña de gas ionizado en la nebulosa, son más abierto e hiperbólicos. Aunque algunos de estos últimos son también proplyds conocidos, muchos no lo son, los arcos más grandes y más brillantes tienden a estar asociados con luminosas estrellas jóvenes, lo que sugiere que el viento intrínsico del disco de las estrellas T-Tauri podrían jugar un papel importante. La orientación de los arcos, junto con las presiones de estancamiento estimadas a partir del brillo superficial, permiten que el campo de velocidades interno de la región HII sean probados. También  encontramos que el flujo del núcleo de la nebulosa es aproximadamente radial y por tanto domina sobre un flujo turbulento y desordenado.
 \end{abstract}
 
 
@@ -58,10 +63,10 @@ Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 \input{observations}
 \chapter{Metodología observacional}
 \input{methodology}
-\chapter{Metodología teórica}
-\input{theorical}
-\chapter{Resultados}
+\chapter{Resultados empíricos}
 \input{results}
+\chapter{Resultados astrófisicos}
+\input{theorical}
 \chapter{Conclusiones}
 \input{conclusion}
 
