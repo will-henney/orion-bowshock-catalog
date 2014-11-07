@@ -26,6 +26,28 @@ próximo semestre.
 **** Observations Box
 S(Hα), R₀, H
 ** Finish brightness calibration
+*** Different values of gain for the WFPC2 observations
+:LOGBOOK:  
+CLOCK: [2014-11-07 Fri 09:45]--[2014-11-07 Fri 11:55] =>  2:10
+:END:      
++ Earlier stuff is in [[file:Flux%20calibration.ipynb][file:Flux calibration.ipynb]]
+  + We had an apparent discrepancy between the brightnesses of a factor of 2 between O'Dell and Robberto
++ Now I have downloaded the original data for the LL1 field
+  + [[file:WFPC2-Calib][Folder: ./WFPC2-Calib]]
+  + We directly see the difference in counts/s between the Robberto data (GO 10246) and all the other images (e.g., GO 5085)
+  + This seems to be due to the difference in gain, but I don't understand exactly why. 
+**** Some facts about gain
++ http://www.photometrics.com/resources/learningzone/gain.php
++ See also [[id:FDE3497E-1891-45E9-AF41-74A92C0F0F64][This section of my Keck notes]]
++ Gain tells you how many ADU you get for each electron, but in a strange upside down way
++ It is typically measured in e^{-}/ADU
++ "High gain" means a /lower/ numerical value of e^{-}/ADU
+  + So Robberto's gain of 15 e^{-}/ADU is lower than the standard 17 e^{-}/ADU
+  + That is because the numbers are technically "inverse gain"
++ A "standard" gain would be such that the full well of the CCD (in electrons) matches the full range of the digitizer (e.g., 65536 for 16 bits)
+  + Then having a "high gain" (low inverse gain) would give you greater sensitivity at the expense of easier saturation
+  + Whereas having a "low gain" (high inverse gain) means that the digitizer can cope with a higher total signal
++ So this is why the Robberto observations used the low gain of 15, so as to be able to register all the electrons and do accurate photometry
 *** Correct for [N II] contamination
 **** Comparison with older WFPC2 mosaics
 : The normalization is to the exposure times in the program GO 5085, i.e.

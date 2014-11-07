@@ -124,7 +124,7 @@ for file_name in file_list:
 
     
     for k in data.keys():
-        if k.startswith('Robberto_WFPC2_f656n'):
+        if k.startswith('Robberto_WFPC2') and k.endswith('f656n'):
             imagename_1=k 
             try:
                 shell_robberto_f656= data[imagename_1]["shell"]["value"]
