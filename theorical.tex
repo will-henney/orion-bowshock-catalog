@@ -34,7 +34,7 @@ La segunda técnica para estimar la densidad electrónica promedio en la cáscar
 \subsubsection{Líneas de recombinación de \ha{}}
 \label{sec:lines-ha}
 
-La serie de Balmer es un conjunto de líneas espectrales del átomo de hidrógeno que a diferencia de otras líneas de emisión del mismo, las transiciónes ocurren desde los niveles de energía \(n= 3,4,5,...\) al nivel \(n=2\) con \(n\) el número cuántico principal, así cada una de estas transiciones corresponde a una longitud de onda partícular (\(\lambda_{32}\) = 6563~\A~(\ha{}; rojo), \(\lambda_{42} = 4862~\A{}\) (\(\mathrm{H}\beta\); turquesa), \(\lambda_{52} = 4340~\A{}\) (\(\mathrm{H}\gamma\); azul) y \(\lambda_{62} = 4101.75~\A{}\) (\(\mathrm{H}\delta\); violeta)) estas longitudes de onda se han determinado a partir de datos experimentales, además éstas longitudes de onda \(\lambda\) caen dentro de la región visible del espectro electromagnético \citep{Carroll:1996}) (ver figura ). Por otro lado, para las líneas de recombinación del átomo de hidrógeno tenemos que la energía de los fotones que se emiten durante las transiciónes está dada por,
+La serie de Balmer es un conjunto de líneas espectrales del átomo de hidrógeno que a diferencia de otras líneas de emisión del mismo, las transiciónes ocurren desde los niveles de energía \(n= 3,4,5,...\) al nivel \(n=2\) con \(n\) el número cuántico principal, así cada una de estas transiciones corresponde a una longitud de onda partícular (\(\lambda_{32}\) = 6563~\A~(\ha{}; rojo), \(\lambda_{42} = 4862~\A{}\) (\(\mathrm{H}\beta\); turquesa), \(\lambda_{52} = 4340~\A{}\) (\(\mathrm{H}\gamma\); azul) y \(\lambda_{62} = 4101.75~\A{}\) (\(\mathrm{H}\delta\); violeta)) estas longitudes de onda se han determinado a partir de datos experimentales, además éstas longitudes de onda \(\lambda\) caen dentro de la región visible del espectro electromagnético \citep{Carroll:1996}). Por otro lado, para las líneas de recombinación del átomo de hidrógeno tenemos que la energía de los fotones que se emiten durante las transiciónes está dada por,
 
 \begin{equation}
   \label{eq:energy}
@@ -55,7 +55,7 @@ esta última expresión también nos proporciona la energía del fotón emitido,
  E = 13.6~\text{eV}~\left(\frac{1}{n_{\text{Inf}}^{2}}-\frac{1}{n_{\text{Sup}}^{2}}\right).
 \end{equation}
 
- Donde esta es la energía liberada cuando el electrón decae de un nivel de energía, \(n_{\text{Sup}}\), a un nivel de menor energía, \(n_{\text{Inf}}\). Usando las ecuaciones~\ref{eq:energy} y \ref{eq:energy-} para el caso particular de las líneas de recombinación de \ha{} (donde la transición ocurre del nivel superior de energía \(n=3\) al nivel inferior de energía \(n=2\)) tendremos que: 
+ Donde esta es la energía liberada cuando el electrón decae de un nivel de energía, \(n_{\text{Sup}}\), a un nivel de menor energía, \(n_{\text{Inf}}\). No obstante, estos niveles de energía \(n\) constan de diferentes subniveles denotados por el número cuántico \(l\) que tienen ligeramente distintas energías, este fenómeno se le conoce como estructura fina, pero el desdoblamiento entre estos es menor que el ensachamiento térmico de las líneas. Usando las ecuaciones~\ref{eq:energy} y \ref{eq:energy-} para el caso particular de las líneas de recombinación de \ha{} (donde la transición ocurre del nivel superior de energía \(n=3\) al nivel inferior de energía \(n=2\)) tendremos que: 
 
 \begin{equation}
  \label{eq:values-energy-landa}
@@ -80,21 +80,13 @@ Empezemos por escribir la relación de brillo superficial, suponiendo que no hay
     \eta_{\ha} = \frac{N(\text{H}^0_{n=3})A_{32}}{4 \pi} \left(\frac{hc}{\lambda_{32}}\right) 
   \end{equation}
 
-donde \(A_{32}\) es la probabilidad de transición y \(N(\text{H}^0_{n=3})\) es la densidad numérica de átomos neutros. Si la tasa de recombinaciones por volumen que producen \ha{} es 
+donde \(A_{32}\) es la probabilidad de transición y \(N(\text{H}^0_{n=3})\) es la densidad numérica de átomos neutros en el nivel \(n=3\). Por otro lado la tasa de recombinaciones por volumen que producen \ha{} es 
 \begin{equation}
   \label{eq:recombinaciones}
   \alpha_{\ha} N_{e}N_{H}=N(\text{H}^0_{n=3})A_{32}
 \end{equation}
 
-donde  \(\alpha_{\ha}\), \(N_{e}\) y \(N_{\text{H}}\)  son el coeficiente de recombinación efectiva, la densidad de electrones y la densidad de núcleos de hidrógeno. El coeficiente de recombinación efectiva  expresa la probabilidad de que un electrón en el estado \(n=3\) decaiga en cascada hasta el nivel de menor energía \(n=2\), considerando todos los caminos posibles, el cual está definido por 
-
-\begin{equation*}
-  \label{eq:coef}
-  N_{\text{H}}N_{e}\alpha_{\ha} = \frac{4\pi j_{\ha}}{h\nu_{\ha}}
-\end{equation*}
-
-donde \(h\nu_{\ha}\) representa la diferencia de energía entre los niveles involucrados en la transición y \(j_{\ha}\) es la intensidad media de la línea de \ha{}. Según \citet{Osterbrock:2006} el coeficiente de recombinacíon efectiva de \ha{} tiene por valor  \(\alpha_{\ha}=1.27\times 10^{-13}\cm^{3}~\text{s}^{-1} \) para una temperatura electrónica de \(T=9000~\K\).\\
-
+donde  \(\alpha_{\ha}\), \(N_{e}\) y \(N_{\text{H}}\)  son el coeficiente de recombinación efectiva \citep{Osterbrock:2006}, la densidad de electrones y la densidad de núcleos de hidrógeno. La anterior expresión la usamos para introducir el coeficiente de recombinación efectiva en nuestras ecuaciones, puesto que para nuestro estudio es muy conveniente, este coeficiente expresa la probabilidad de que un electrón en el estado \(n=3\) decaiga en cascada hasta el nivel de menor energía \(n=2\). Es importante añadir que cálculos completos de equilibrio estadistico de las cascadas de recombinación han mostrado que el coeficiente de recombinación efectiva depende principalmente de la temperatura electrónica \(T_{e}\), estrictamente hablando es aproximadamente proporcional a la inversa de la  \(T_{e}\) \citep{Pequignot:1991, Nussbaumer:1984} y en menor medida dependen de la densidad. También dependen de si la serie de Lyman es ópticamente gruesa o delgada, pero el primer caso es el relevante en este estudio. Hemos supuesto una temperatura electrónica constante de \(\sim 9000~\K \) esto lo justificaremos depués, para la cual el coeficiente de recombinación efectiva es \(\alpha_{\ha}=1.27\times 10^{-13}\cm^{3}~\text{s}^{-1} \).\\
 
 Por otro lado, al sustituir la Ec. \ref{eq:recombinaciones} en la Ec.~\ref{eq:emision-coeficiente} y teniendo en cuenta que \(N_{e}\simeq N_{\text{H}} \simeq N\) obtenemos que
 
@@ -125,7 +117,7 @@ Otra cosa que debemos  tener en cuenta en relación a los distancias y radios me
 
 Donde los parámetros primados se ubican en el marco de referencia del objeto en cuestión (\(x', y', z'\)), es decir son las distancias y radios reales. La relación entre el radio curvatura proyectado y real permanece constante por que en este caso se considera una aproximación esférica donde el radio de curvauta no varía con el marco de referencia. 
 
-\subsubsection{Estimación de la longitud del camino de la línea de visión, \(\Delta \zeta\)}
+\subsubsection{Estimación de la longitud del camino de la línea de visión a través de la cácasra, \(\Delta \zeta\)}
 \label{sec:camino}
 
 \begin{figure}
@@ -135,7 +127,7 @@ Donde los parámetros primados se ubican en el marco de referencia del objeto en
   \label{fig:geometria}
 \end{figure}
 
-Para una cáscara localmente esférica con radio de curvatura \(R_{c}\) y anchura \(h\) que es observado tangencialmente \citeauthor{Henney:2013a}, suponiendo simetría cilíndrica y el eje de simetría en el plano del cielo (\(x, y\))(ver figura~\ref{fig:geometria1})  \ref{fig:geometria}), la longitud máxima de la línea de visión es
+Para una cáscara localmente esférica con radio de curvatura \(R_{c}\) y anchura \(h\) que es observado tangencialmente \citeauthor{Henney:2013a}, suponiendo simetría cilíndrica y el eje de simetría en el plano del cielo (\(x, y\))(ver figura~\ref{fig:geometria1}), la longitud máxima de la línea de visión a través de la cáscara es
 
 
 \begin{equation}
@@ -160,7 +152,7 @@ Para una cáscara localmente esférica con radio de curvatura \(R_{c}\) y anchur
 \subsection{Presión Térmica en la cáscara chocada}
 \label{sec:pressur-thermal}
 
-En la cáscara chocada la presión dominante es la presión térmica, debido a que esta zona esta contituida por gas ionizado, esto porque la energía cinética del flujo de partículas cargadas proveniente de la estrella central o proplyd se convierte en energía térmica en la zona chocada, entonces en este sentido tendremos que,
+En la cáscara chocada la presión dominante es la presión térmica, debido a que esta zona esta contituida por gas ionizado, esto es porque la energía cinética del flujo de partículas cargadas proveniente de la estrella central o proplyd se convierte en energía térmica en la zona chocada, entonces en este sentido tendremos que,
 
 \begin{equation}
   \label{eq:presion-cascara}
@@ -283,22 +275,31 @@ Donde \(P_{\text{Termica}}\) está dada por la ec~\ref{eq:presion-cascara}.
 \section{Resultados físicos: cálculo de las propiedades físicas }
 \label{sec:results}
 
+\begin{figure}
+  \centering
+   \includegraphics[width=\linewidth, clip]{luis-programas/brightness-shell_acs_Vs-D_new.pdf}
+  \caption{Brillo superficial de \ha{}  corregido por extinción obtenido a partir de las imágenes de \citeauthor{Bally:2006a} en función de la distancia proyectada desde Trapecio. La línea respresenta un ajuste líneal dada por \(S(\ha{})\sim D^{-1.97}\).} 
+  \label{fig:bright}
+\end{figure}
+
+
+Para empezar hemos determinado el brillo superficial de \(\ha{}~\lambda6563\) usando las imágenes de Bally (cámara ACS-F658N) para posteriormente determinar otros parámetros físicos como la densidad numérica de partículas en la cáscara, como veremos más adelante. Para nuestros propósitos hemos determinado el brillo superficial de \ha{} a partir de las imágenes de Bally. Como ya sabemos estas observaciones se basan en líneas de emisión de \ha{} contaminadas por las líneas de \nii{}, es así que el brillo medido que  mostramos en la figua~\ref{fig:bright} es el resultado de haber hecho la correción por la emisión de \nii y en el mismo orden de ideas a este resultado de las estimaciones del brillo se le suma la correción por extinción. En la figura se puede ver que el brillo superficial  de \ha{} cae con la distancia proyectada desde Trapecio, esto es con la relación \(S(\ha{})\sim D^{-1.97}\) (esta realción es obtenida a partir de un ajuste lineal realizado sobre los  puntos graficados), así que tenemos que los objetos en el interior de la nebulosa son más brillantes que los que se ecuentran más alejados. En el caso de los proplyds probablemente esto se deba a que el número de fotones ionizantes proveniente de \thC{} va disminuyendo con la distancia por la intervención del gas nebular.  
+
 \subsection{Densidad promedio en la cáscara}
 \label{sec:density}
 
 \begin{figure}
   \centering
    \includegraphics[width=\linewidth, clip]{luis-programas/will-nshell-vs-D.pdf}
-  \caption{Densidad electrónica corregida por extinción en función de la distancia proyectada a \(\theta^1\ \text{Ori}\ \text{C}\), obtenida a partir de las observaciones de Bally, es decir usando el  brillo superficial de \(\ha\) en la cáscara chocada para determinarla. El tamaño de los puntos indica que tan grande es el camino de visión en la zona chocada si los comparamos entre si. Las flechas en la parte superior izquierda representan la distancia corregida de los arcos de emisión a \thC{}, para los ángulos de inclinación; \(i = 30^{\circ}, 45^{\circ}, 60^{\circ}, 75^{\circ}\).  Por otro lado la escala de colores representa el brillo superficial de los objetos en unidades de [\(\mathrm{erg~s^{-1}~cm^{-2}~sr^{-1}}\)]. }
+  \caption{Densidad electrónica corregida por extinción en función de la distancia proyectada a \(\theta^1\ \text{Ori}\ \text{C}\), obtenida a partir de las observaciones de Bally, es decir usando el  brillo superficial de \(\ha\) en la cáscara chocada para determinarla. El tamaño de los puntos indica que tan grande es el camino de visión en la zona chocada si los comparamos entre si. Las flechas en la parte inferior izquierda representan la distancia corregida por la inclinación de los arcos de emisión a \thC{}, para los ángulos de inclinación; \(i = 30^{\circ}, 45^{\circ}, 60^{\circ}, 75^{\circ}\).  Por otro lado la escala de colores representa el brillo superficial de \ha{} de las cáscara chocada en unidades de [\(\mathrm{erg~s^{-1}~cm^{-2}~sr^{-1}}\)]. }
   \label{fig:density}
 \end{figure}
 
-Dado que a partir de las observaciones hemos podido determinar el brillo superficial de \ha{} realizando un poco de fotometría como se puede apreciar previamente y además como tenemos el camino de la línea de visión en la cáscara chocada (\(\Delta\zeta\)), dada por la Ec. \ref{eq:vision},  hemos determinado la densidad de núcleos de Hidrógenos (\(n\))  usando la ecuación \ref{eq:densidad}, específicamente en esta región (en la cáscara) para los diferentes objetos LL y los choques de los proplyds. Hay que subrayar que hemos usado cómo distancia a la Nebulosa de Orión 436 Pc para hacer las respectivas conversiones de unidades.\\ 
+Dado que a partir de las observaciones hemos podido determinar el brillo superficial de \ha{} realizando un poco de fotometría como se puede apreciar previamente y además como hemos determinado el camino de la línea de visión en la cáscara chocada (\(\Delta\zeta\)), mediante la Ec. \ref{eq:vision}, fue posible para nosotros determinar la densidad promedio de partículas (\(N\)) usando la ecuación \ref{eq:densidad}, específicamente en esta zona (en la cáscara chocada) para los diferentes objetos LL y los proplyds. Hay que subrayar que hemos usado cómo distancia a la Nebulosa de Orión \(436 \pm 20~\text{pc}\) \citep{Odell:2008} para hacer las respectivas conversiones de unidades, es decir para convertir en unidades físicas esto es en [cm], las unidades de los radios de curvatura \(R_{c}\) y la longitud del ancho de las cáscaras \(h\), puesto que de las observaciones estos parámetros se midieron en unidades de [arcsec], esta conversión fue necesaria para calcular la densidad promedio de partículas en la cáscara (ver la sección \ref{sec:phy}).\\
 
-En la figura \ref{fig:density} se logra apreciar que los objetos que están más cercas de las estrellas masivas del Trapecio, presentan una densidad electrónica mayor que los que se encuentran a las afueras de la nebulosa, entonces estas altas densidades electrónicas provocan que el brillo superficial, generado a partir de la emisión de la líneas de recombinación de \ha{} sea mayor en las proximidades de \thC{}. Y es que en esta región domina la emisión de \ha, es decir hay poca contaminación por las líneas de  \nii{}.\\
-
-
-\subsection{Relación y diferencia entre la presión térmica en la cáscara y la presión hidrodinámica en los vientos }
+En esta medida, en la figura \ref{fig:density} se logra apreciar que la cáscara chocada de los objetos que están más cerca de las estrellas masivas del Trapecio, presentan una densidad electrónica mayor que los que se encuentran a las afueras de la nebulosa. Esto es razonable porque el flujo fotoevaporado de los proplyds interiores de la nebulosa que entre otras cosas es medianamente supersónico interacciona con un viento estelar muy rápido proveniente de \thC{}, generando con esto que la cáscara sea muy brillante en \ha{} por la recombinación de esta línea, mientras que en el caso contrario, es decir los objetos LL  ubicados en las regiones externas de la nebulosa que por lo general están a grandes distancias, el viento de la estrella T Tauri interacciona con el flujo lijeramente supersónico de champaña nebular, resultando cáscaras menos brillantes.
+  
+\subsection{Presión térmica en la cáscara y  presión hidrodinámica en los vientos }
 \label{sec:pressure}
 
 \begin{figure}
@@ -312,7 +313,7 @@ Usando la ecuación \ref{eq:presion-cascara} de \S\ref{sec:pressur-thermal} se e
 
  Por otro lado usando la Ec. \ref{eq:presion-externa} de la misma sección determinamos la presión hidrodinámica ejercida para cada objeto por el viento estelar hipersónico de la estrella másiva \thC{} del Trapecio (usando la distancia \(D\) del objeto en cuestión a \thC{}), para una cierta tasa de pérdida de masa de \(\dot{M} = 3.5 \times 10^{-7}~\msolagno\) y una velocidad de \(v = 1200~\mathrm{km~s^{-1}}\). \\
 
-Ahora bien, la figura \ref{fig:pressure} es el resultado de tales estimaciones. En ella estamos comparando las presiones en las cáscara chocada de los objetos LL y de los proplyds (símbolos de colores en la gráfica), con la presión ram generada por el viento estelar (lineas continuas  y discontinuas  de color  negro en la gráfica). Se observa  que la presión térmica es mayor en los objetos, que están dentro de la nebulosa,  es decir en los proplyds conocidos, a su vez esta  coincide con la presión ram del flujo de la estrella masiva, indicando que los choques de los proplyds en el interior están confinados por el hipersónico viento estelar, es posible argumentar esto considerando el equilibro de presiones (ver Ec. \ref{eq:igualda-presion}). Lo contrario sucede con los arcos hiperbólicos en las afueras de la nebulosa, puesto que la presión en la zona chocada no coincide con la presión del viento estelar, por tanto esto nos lleva a pensar que estos objetos no están interactuando con el viento estelar, sino más bien con el transónico flujo de champaña fotoevaorado proveniente del núcleo de la nebulosa.  
+Ahora bien, la figura \ref{fig:pressure} es el resultado de tales estimaciones. En ella estamos comparando las presiones en las cáscara chocada de los objetos LL y de los proplyds (símbolos de colores en la gráfica), con la presión ram generada por el viento estelar (lineas continuas  y discontinuas  de color  negro en la gráfica). Se observa  que la presión térmica es mayor en los objetos, que están dentro de la nebulosa,  es decir en los proplyds conocidos, a su vez esta  presión coincide con la presión ram del flujo de la estrella masiva, indicando que los choques de los proplyds en el interior están confinados por el hipersónico viento estelar, es posible argumentar esto considerando el equilibro de presiones (ver Ec. \ref{eq:igualda-presion}). Lo contrario sucede con los arcos hiperbólicos en las afueras de la nebulosa, puesto que la presión en la zona chocada no coincide con la presión del viento estelar, por tanto esto nos lleva a pensar que estos objetos no están interactuando con el viento estelar, sino más bien con el transónico flujo de champaña fotoevaorado proveniente del núcleo de la nebulosa.  
 
 \subsection{Flujo de momento interno: \(\dot{M}_{w}\text{V}_{w}\) }
 \label{sec:momentum}
