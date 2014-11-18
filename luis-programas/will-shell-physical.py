@@ -102,6 +102,11 @@ with open("extinction.json") as f:
 Sha = Sfactor_ACS*tab['Dif_Bally']
 Chb = np.array([extinction_data.get(source, 0.0) for source in tab['Object']])
 Sha *= 10**(fha*Chb)
+# Correct for [N II] contamination of Ha filter
+# This comes from the fit done in luis-programas/ratio-brightness.py
+# Combined fit: Ratio = 0.28 D**0.43
+Rnii_ha = 0.28*D60**0.43
+Sha /= 1.0 + Rnii_ha
 
 # Thickness and radius of the shell for measurements of delta l
 h0 = tab['h']*cm_per_arcsec
@@ -111,10 +116,17 @@ deltal = 2*np.sqrt(h0*rc)
 nshell = np.sqrt(4.*np.pi*Sha/(alpha*deltal*Eha))
 pshell = 2.0*nshell*k*T
 MdotV_in = pshell*4.*np.pi*(tab['R_in']*cm_per_arcsec)**2 *yr/Msun/km
+MdotV_out = pshell*4.*np.pi*(60*D60*cm_per_arcsec)**2 *yr/Msun/km
+
+windmom = Mdot_wind*Vwind*yr/Msun/km
+windmom30 = windmom*np.cos(np.radians(30))**2
+windmom60 = windmom*np.cos(np.radians(60))**2
 
 D60_grid = np.linspace(D60.min(), D60.max(), 2)
 Dcm_grid = 60*D60_grid*cm_per_arcsec
 Pram = Mdot_wind*Vwind/(4.*np.pi*Dcm_grid**2)
+
+
 
 proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
 not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
@@ -161,6 +173,32 @@ ax.set_xlim(0.05, 20.0)
 ax.set_ylim(2e-10, 1.5e-7)
 fig.savefig(pltfile)
 figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+pltfile = 'will-MdotVout-vs-D.pdf'
+fig = plt.figure(figsize=(7,6))
+ax = fig.add_subplot(111, axisbg="#eeeeee")
+plt.scatter(D60[m], MdotV_out[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
+label_sources(tab['Object'], D60, MdotV_out, allmask=m)
+cb = plt.colorbar()
+cb.set_label('H alpha surface brightness, erg/s/cm2/sr')
+plt.xlabel('Projected distance from Trapezium, D / arcmin')
+plt.ylabel('Outer flow Mdot V, Msun/yr km/s')
+plt.axhline(windmom, ls='-', c='k', alpha=0.7)
+plt.axhline(windmom30, ls='--', c='k', alpha=0.7)
+plt.axhline(windmom60, ls=':', c='k', alpha=0.7)
+textbb = {"facecolor": "white", "alpha": 0.7, "edgecolor": "none"}
+textpars = {'ha': 'center', 'va': 'center', 'bbox': textbb, 'fontsize': 'x-small'}
+plt.text(1.0, windmom, 'Stellar wind: 3.5e-7 Msun/yr, 1200 km/s', **textpars)
+plt.text(10.0, windmom, 'i = 0', **textpars)
+plt.text(10.0, windmom30, 'i = 30', **textpars)
+plt.text(10.0, windmom60, 'i = 60', **textpars)
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_xlim(0.05, 20.0)
+ax.set_ylim(6e-6, 4e-2)
+fig.savefig(pltfile)
+figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
 
 pltfile = 'will-MdotV-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
