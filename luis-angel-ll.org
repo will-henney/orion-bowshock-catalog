@@ -7,6 +7,642 @@ Presentamos una lista completa de todos los choques estacionarios asociados a es
 Catalog of stationary bowshock arcs in the Orion Nebula
 
 We present a complete catalog of all the stationary emission line arcs (LL objects and proplyd bowshocks) found in archival HST imaging of the Orion Nebula.   The total number of objects detected is 73, of which 20 have not previously been reported in the literature.  We classify the shapes of emission line arcs by fitting conic sections to the inner and outer shell boundaries and calculate the background corrected H alpha surface brightness of each object.   We find significant differences in the shell shapes between the objects closest to the ionizing stars and those farther away.  The closer group, which all represent proplyd interactions with the hypersonic stellar wind, have relatively closed shapes, while the farther group, which are due to interactions with the transonic ionized champagne flow in the nebula, are more open and hyperbolic.  Although some of the latter group are also known proplyds, many are not, and the largest and brighest arcs tend to be associated with particularly luminous young stars, suggesting that the intrinsic T Tauri disk wind may play a role.  The orientations of the arcs, together with the stagnation pressures estimated from the surface brightness, allow the internal velocity field of the H II region to be probed.  We find that approximately radial flows from the core of the nebula dominate over disordered, turbulent flows.
+* Spatial groups of arcs
++ We can divide the arcs into 6 groups:
+  1. LV knots and other very close-in arcs
+     - D' < 20''
+     - approx isotropic distribution
+     - consistent with stellar wind confinement
+     - radiation pressure may also be important
+     - roughly half of all proplyds in this zone have arcs
+     - no consistent offset between axis and radial direction
+  2. The intermediate arcminute halo
+     - D' ~= 0.5' -> 1'
+     - most are either to SW, or to N
+       - but the N ones may be are just the inner extension of the N group
+       - and the SW ones may be outer extension of the LV group
+     - no consistent offset between axis and radial direction
+     - seem to require too high an outer pressure for the stellar wind
+       - but perhaps mass loading could rescue this
+     - Only 20% of proplyds in this zone have arcs
+  3. The northwest group
+     - D' ~= 2' -> 4'
+     - From N to WNW
+     - Slight negative (clockwise) offset between axis and radial direction
+       - => clockwise non-radial external flow (to W)
+     - 
+** Finding the spatial groups
+:PROPERTIES:
+:noweb:    yes
+:END:
+
+*** Read in the data
+#+name: read-data-for-classification
+#+BEGIN_SRC python
+  import matplotlib.pyplot as plt
+  from matplotlib.patches import Ellipse
+  from astropy.table import Table
+  import numpy as np
+
+  table = Table.read("luis-programas/arcs-summary-merge.tab", 
+                   format="ascii.commented_header", delimiter="\t",
+                   fill_values=('--', np.nan) ).filled(np.nan)
+  with open("luis-programas/problem-sources.txt") as f:
+      problem_sources = f.read().split('\n')
+  with open("luis-programas/interproplyd.txt") as f:
+      interprop_sources = f.read().split('\n')
+
+  problem_mask = np.array([name in problem_sources for name in table['Object']])
+  interprop_mask = np.array([name in interprop_sources for name in table['Object']])
+  m = (~problem_mask) & (~interprop_mask)
+
+  D60 = table['D'][m]/60.0
+  PA = (table['PA_star'][m] - 180.0) % 360.0
+#+END_SRC
+*** Plot graph of PA vs log Distance 
+#+BEGIN_SRC python :return pltfile :results file
+  <<read-data-for-classification>>
+  xmin, xmax = 0.05, 20.0
+  x = np.concatenate((D60, D60, D60))
+  y = np.concatenate((PA-360, PA, PA+360))
+
+  plt.plot(x, y, 'o', color='k', alpha=0.7)
+  plt.fill_between([xmin, xmax], [0.0, 0.0], [360.0, 360.0], alpha=0.05, color='k')
+  # plt.gca().add_patch(Ellipse((5.0, 200), 2.0, 60.0))
+  plt.xlim(xmin, xmax)
+  plt.xscale('log')
+  plt.ylim(-180.0, 360.0 + 180.0)
+  plt.xlabel('Projected distance, arcmin')
+  plt.ylabel('Position angle, degrees')
+  plt.gcf().set_size_inches(8, 8)
+  pltfile = 'distro-D-PA.pdf'
+  plt.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:distro-D-PA.pdf]]
+
+- I have edited the file with iDraw to add colored ellipses for the groups that we find:
+  - [[file:arc-classify.pdf]]
+
+*** Look at the PA distribution histograms in different radial bins
+#+BEGIN_SRC python :return pltfile :results file
+  <<read-data-for-classification>>
+  PA0 = 60
+  PA = ((PA - PA0) % 360) + PA0
+  rangemasks = [
+      (D60 < 0.2, "D' <= 0.2'"),
+      ((D60 >= 0.2) & (D60 < 1.2), "D' = 0.2' - 1.2'"),
+      ((D60 >= 1.2) & (D60 < 5.5), "D' = 1.2' - 5.5'"),
+      ((D60 >= 5.5), "D' > 5'")
+  ]
+
+  import seaborn as sns
+  import matplotlib.ticker
+  import sys
+
+  hist_kws = {"range": (PA0, 360 + PA0), "alpha": 0.6}
+  fig, axes = plt.subplots(4, 1, sharex=True, sharey=True)
+  #with sns.color_palette("RdPu_r", 4):
+  all_labels, all_handles = [], []
+
+  palette = iter(sns.color_palette(["gray", "orange", "purple", "green"]))
+  for ax, (mask, label), nbins in zip(axes, rangemasks, [4, 12, 36, 24]):
+      ax.hist(PA[mask], bins=nbins, color=next(palette), label=label, **hist_kws)
+      handles, labels = ax.get_legend_handles_labels()
+      all_labels.extend(labels)
+      all_handles.extend(handles)
+      ax.set_ylabel('# of arcs')
+
+  sys.stderr.write(str(all_labels))
+  sys.stderr.write(str(all_handles))
+  axes[-1].legend(all_handles, all_labels)
+  axes[-1].set_xlim(*hist_kws["range"])
+  axes[-1].set_xlabel('Position angle, degrees')
+  axes[-1].set_xticks(np.arange(PA0, 360+PA0+1, 30))
+  axes[-1].xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, pos: x % 360))
+  fig.set_size_inches(5, 10)
+  fig.tight_layout()
+  pltfile = 'histogram-PA-vs-D.pdf'
+  plt.savefig(pltfile)
+
+#+END_SRC
+
+#+RESULTS:
+[[file:histogram-PA-vs-D.pdf]]
+
+
+*** Assign the arcs to the groups
+#+BEGIN_SRC python :return newtabfile :results file
+  <<read-data-for-classification>>
+  # recalculate D60 and PA but for all sources
+  D60 = table['D']/60.0
+  PA = (table['PA_star'] - 180.0) % 360.0
+
+  criteria = {
+      "LV": D60 < 0.2,
+      "SE": (D60 >= 0.2) & (D60 < 1.2) & (PA > 60) & (PA < 200),
+      "N": (D60 >= 0.2) & (D60 < 1.2) & ((PA + 100) % 360 < 150),
+      "NW": (D60 >= 1.2) & (D60 < 5.0) & ((PA - 60) % 360 > 210),
+      "SW": (D60 >= 1.2) & (D60 < 6.0) & (PA > 200) & (PA < 290),
+      "W": (D60 >= 7.0) & (PA > 210) & (PA < 290),
+      "S": (D60 >= 3.0) & (PA > 100) & (PA < 210),
+  }
+
+  table["Group"] = '  '
+  for group, mask in criteria.items():
+      table["Group"][mask] = group
+  table["Group"][problem_mask] = '*P'
+  table["Group"][interprop_mask] = '*I'
+
+  newtabfile = "luis-programas/arcs-summary-classify.tab"
+  table.write(newtabfile, format="ascii.commented_header", delimiter="\t")
+
+#+END_SRC
+
+#+RESULTS:
+[[file:luis-programas/arcs-summary-classify.tab]]
+
++ This program adds an extra column to the table, which is a 2-character string representing the spatial group.
++ We also use =*I= and =*P= to represent interproplyd arcs and "problematic" arcs
+*** Repeat the earlier diagnostic graphs, but classifying by spatial group
+:PROPERTIES:
+:dir:      luis-programas
+:noweb:    yes    
+:END:
+
+Note that these run in the [[file:luis-programas]] folder
+
+#+name: read-classify-table
+#+BEGIN_SRC python
+  tab = Table.read("arcs-summary-classify.tab",
+                   format="ascii.commented_header", delimiter="\t",
+                   fill_values=('--', np.nan) )
+#+END_SRC
+
+#+name: classify-plots-setup
+#+BEGIN_SRC python
+  import numpy as np
+  import json
+  import matplotlib.pyplot as plt
+  from  astropy.table import Table
+  import seaborn as sns
+
+  <<annotations>>
+  <<read-classify-table>>
+  <<mask-out-unwanted>>
+  <<set-common-vars>>
+
+  groups = [ "LV", "SE", "N", "NW", "SW", "W", "S", ]
+  colors = [ "light brown", "light orange", "pale yellow", "dark pink", "purple", "cerulean",
+             "mint green", ]
+  colors = sns.xkcd_palette(colors)
+  groups_and_colors = zip(groups, colors)
+
+  lgd_kws = {'frameon': True, 'fancybox': True, 'shadow': True}
+
+  <<identify-proplyds>>
+  proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
+  not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
+  maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
+  
+  
+#+END_SRC
+
+#+RESULTS: classify-plots-setup
+: None
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-Aout-vs-Ain-class.pdf'
+  fig = plt.figure(figsize=(6,6))
+  ax = fig.add_subplot(111)
+  ax.plot([0.0, 10.0], [0.0, 10.0], '-w', lw=1, zorder=-1)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      plt.scatter(Ain[mm], A[mm], s=20*tab['R_out'][mm], c=color,
+                  label=group+' group',
+                  alpha=0.8)
+  label_sources(tab['Object'], Ain, A, allmask=m,
+                extramask=(A > 2*Ain) | (Ain > 2*A))
+  plt.xlabel('Inner shock bluntness, A = Rc/r0')
+  plt.ylabel('Outer shock bluntness, A = Rc/r0')
+  ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(0.0, 10.0)
+  ax.set_ylim(0.0, 10.0)
+  ax.axis('equal')
+  ax.legend(loc='upper left', **lgd_kws)
+  fig.tight_layout()
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Aout-vs-Ain-class.pdf]]
+
+This diagnostic, Aout vs Ain, is actually not very useful.  A better way of looking at it is the flare parameter that we use below. 
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-A-vs-q-class.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      plt.scatter(q[mm], A[mm], s=20*tab['R_out'][mm], c=color,
+                  label=group+' group',
+                  alpha=0.8)
+  label_sources(tab['Object'], q, A, allmask=m)
+  plt.xlabel('Bowshock fractional size, q = r0/D')
+  plt.ylabel('Bowshock bluntness, A = Rc/r0')
+  ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xscale('log')
+  ax.set_xlim(0.001, 1.0)
+  ax.legend(**lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-A-vs-q-class.pdf]]
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-H-vs-q-class.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      plt.scatter(q[mm], H[mm], s=20*tab['R_out'][mm], c=color,
+                  label=group+' group',
+                  alpha=0.8)
+  label_sources(tab['Object'], q, H, allmask=m)
+  plt.xlabel('Bowshock fractional size, q = r0/D')
+  plt.ylabel('Shell relative thickness, H = h/r0')
+  plt.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xscale('log')
+  ax.set_xlim(0.001, 1.0)
+  ax.legend(**lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-H-vs-q-class.pdf]]
+
+For the flaring, we take the geometric mean of the values calculated from the center of curvature of the inner and outer shells.  
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+  out_fac = (tab['Rc_out'] - tab['h'])/(tab['Rc_in']*tab['h'])
+  in_fac = (tab['Rc_in'] + tab['h'])/(tab['Rc_out']*tab['h'])
+  Flair = np.sqrt(out_fac*in_fac)*(tab['Rc_out'] - tab['h'] - tab['Rc_in'])
+  Flair = np.sign(Flair)*np.sqrt(np.abs(Flair))
+  pltfile = 'will-Flare-vs-H-class.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      plt.scatter(H[mm], Flair[mm], s=20*tab['R_out'][mm], c=color,
+                  label=group+' group',
+                  alpha=0.8)
+  label_sources(tab['Object'], H, Flair, allmask=m,
+                extramask=(Flair > 2.0) | (Flair < -0.5) | tab['Object'] in ['308-3036'])
+  plt.xlabel('Shell relative thickness, H = h/r0')
+  plt.ylabel('Shell flaring factor')
+  ax.axhline(color='black', lw=0.5)
+  ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(0.0, None)
+  ax.set_ylim(-3, 5)
+  ax.legend(loc='upper left', **lgd_kws)
+  fig.tight_layout()
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Flair-vs-H-class.pdf]]
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-r0-vs-D-class.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  for group, color in groups_and_colors:
+      for thismask, marker, label in [
+              (proplyd_mask | maybe_proplyd_mask, 's', group+' group'),
+              (not_proplyd_mask, 'D', group+' group (non-proplyd)'),
+      ]:
+          mm = m & (tab['Group'] == group) & thismask
+          n = len(D60[mm])
+          if n > 0:
+              plt.scatter(D60[mm], tab['R_out'][mm], s=100*H[mm], c=[color]*n,
+                          label=label, marker=marker, alpha=0.8)
+  label_sources(tab['Object'], D60, tab['R_out'],
+                (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Bowshock radius, r0 / arcsec')
+  plt.text(0.02, 0.02, 'Symbol size indicates shell relative thickness, H = h/r0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(0.25, 14.0)
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.minorticks_on()
+  ax.grid(which='minor', lw=0.3)
+  ax.legend(loc='upper left', ncol=2, fontsize='x-small',
+            ,**lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-r0-vs-D-class.pdf]]
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-PA-vs-PA-class.pdf'
+  sns.set_style('ticks')
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  plt.fill_betweenx([-90.0, 90.0], [0.0, 0.0], [90.0, 90.0], zorder=-10, alpha=0.08)
+  plt.fill_betweenx([-90.0, 90.0], [180.0, 180.0], [270.0, 270.0], zorder=-10, alpha=0.08)
+  plt.fill_betweenx([-90.0, 90.0], [360.0, 360.0], [450.0, 450.0], zorder=-10, alpha=0.08)
+  plt.text(45.0, -80.0, 'NE\nquadrant',  ha='center', fontsize='x-small')
+  plt.text(135.0, -80.0, 'SE\nquadrant', ha='center', fontsize='x-small')
+  plt.text(225.0, -80.0, 'SW\nquadrant', ha='center', fontsize='x-small')
+  plt.text(315.0, -80.0, 'NW\nquadrant', ha='center', fontsize='x-small')
+  plt.axhline(zorder=-5, color='k', alpha=0.5)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      plt.scatter(PA_star[mm], dPA[mm], s=20*tab['R_out'][mm], c=color,
+                  label=group+' group',
+                  alpha=0.8)
+  label_sources(tab['Object'], PA_star, dPA, np.abs(dPA) > 45.0, allmask=m)
+  plt.xlabel('PA of source from Trapezium, deg')
+  plt.ylabel('Angle between bowshock axis and radial direction, deg')
+  plt.text(0.05, 0.95, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(-30.0, 375.0)
+  ax.set_xticks(np.arange(0, 360+1, 45))
+  ax.set_yticks([-60, -30, 0, 30, 60])
+  ax.set_ylim(-90.0, 90.0)
+  ax.legend(**lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-PA-vs-PA-class.pdf]]
+
+
+
+
+*** Output a latex table for the catalog paper, which includes the groups
+:LOGBOOK:  
+CLOCK: [2014-12-05 Fri 12:46]--[2014-12-05 Fri 12:47] =>  0:01
+CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
+:END:      
+:PROPERTIES:
+:ID:       5E3DCF1E-ADD5-4FB7-A212-2B99389B433B
+:noweb:    yes
+:END:
+- First version is one big table.
+- This is based on [[file:luis-programas/table-sort.py]] 
+- Main change is to make the output precision be uniform for each column
+#+name: table-write-setup
+#+BEGIN_SRC python
+  from  astropy.table import Table
+  import astropy.coordinates as coord
+  import astropy.units as u
+
+  def format_RA(ra):
+      return coord.Angle(ra, unit=u.hour).to_string(sep=':', precision=2, pad=True)
+
+  def format_DEC(dec):
+      s = coord.Angle(dec, unit=u.deg).to_string(sep=':', precision=1, pad=True)
+      if s.startswith('-'):
+          return r'$-$' + s[1:]
+      else:
+          return s
+
+  arctab = Table.read("luis-programas/arcs-summary-classify.tab", format = "ascii")
+  selected_columns = ['Object', 'Group', 'RA', 'Dec',
+                      'D', 'PA_star', 'R_out','R_in','Rc_out','Rc_in','h', 'PA_out', 'PA_in']
+  latex_columns = ['Object', 'Group', 'RA', 'Dec',
+                   r'\(D\)', 'PA',
+                   r'\(R_\mathrm{out}\)',
+                   r'\(R_\mathrm{in}\)',
+                   r'\(R_\mathrm{c,out}\)',
+                   r'\(R_\mathrm{c,in}\)',
+                   r'\(h\)',
+                   r'PA\(\mathrm{_{out}}\)',
+                   r'PA\(\mathrm{_{in}}\)',
+  ]
+  column_formats = {}
+  for c, cc in zip(selected_columns, latex_columns):
+      if c[0] in 'DRh':
+          column_formats[cc] = '%.2f'
+      elif c.startswith('PA'):
+          column_formats[cc] = '%.1f'
+      else:
+          column_formats[cc] = '%s'
+          
+  column_formats['RA'] = format_RA
+  column_formats['Dec'] = format_DEC
+  arctab.sort('RA')
+#+END_SRC
+
+#+BEGIN_SRC python :return table_filename :results file
+  <<table-write-setup>>
+  table_filename = 'catalog-paper/table-sort-full.tex'
+  arctab[selected_columns].write(
+      table_filename,
+      format = "ascii.aastex",
+      names=latex_columns,
+      formats=column_formats,
+      col_align='r'*len(latex_columns),
+      fill_values=[('nan', r'\nodata'), ('0.00', r'\nodata')]) 
+#+END_SRC 
+
+#+RESULTS:
+[[file:catalog-paper/table-sort-full.tex]]
+
+But what we really want is a separate table for each spatial group.  This is what I do next:
+#+BEGIN_SRC python
+  <<table-write-setup>>
+  groupdict = {
+      "LV": ("01-LV", "LV knots"),
+      "SE": ("02-southeast", "Southeast group"),
+      "N": ("03-north", "North group"),
+      "NW": ("04-northwest", "Northwest group"),
+      "SW": ("05-southwest", "Southwest group"),
+      "W": ("06-west", "West group"),
+      "S": ("07-south", "South group"),
+      "*P": ("XX-problematic", "Problematic objects"),
+      "*I": ("00-interproplyd", "Interproplyd shells"),
+  }
+  selected_columns.remove('Group')
+  latex_columns.remove('Group')
+  for group, (label, cap) in groupdict.items():
+      table_filename = 'catalog-paper/table-sort-{}.tex'.format(label)
+      m = arctab['Group'] == group
+      arctab[m][selected_columns].write(
+          table_filename,
+          format = "ascii.aastex",
+          latexdict=dict(tabletype='deluxetable*'),
+          names=latex_columns,
+          formats=column_formats,
+          col_align='r'*len(latex_columns),
+          caption='Shell geometric parameters of {}'.format(cap.lower()),
+          fill_values=[('nan', r'\nodata'), ('0.00', r'\nodata')])
+      
+#+END_SRC
+
+#+RESULTS:
+: None
+
+
+**** TODO Remaining issues with the catalog latex tables [0/6]
+- [ ] Do we really need to use deluxetable?
+  - There is blank space between the last row and the hline at the end of the table.  It doen't seem easy to avoid this.  I think it would not be there if we used a normal table
+- [ ] Could we use booktabs instead?
+- [ ] The interproplyd shell table needs to have some more columns
+  - The D and PA from the primary
+- [ ] We should put in the units for each column
+- [ ] And maybe number the columns
+- [ ] And add notes to the table, at least for the first one. 
+
+**** COMMENT Scratch area for writing astropy tables as latex
+
+#+BEGIN_SRC python :results output
+  from astropy.table import Table
+  import astropy.coordinates as coord
+  import astropy.units as u
+  
+  arctab = Table.read("luis-programas/arcs-summary-classify.tab", format = "ascii")
+  ra = arctab['RA'][0]
+  a = coord.Angle(ra, unit=u.hour)
+  print(type(arctab['RA'][0]))
+  print(arctab['RA'][0])
+  print(a.to_string(sep=':', precision=2, pad=True))
+#+END_SRC
+
+#+RESULTS:
+: <class 'numpy.str_'>
+: 5:35:02.200
+: 05:35:02.20
+
+*** [1/4] Output latex figures with the individual sources
+:LOGBOOK:  
+CLOCK: [2014-12-05 Fri 12:47]
+:END:      
+- This is similar to what [[id:E783982D-1FC7-4E2A-B2FE-C49BE0A5AAF5][we did for the Greece poster]]
+- But we want a separate figure for each group
+- [X] first version failed because '158-323' is not in =db=
+  - this is because it is actually LV5, and called such in ll-data.json
+  - Use a similar fix to what we did here: [[id:013B7A01-2624-435F-8B47-B591397F507C][Make a table of Jorge's measurements]]
+- [ ] Duplicate proplyd: w005-514
+- [ ] 204-330 should be in the interproplyd group
+- [ ] Should be using images from ../JorgeBowshocks/ETC
+
+#+BEGIN_SRC python
+  import json
+  import os
+  from astropy.table import Table
+
+  # This is the sample list with the group information (in astropy.table format)
+  arctab = Table.read("luis-programas/arcs-summary-classify.tab", format = "ascii")
+  arctab.sort('RA')
+
+  # and this is the list from ll-data.json -> db, keys
+  <<list-of-sources-sorted-by-ra>>
+
+  pdf_template = "j8oc{1:02d}010_wcs/{0:s}-Bally_{1:02d}-images.pdf"
+  fig_template = r'\BowshockFig{{{:s}}}{{{:02d}}}'
+  nofig_template = r'\MissingFig{{{:s}}}{{{:02d}}}'
+
+  <<extract-usual-name-of-each-source>>
+  <<extract-which-of-bally-fields-contains-source>>
+
+  ## First add new entries to db with the canonical names for LV knots
+  for source, data in db.items():
+      if "LV" in source or "HST" in source:
+          db[data["oname"]] = data
+  ## and remove w from names in the Object column of the table
+  for row in arctab:
+      if row['Object'].startswith('w'):
+          row['Object'] = row['Object'][1:]
+
+  groupdict = {
+      "LV": ("01-LV", "LV knots"),
+      "SE": ("02-southeast", "Southeast group"),
+      "N": ("03-north", "North group"),
+      "NW": ("04-northwest", "Northwest group"),
+      "SW": ("05-southwest", "Southwest group"),
+      "W": ("06-west", "West group"),
+      "S": ("07-south", "South group"),
+      "*P": ("XX-problematic", "Problematic objects"),
+      "*I": ("00-interproplyd", "Interproplyd shells"),
+  }
+
+
+  NCOLS = 3
+  labels = ["abc", "def", "ghi", "jkl", "mno", "pqr", "stu"]
+
+  for group, (label, cap) in groupdict.items():
+      figure_filename = 'catalog-paper/fig-stamps-{}.tex'.format(label)
+
+      m = arctab['Group'] == group
+      grouptab = arctab[m]
+      captiontext = "Stationary arc sources in the {} group.".format(cap)
+      figs = []
+      for k in grouptab['Object']:
+          if field(k):
+              if os.path.isfile(pdf_template.format(name(k), field(k))):
+                  figs.append(fig_template.format(name(k), field(k)))
+              else: 
+                  figs.append(nofig_template.format(name(k), field(k)))
+
+      thisrow = []
+      thistable = []
+      for fig in figs:
+          thisrow.append(fig)
+          if len(thisrow) == NCOLS:
+              thistable.append(thisrow)
+              thisrow = []
+      if thisrow:
+          # catch any partial row at the end
+          thistable.append(thisrow)
+
+      def output_row(row):
+          return " & ".join(row) + r" \\"
+
+      def format_abc(abc):
+          return [r"\raiselabel{(\textit{" + s + "})}" for s in abc]
+
+      def output_figtable(table):
+          result = r"\begin{figure*}" + "\n"
+          result += r"  \setlength\tabcolsep{\figstampcolsep}" + "\n"
+          result += r"  \begin{tabular}{" + "l "*NCOLS + "}" + "\n"
+          for row, abc in zip(table, labels):
+              result += "    " + output_row(row) + "\n"
+              result += "    " + output_row(format_abc(abc[:len(row)])) + "\n"
+          result += r"  \end{tabular}" + "\n"
+          result += r"  \caption{" + captiontext + "}" + "\n"
+          result += r"  \label{fig:stamps-" + group + "}" + "\n"
+          result += r"\end{figure*}" + "\n"
+          return result
+
+      with open(figure_filename, 'w') as f:
+          f.write(output_figtable(thistable))
+#+END_SRC
+
+#+RESULTS:
+: None
+
 * Informes semestrales
 ** 2014-II [2014-07-02 Wed]
 Durante este semestre, el estudiante ha cursado el Seminario de
@@ -18,6 +654,7 @@ Orión.  El trabajo para su tésis de maestría es ahora 95% completo, y
 ha empezado con la escritura de la misma; ahora cuenta con borradores
 de 3 capítulos.  Se espera que se gradue durante el transcurso del
 próximo semestre. 
+
 
 
 * Tasks to finish before OSSF 2014 conference
@@ -102,6 +739,7 @@ CLOCK: [2014-11-07 Fri 09:45]--[2014-11-07 Fri 11:55] =>  2:10
 ** A better document with all the images
 :PROPERTIES:
 :noweb:    yes
+:ID:       E783982D-1FC7-4E2A-B2FE-C49BE0A5AAF5
 :END:
 
 + Luis has this, but there is a lot of whitespace
@@ -1234,6 +1872,9 @@ This is a good example of a high-incliation object, giving rise to low value of 
 
 
 ** Make a table of Jorge's measurements
+:PROPERTIES:
+:ID:       013B7A01-2624-435F-8B47-B591397F507C
+:END:
 + JSON files read by [[file:luis-programas/arcs-summary-proplyds.py]]
   #+BEGIN_SRC sh :dir luis-programas :results silent
 python arcs-summary-proplyds.py
@@ -1296,7 +1937,6 @@ python arcs-summary.py
   : Row [16] updating LV3 to 163-317
   : Row [13] updating HST1 to 177-341
   : Row [15] updating LV2b to 166-316
-
 + This write the final table to [[file:luis-programas/arcs-summary-merge.tab]]
 
 ** Look at correlations
@@ -1439,8 +2079,6 @@ python arcs-summary.py
                 (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
   Darray = np.linspace(D60.min(), D60.max())
   r0norm = 0.8
-  plt.plot(Darray, r0norm*Darray/Darray.min(), 'k--', zorder=-100)
-  plt.plot(Darray, r0norm*(Darray/Darray.min ())**0.25, 'k-', zorder=-100)
   cb = plt.colorbar()
   cb.set_label('Brightness contrast, log10(Shell / BG)')
   plt.xlabel('Projected distance from Trapezium, D / arcmin')
@@ -1481,9 +2119,9 @@ python arcs-summary.py
 #+RESULTS:
 - [[file:luis-programas/will-A-vs-q.pdf][will-A-vs-q.pdf]]
 - [[file:luis-programas/will-H-vs-A.pdf][will-H-vs-A.pdf]]
-- [[file:luis-programas/will-H-vs-q.pdf][will-H-vs-q.pdf]]   
+- [[file:luis-programas/will-H-vs-q.pdf][will-H-vs-q.pdf]]
 - [[file:luis-programas/will-q-vs-D.pdf][will-q-vs-D.pdf]]
-- [[file:luis-programas/will-r0-vs-D.pdf][will-r0-vs-D.pdf]]  
+- [[file:luis-programas/will-r0-vs-D.pdf][will-r0-vs-D.pdf]]
 - [[file:luis-programas/will-PA-vs-PA.pdf][will-PA-vs-PA.pdf]]
 
 
@@ -1498,7 +2136,8 @@ Based on Luis's program [[file:luis-programas/pressure.py]]
 Sfactor_ACS = 0.0025030687604156482
 
 # Value of recombination coefficient in cm^3/s
-alpha = 2.6e-13 
+alpha_B = 2.6e-13 
+alpha_Ha = 1.27e-13
 
 # Energy to 3 to 2... erg
 Eha = 3.0267338723714944e-12 
@@ -1597,7 +2236,7 @@ Three categories:
   rc = tab['Rc_out']*cm_per_arcsec
   deltal = 2*np.sqrt(h0*rc)
 
-  nshell = np.sqrt(4.*np.pi*Sha/(alpha*deltal*Eha))
+  nshell = np.sqrt(4.*np.pi*Sha/(alpha_Ha*deltal*Eha))
   pshell = 2.0*nshell*k*T
   MdotV_in = pshell*4.*np.pi*(tab['R_in']*cm_per_arcsec)**2 *yr/Msun/km
   MdotV_out = pshell*4.*np.pi*(60*D60*cm_per_arcsec)**2 *yr/Msun/km
@@ -1606,11 +2245,23 @@ Three categories:
   windmom30 = windmom*np.cos(np.radians(30))**2
   windmom60 = windmom*np.cos(np.radians(60))**2
 
-  D60_grid = np.linspace(D60.min(), D60.max(), 2)
+  D60min, D60max = 0.05, 20.0
+  D60_grid = np.logspace(np.log10(D60min), np.log10(D60max), 200)
   Dcm_grid = 60*D60_grid*cm_per_arcsec
   Pram = Mdot_wind*Vwind/(4.*np.pi*Dcm_grid**2)
 
-
+  # Radiation pressure quantities
+  # First dust
+  sigma_D = 1.0e-21
+  Lsun = 3.82e33
+  Lstar = 2e5*Lsun
+  light_speed = 2.99792458e10
+  tau_D = nshell*h0*sigma_D
+  Prad_D = (Lstar/light_speed) * (1.0 - np.exp(-tau_D)) / (4.0*np.pi*(60*D60*cm_per_arcsec)**2)
+  # Second hydrogen
+  eV = 1.602176462e-12
+  Eion = 1.3*13.6*eV              # assume mean energy of 1.3 Ryd
+  Prad_H = (Eion/light_speed)*alpha_B * nshell**2 * h0
 
   proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
   not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
@@ -1618,12 +2269,29 @@ Three categories:
 
   figlist = []
 
+  def OH_upper(D):
+      result = 6000.0*D**-1.4
+      result[result > 2e4] = 2e4
+      result[D < 0.4] = 2e4*(D[D < 0.4]/0.4)**0.5
+      result[result < 400.0] = 400.0
+      result[(result < 3000.0) & (D < 3.5)] = 3000.0
+      return result
+
+  def OH_lower(D):
+      result = 3000.0*D**-1.4
+      result[D < 1.0] = 3000.0
+      return result
+
+
   pltfile = 'will-nshell-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
   ax = fig.add_subplot(111, axisbg="#eeeeee")
   plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
   label_sources(tab['Object'], D60, nshell, (nshell > 3500.0/D60) | (nshell < 1000.0/D60), allmask=m)
   cb = plt.colorbar()
+  # O'Dell & Harris trend line
+  plt.fill_between(D60_grid, OH_upper(D60_grid), OH_lower(D60_grid), color='k', alpha=0.1)
+  #plt.plot(D60_grid, 4500.0*D60_grid**-1.3, '-')
   draw_inclination_arrow(0.1, 100*1.3**3, 30)
   draw_inclination_arrow(0.1, 100*1.3**2, 45)
   draw_inclination_arrow(0.1, 100*1.3, 60)
@@ -1634,7 +2302,7 @@ Three categories:
   plt.ylabel('Shell electron density, ne / pcc ')
   ax.set_xscale('log')
   ax.set_yscale('log')
-  ax.set_xlim(0.05, 20.0)
+  ax.set_xlim(D60min, D60max)
   ax.set_ylim(50.0, 5.e4)
   fig.savefig(pltfile)
   figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
@@ -1655,6 +2323,23 @@ Three categories:
   ax.set_yscale('log')
   ax.set_xlim(0.05, 20.0)
   ax.set_ylim(2e-10, 1.5e-7)
+  fig.savefig(pltfile)
+  figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+  pltfile = 'will-Prad-frac-vs-D.pdf'
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  plt.scatter(D60[m], tau_D[m], s=10*deltal[m]/cm_per_arcsec, c='brown', label='Shell optical depth', alpha=0.6)
+  plt.scatter(D60[m], Prad_H[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, c='yellow', label='Prad hydrogen', alpha=0.6)
+  plt.scatter(D60[m], Prad_D[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, label='Prad dust', c='red', alpha=0.6)
+  label_sources(tab['Object'], D60, Prad_D/pshell, allmask=m)
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Optical depth or Pressure ratio: radiation/gas')
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(3e-5, 2.0)
+  ax.legend(loc='upper right', fontsize='small')
   fig.savefig(pltfile)
   figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
@@ -1709,10 +2394,26 @@ Three categories:
 #+RESULTS:
 - [[file:luis-programas/will-nshell-vs-D.pdf][will-nshell-vs-D.pdf]]
 - [[file:luis-programas/will-Pshell-vs-D.pdf][will-Pshell-vs-D.pdf]]
+- [[file:luis-programas/will-Prad-frac-vs-D.pdf][will-Prad-frac-vs-D.pdf]]
 - [[file:luis-programas/will-MdotVout-vs-D.pdf][will-MdotVout-vs-D.pdf]]
 - [[file:luis-programas/will-MdotV-vs-D.pdf][will-MdotV-vs-D.pdf]]
 
 
+*** Radiation pressure acting on the shells
+
+**** Compare momentum flux in the wind and radiation field
++ Wind: Mdot Vw = 2.647e27 g cm / s^2
++ Radiation: L / c = 2.548e28 erg / cm
++ erg = g cm^2 / s^2, so units are the same
++ => we need an optical depth of 0.1 or more in the shell in order to be competitive
++ If \sigma = 1.e-21, the we need N > 1e20
++ This seems unlikely, so why does LV2 show up with Prad/Pgas = 1
+  + It has n = 3.5e4, h = 0.706 arcsec = 4.54e15 cm
+  + => N = 1.589e20 /cm^2
++ So it is competitive after all
+  + /if/ we believe in such a high dust cross section
+  + and in such a large thickness for the shell
++ All the other LV shells have \tau that is typically 10 times smaller than for LV2, so radiation pressure is less important for them
 
 * Final tasks to finish the thesis
 
@@ -2991,13 +3692,14 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
           key = key[1:]
       db[key] = dict(bname=bname, oname=oname, sname=sname, RA=RA,
                      Dec=Dec, Ref=Ref, Bally=Bally, Notes=Notes, Arc=Arc)
-      with open(dbfile, "w") as f:
-          json.dump(db, f, indent=2)
-      with open(dbfile.replace(".json", ".tml"), "w") as f:
-          toml.dump(db, f)
       if Top40 == 1:
           top40list.append(key)
 
+
+  with open(dbfile, "w") as f:
+      json.dump(db, f, indent=2)
+  with open(dbfile.replace(".json", ".tml"), "w") as f:
+      toml.dump(db, f)
 
   with open("top40-list.txt", "w") as f:
       f.write("\n".join(top40list))
@@ -3006,7 +3708,7 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
 #+END_SRC
 
 #+RESULTS:
-- [[file:ll-data.json]]
+- [[file:ll-data.json]] 
 - [[file:top40-list.txt]]
 
 
@@ -3409,15 +4111,17 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
      
 **** Notes
 + extract-image.py must encode the camera/instrument in the output file somehow
-** [2/3] Next steps for Luis Ángel
+** [3/3] Next steps for Luis Ángel
 
 *** DONE Finish tracing the arcs
 CLOSED: [2013-11-12 Tue 09:15]
 *** DONE Determine radius of curvature
 CLOSED: [2013-11-15 Fri 11:20]
-*** TODO Measure surface brightnesses
+*** DONE Measure surface brightnesses
+CLOSED: [2014-11-24 Mon 09:20]
 
-** TODO Determinando la forma de los arcos
+** DONE Determinando la forma de los arcos
+CLOSED: [2014-11-24 Mon 09:20]
 :LOGBOOK:
 CLOCK: [2013-09-19 Thu 19:27]--[2013-10-07 Mon 09:47] => 422:20
 :END:
