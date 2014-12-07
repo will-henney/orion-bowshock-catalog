@@ -8,12 +8,13 @@
 \usepackage[vmargin=1in, hmargin=1.5in]{geometry}
 \usepackage{longtable}
 \usepackage{fixltx2e}
+\usepackage{etoolbox} % provies \patchcmd
 \bibliographystyle{apj}
 \usepackage{hyperref}
 %\def\fnum@table{Tabla~\thetable}
 
-\title{BORRADOR PRELIMINAR DE LA TESIS:\\
-Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
+
+\title{Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 
 \author{
   Luis Angel Gutiérrez Soto\\
@@ -40,6 +41,7 @@ Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 \newcommand\oii{\ensuremath{\mathrm{[O\,II]}}}
 \newcommand\oi{\ensuremath{\mathrm{[O\,I]}}}
 \newcommand\sii{\ensuremath{\mathrm{[S\,II]}}}
+\newcommand\cliii{\ensuremath{\mathrm{[Cl\,III]}}}
 \newcommand\ciii{\ensuremath{\mathrm{[C\,III]}}}
 \newcommand\Out{\ensuremath{\mathrm{out}}}
 \newcommand\In{\ensuremath{\mathrm{in}}}
@@ -53,7 +55,65 @@ Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 \tableofcontents
 
 \begin{abstract}
-En esta tesis presentamos una lista completa de todos los arcos estacionarios de líneas de emisión (objetos LL y choques de proa de los proplyds) encontradosen unos archivos de unas imágenes  del Telescopio Espacial Hubble (HST por sus siglas en inglés) de la Nebulosa de Orión. El número total de objetos detectado es de 73, de los cuales 20 no han sido reportados previamente en la literatura. Clasificamos la forma de los arcos radiactivos, mediante el ajuste de secciones cónicas en los límites internos y externos de la cáscara chocada y calculamos el brillo superficial de \ha{} corregido por el fondo para cada objeto. Encontramos diferencias significativas en la forma de las cáscaras entre los objetos que se encuentran más cerca de las estrellas ionizantes y los que están más lejos. El grupo cercano, que constituyen auténticas interacciones de los proplyds con el viento estelar hipersónico, tienen formas relativamente cerradas, mientras que el grupo más lejano, que se origina debido a la interacción con el transónico flujo de champaña de gas ionizado en la nebulosa, son más abierto e hiperbólicos. Aunque algunos de estos últimos son también proplyds conocidos, muchos no lo son, los arcos más grandes y más brillantes tienden a estar asociados con luminosas estrellas jóvenes, lo que sugiere que el viento intrínsico del disco de las estrellas T-Tauri podrían jugar un papel importante. La orientación de los arcos, junto con las presiones de estancamiento estimadas a partir del brillo superficial, permiten que el campo de velocidades interno de la región HII sean probados. También  encontramos que el flujo del núcleo de la nebulosa es aproximadamente radial y por tanto domina sobre un flujo turbulento y desordenado.
+  En esta tesis presentamos un catálogo completo de todos los arcos
+  estacionarios radiativos asociadas a estrellas jóvenes (T~Tauri) en
+  la nebulosa de Orión.  Identificamos nuestra muestra a partir de
+  imágenes en la línea H$\alpha$ del Telescopio Espacial Hubble (HST
+  por sus siglas en inglés). Estos arcos se interpretan como el
+  resultado de una interacción supersónica entre dos flujos: el
+  primero es un flujo interno que proviene de una estrella jóven,
+  mientras que el segundo es un flujo externo que proviene de su
+  ambiente dentro de la región fotoionizada, el cuál está dominado por
+  las estrellas masivas del Trapecio.  El objetivo principal de este
+  trabajo es proporcionar los datos empíricos para poder investigar la
+  naturaleza de estos flujos.
+
+  El número total de objetos detectados es de 73, de los cuales 20 no
+  han sido reportados previamente en la literatura, y sus distancias
+  proyectadas del Trapecio varían de $< 0.1'$ hasta $> 10'$, que
+  corresponde a $0.01$ a $1$ parsec. Clasificamos la forma de los
+  arcos radiativos, mediante el ajuste de círculos en los límites
+  internos y externos de la cáscara chocada, así determinando su radio
+  (distancia de la estrella T~Tauri a la cáscara) y radio de curvatura, así como
+  el ancho de la cáscara.  Además, calculamos el brillo superficial de
+  la cáscara y del fondo nebular en la línea \ha{}, corregidos por
+  contaminación de las líneas [N II] y por extinción. 
+
+  Encontramos muy poca dependencia del radio de la cáscara con la
+  distancia proyectada del Trapecio.  Sin embargo la forma de la
+  cáscara sí muestra cambios significativos con distancia.  Los arcos
+  más distantes del Trapecio tienden a tener cáscaras más anchas y más
+  abiertas que los arcos más interiores.  La orientación de los ejes
+  de simetría de los arcos es siempre cerca a la dirección radial,
+  pero hay desviaciones sistemáticas y significativas de hasta
+  $\approx 30^\circ$,
+  particularmente en el sur de la nebulosa.  Una comparación de la
+  distribución de las posiciones de los arcos con las distribuciones
+  de las estrellas y de los proplyds en el cúmulo de la Nebulosa de
+  Orión indica que hay el menos tres poblaciones distintas de arcos
+  estacionarios, con las dos interiores asociadas a los
+  proplyds pero la exterior no. 
+
+  Demostramos que la emisión H$\alpha$ de los arcos está dominada por
+  gas que está en equilibrio térmico a la misma temperatura que la
+  nebulosa ($\approx 10^4$~K) y que la emisión de gas más caliente
+  producido por los choques es despreciable.  Así, podemos determinar
+  la densidad y presión térmica en las cáscaras a partir de nuestras
+  observaciones de sus radios, anchos y brillo en H$\alpha$.  Por
+  suponer que la presión térmica de la cáscara sea igual a las
+  presiones hidrodinámicas del flujo interno y externo, calculamos el
+  flujo de momento de estos dos flujos para cada arco de nuestra
+  muestra.  Encontramos que el flujo de momento de los vientos
+  estelares de las estrellas masivas del Trapecio es suficiente para
+  confinar la población más interior de arcos, pero que los arcos más
+  distantes que $0.05$~pc requieren un flujo de momento que de 10 a
+  100 veces más grande.  El flujo interno de momento no depende de la
+  distancia para los arcos dentro de $0.2$~pc del Trapecio, que son
+  todos asociados a proplyds.  Los arcos más distantes que $0.2$~pc,
+  de los cuales sólo la mitad son asociados a proplyds,
+  muestran un flujo interno de momento que es $\sim 10$ veces más
+  débil y con una tendencia a ser más fuertes en las fuentes que no
+  son proplyds.
 \end{abstract}
 
 
@@ -67,9 +127,10 @@ En esta tesis presentamos una lista completa de todos los arcos estacionarios de
 \input{results}
 \chapter{Resultados astrofísicos}
 \input{theorical}
-\chapter{Conclusiones}
+\chapter{Conclusiones y trabajo a futuro}
 \input{conclusion}
 
 \bibliography{luis-ref}
 
 \end{document}
+

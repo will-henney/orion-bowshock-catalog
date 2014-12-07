@@ -125,13 +125,13 @@ En segundo lugar se determinó el coeficiente de calibración  para las imágene
 Las imágenes de los viejos mosaicos del WFPC2  obtenidas con el filtro f656n (\(\mathrm{\ha~6563~\AA{}}\)) y el filtro f658n (\(\mathrm{\nii~6583~\AA{}}\)) están unidades de [counts], así que para obtener unidades de brillo superficial, también se estimó el coeficiente de calibración para estas observaciones. Para determinar dichas constantes de calibración se hizo el siguiente análisis; para obtener unidades de [\(\mathrm{count~s^{-1}}\)] hay que  dividir entre el tiempo de exposicón, teniendo en cuenta que las observaciones tomadas con el filtro F656N tiene un tiempo de exposición de 200~s y las del filtro F658N tiene un tiempo de exposición de 500~s. Ahora, si estos valores en unidades de [\(\mathrm{count~s^{-1}}\)], se dividen entre los coeficientes de calibración de \citet{Odell:2009}, los cuales a llamado \(\mathrm{K1_{filter}}\) y respectivamente tienen por valor: \(\mathrm{K1_{F656N} = 1.62}\) y \(\mathrm{K1_{F658N} = 160}\) con unidades de [\(\mathrm{10^{-10}~counts~cm^{2}~sr~phtons^{-1}}\)], se obtienen unidades de [\(\mathrm{photons~s^{-1}~cm^{-2}~sr^{-1}}\)]. Por último, al multiplicar por la energía del fotón (\(\mathrm{E=3.027\times 10^{-12}~erg~para~\ha{}~6563~\AA{}}\) y \(\mathrm{E=3.018 \times10^{-12}~erg}\) para \(\nii{}~6583~\A{}\)) se obtienen cantidades con unidades de [\(\mathrm{erg~s^{-1}}\)  \(\mathrm{cm^{-2}~sr^{-1}}\)] que al final de cuentas es lo que se quiere.  Con este análisis concluimos que al realizar la operación \(\text{E}/(\mathrm{K1_{fiter}}\))  podemos obtener las constantes de calibración deseadas, teniendo en cuenta que hay que dividir previamente los valores de las imágenes entre T (el tiempo de exposición) y donde E es la energía del fotón. En la tabla~\ref{tab:table-constans} se pueden apreciar los valores de los coeficientes para F656N y F658N.
 
 
-\begin{table}[htp]
+\begin{table}[!hb]
 \centering
 \small\raggedright
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.7}
 \caption{Valores de los coeficientes de calibración.}
   \label{tab:table-constans}
-
+\setlength\tabcolsep{2.3pt}
 \begin{tabular}{ |l| |c| |l| }
 \hline
 Cámara-filtro&                       Coeficiente de calibración&       Unidades\\ \hline 
@@ -140,7 +140,7 @@ WFPC2-F656N (Imágenes de Robberto)&  0.16896 &                          \(\math
 WFPC2-F656N (Mosaico)&               0.01868 &                          \(\mathrm{erg~counts^{-1}~cm^{-2}~sr^{-1}}\)\\
 WFPC2-F658N (Mosaico)&               0.01886 &                          \(\mathrm{erg~counts^{-1}~cm^{-2}~sr^{-1}}\)\\ 
 \hline
- \end{tabular} 
+ \end{tabular}
  \end{table}
 \normalsize
 
