@@ -107,8 +107,6 @@ label_sources(tab['Object'], D60, tab['R_out'],
               (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
 Darray = np.linspace(D60.min(), D60.max())
 r0norm = 0.8
-plt.plot(Darray, r0norm*Darray/Darray.min(), 'k--', zorder=-100)
-plt.plot(Darray, r0norm*(Darray/Darray.min ())**0.25, 'k-', zorder=-100)
 cb = plt.colorbar()
 cb.set_label('Brightness contrast, log10(Shell / BG)')
 plt.xlabel('Projected distance from Trapezium, D / arcmin')

@@ -12,16 +12,17 @@
 \bibliographystyle{apj}
 \usepackage{hyperref}
 %\def\fnum@table{Tabla~\thetable}
+\usepackage{fancyhdr}
 
+%\title{Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
 
-\title{Un catálogo de choques de proa estacionarios en la Nebulosa de Orión}
+%\author{
+ % Luis Angel Gutiérrez Soto\\
+ % Tesis de Maestría, Posgrado de Astrofísica, UNAM\\
+ % Asesor: Dr. William Henney, CRyA, UNAM\\
+ % Morelia Michoacán, México
+ % }
 
-\author{
-  Luis Angel Gutiérrez Soto\\
-  Tesis de Maestría, Posgrado de Astrofísica, UNAM\\
-  Asesor: Dr. William Henney, CRyA, UNAM\\
-  Morelia Michoacán, México
-  }
 
 \newcommand\U[1]{\ensuremath{\mathrm{#1}}}
 \newcommand\K{\U{K}}
@@ -50,9 +51,54 @@
 %\renewcommand{\tablename}{Tabla}
 
 \begin{document}
-\maketitle
+%\maketitle
+\renewcommand{\thepage}{\roman{page}}
+\setcounter{page}{1}
+
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+
+\input{portada.tex}
+\blankpage
 
 \tableofcontents
+
+%\fancyhead[L]{Capítulo \thechapter}
+%\fancyhead[R]{Un catálogo de choques de proa estacionarios en la nebulosa de Orión}
+%\fancyfoot[L]{}
+%\fancyfoot[R]{\thepage}
+%\cfoot{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{Un catálogo de choques de proa estacionarios en la nebulosa de Orión}
+\fancyhead[RE,LO]{Cap\'itulo \thechapter}
+\fancyfoot[CE,CO]{\leftmark}
+\fancyfoot[LE,RO]{\thepage}
+\cfoot{} 
+
+\blankpage
+
+ 
+\newpage
+\section*{Agradecimientos}
+ 
+A la UNAM por darme la oportunidad de estudiar la Maestría en Ciencias (Astrofísica) con sede en la Ciudad de Morelia, Michoacán.
+\\[0.5cm] 
+
+Investigación realizada gracias al Programa de Apoyo a Proyectos de Investigación e Innovación Tecnológica (PAPIIT) de la UNAM. Clave del proyecto: IN102012. Título del proyecto: Abundancias químicas en discos protoplanetarios. Agradezco a la DGAPA-UNAM la beca recibida.
+\\[0.5cm]
+
+Al Dr William Henney por haber dirigido esta tesis de maestría, por sus consejos, por sus enseñanzas tanto en temas de astrofísica como en programación y por tenerme tanta paciencia. 
+\\[0.5cm] 
+
+A mi familia por su apoyo incondicional durante todo este tiempo, por su cariño  y por estar siempre conmigo a pesar de la distancia.
+\\[0.5cm] 
+
 
 \begin{abstract}
   En esta tesis presentamos un catálogo completo de todos los arcos
@@ -74,23 +120,23 @@
   corresponde a $0.01$ a $1$ parsec. Clasificamos la forma de los
   arcos radiativos, mediante el ajuste de círculos en los límites
   internos y externos de la cáscara chocada, así determinando su radio
-  (distancia de la estrella T~Tauri a la cáscara) y radio de curvatura, así como
-  el ancho de la cáscara.  Además, calculamos el brillo superficial de
-  la cáscara y del fondo nebular en la línea \ha{}, corregidos por
-  contaminación de las líneas [N II] y por extinción. 
+  (distancia de la estrella T~Tauri a la cáscara) y radio de curvatura, así como el ancho de la
+  la cáscara. Además, calculamos el brillo superficial de la cáscara y 
+  del fondo nebular en la línea \ha{}, corregidos por contaminación de las  
+  líneas [N II] y por extinción . 
 
   Encontramos muy poca dependencia del radio de la cáscara con la
   distancia proyectada del Trapecio.  Sin embargo la forma de la
   cáscara sí muestra cambios significativos con distancia.  Los arcos
   más distantes del Trapecio tienden a tener cáscaras más anchas y más
   abiertas que los arcos más interiores.  La orientación de los ejes
-  de simetría de los arcos es siempre cerca a la dirección radial,
+  de simetría de los arcos es siempre cercana a la dirección radial,
   pero hay desviaciones sistemáticas y significativas de hasta
   $\approx 30^\circ$,
   particularmente en el sur de la nebulosa.  Una comparación de la
   distribución de las posiciones de los arcos con las distribuciones
   de las estrellas y de los proplyds en el cúmulo de la Nebulosa de
-  Orión indica que hay el menos tres poblaciones distintas de arcos
+  Orión indica que hay al menos tres poblaciones distintas de arcos
   estacionarios, con las dos interiores asociadas a los
   proplyds pero la exterior no. 
 
@@ -106,7 +152,7 @@
   muestra.  Encontramos que el flujo de momento de los vientos
   estelares de las estrellas masivas del Trapecio es suficiente para
   confinar la población más interior de arcos, pero que los arcos más
-  distantes que $0.05$~pc requieren un flujo de momento que de 10 a
+  distantes que $0.05$~pc requieren un flujo de momento 10 a
   100 veces más grande.  El flujo interno de momento no depende de la
   distancia para los arcos dentro de $0.2$~pc del Trapecio, que son
   todos asociados a proplyds.  Los arcos más distantes que $0.2$~pc,
@@ -116,6 +162,8 @@
   son proplyds.
 \end{abstract}
 
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
 
 \chapter{Introducción}
 \input{introduction}

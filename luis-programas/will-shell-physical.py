@@ -8,7 +8,8 @@ import json
 Sfactor_ACS = 0.0025030687604156482
 
 # Value of recombination coefficient in cm^3/s
-alpha = 2.6e-13 
+alpha_B = 2.6e-13 
+alpha_Ha = 1.27e-13
 
 # Energy to 3 to 2... erg
 Eha = 3.0267338723714944e-12 
@@ -113,7 +114,7 @@ h0 = tab['h']*cm_per_arcsec
 rc = tab['Rc_out']*cm_per_arcsec
 deltal = 2*np.sqrt(h0*rc)
 
-nshell = np.sqrt(4.*np.pi*Sha/(alpha*deltal*Eha))
+nshell = np.sqrt(4.*np.pi*Sha/(alpha_Ha*deltal*Eha))
 pshell = 2.0*nshell*k*T
 MdotV_in = pshell*4.*np.pi*(tab['R_in']*cm_per_arcsec)**2 *yr/Msun/km
 MdotV_out = pshell*4.*np.pi*(60*D60*cm_per_arcsec)**2 *yr/Msun/km
@@ -122,11 +123,23 @@ windmom = Mdot_wind*Vwind*yr/Msun/km
 windmom30 = windmom*np.cos(np.radians(30))**2
 windmom60 = windmom*np.cos(np.radians(60))**2
 
-D60_grid = np.linspace(D60.min(), D60.max(), 2)
+D60min, D60max = 0.05, 20.0
+D60_grid = np.logspace(np.log10(D60min), np.log10(D60max), 200)
 Dcm_grid = 60*D60_grid*cm_per_arcsec
 Pram = Mdot_wind*Vwind/(4.*np.pi*Dcm_grid**2)
 
-
+# Radiation pressure quantities
+# First dust
+sigma_D = 1.0e-21
+Lsun = 3.82e33
+Lstar = 2e5*Lsun
+light_speed = 2.99792458e10
+tau_D = nshell*h0*sigma_D
+Prad_D = (Lstar/light_speed) * (1.0 - np.exp(-tau_D)) / (4.0*np.pi*(60*D60*cm_per_arcsec)**2)
+# Second hydrogen
+eV = 1.602176462e-12
+Eion = 1.3*13.6*eV              # assume mean energy of 1.3 Ryd
+Prad_H = (Eion/light_speed)*alpha_B * nshell**2 * h0
 
 proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
 not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
@@ -134,12 +147,29 @@ maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object
 
 figlist = []
 
+def OH_upper(D):
+    result = 6000.0*D**-1.4
+    result[result > 2e4] = 2e4
+    result[D < 0.4] = 2e4*(D[D < 0.4]/0.4)**0.5
+    result[result < 400.0] = 400.0
+    result[(result < 3000.0) & (D < 3.5)] = 3000.0
+    return result
+
+def OH_lower(D):
+    result = 3000.0*D**-1.4
+    result[D < 1.0] = 3000.0
+    return result
+
+
 pltfile = 'will-nshell-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
 ax = fig.add_subplot(111, axisbg="#eeeeee")
 plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
 label_sources(tab['Object'], D60, nshell, (nshell > 3500.0/D60) | (nshell < 1000.0/D60), allmask=m)
 cb = plt.colorbar()
+# O'Dell & Harris trend line
+plt.fill_between(D60_grid, OH_upper(D60_grid), OH_lower(D60_grid), color='k', alpha=0.1)
+#plt.plot(D60_grid, 4500.0*D60_grid**-1.3, '-')
 draw_inclination_arrow(0.1, 100*1.3**3, 30)
 draw_inclination_arrow(0.1, 100*1.3**2, 45)
 draw_inclination_arrow(0.1, 100*1.3, 60)
@@ -150,7 +180,7 @@ plt.xlabel('Projected distance from Trapezium, D / arcmin')
 plt.ylabel('Shell electron density, ne / pcc ')
 ax.set_xscale('log')
 ax.set_yscale('log')
-ax.set_xlim(0.05, 20.0)
+ax.set_xlim(D60min, D60max)
 ax.set_ylim(50.0, 5.e4)
 fig.savefig(pltfile)
 figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
@@ -171,6 +201,23 @@ ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlim(0.05, 20.0)
 ax.set_ylim(2e-10, 1.5e-7)
+fig.savefig(pltfile)
+figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
+
+pltfile = 'will-Prad-frac-vs-D.pdf'
+fig = plt.figure(figsize=(7,6))
+ax = fig.add_subplot(111, axisbg="#eeeeee")
+plt.scatter(D60[m], tau_D[m], s=10*deltal[m]/cm_per_arcsec, c='brown', label='Shell optical depth', alpha=0.6)
+plt.scatter(D60[m], Prad_H[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, c='yellow', label='Prad hydrogen', alpha=0.6)
+plt.scatter(D60[m], Prad_D[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, label='Prad dust', c='red', alpha=0.6)
+label_sources(tab['Object'], D60, Prad_D/pshell, allmask=m)
+plt.xlabel('Projected distance from Trapezium, D / arcmin')
+plt.ylabel('Optical depth or Pressure ratio: radiation/gas')
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_xlim(0.05, 20.0)
+ax.set_ylim(3e-5, 2.0)
+ax.legend(loc='upper right', fontsize='small')
 fig.savefig(pltfile)
 figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 

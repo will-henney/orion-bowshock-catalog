@@ -67,7 +67,6 @@ of the outer shock
 for file_name in file_list:
     with open(file_name) as f:
         data = json.load(f)
-
     # Add this object's data to each output column
     table["Object"].append(data["star"]["id"])
     table["RA"].append(data["star"]["RA"])

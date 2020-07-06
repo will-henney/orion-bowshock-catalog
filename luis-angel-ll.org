@@ -1,3 +1,280 @@
+* Looking at the stellar sources
+** Write out a region file for all the sources
++ This is based on [[id:0552A67D-F467-4F41-BD5D-DF5212B4AB35][Write ds9 region file for the LL objects]]
+
+*** First some utility functions
+#+BEGIN_SRC python :eval no :tangle catalog_utils.py
+  region_hdr_lines = [
+      '# Region file format: DS9 version 4.1',
+      'global color=yellow dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" '
+      + 'select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1',
+      'fk5',
+  ]
+
+  def region_box_to_string(ra='5:34:40.800', dec='-5:22:43.00', text='LL2',
+                           color='yellow', width=2, height=2, angle=0.0):
+                           pattern = 'box({},{},{}\",{}\",{}) # text={{{}}} color={}'
+                           return pattern.format(ra, dec, width, height, angle, text, color)
+
+
+  def region_lines_from_table(table, ra='RAJ2000', dec='DEJ2000',
+                              name='Name', name_fmt='{}', color='yellow'):
+      """Create DS9 region lines for all sources in an astropy `table`
+
+      Coordinates come from the columns named `ra` and `dec`, while
+      source names come the column named `name` and are formatted
+      according to `name_fmt`"""
+
+      region_lines = region_hdr_lines[:]
+      for row in table:
+          region_lines.append(
+              region_box_to_string(row[ra], row[dec],
+                                   name_fmt.format(row[name]), color))
+
+      return region_lines
+#+END_SRC
+
+*** Now try it on the COUP data
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  xdata = Table.read('COUP/Getman2005/Getman-2005-Vizier.fits')
+  regionfile = 'coup-sources.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(xdata, name='COUP',
+                                                name_fmt='COUP {:04d}',
+                                                color='cyan')))
+#+END_SRC
+
+#+RESULTS:
+[[file:coup-sources.reg]]
+
+*** And on the NICMOS data
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Andersen2011/nicmos.fits')
+  regionfile = 'nicmos-sources.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='Seq',
+                                                name_fmt='NIC {:04d}',
+                                                color='red')))
+#+END_SRC
+
+#+RESULTS:
+[[file:nicmos-sources.reg]]
+
+*** And the bizarre Russian Oricat data
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Vereshchagn2011/oricat.fits')
+  regionfile = 'oricat-sources.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='Oricat',
+                                                name_fmt='Oricat {:05d}',
+                                                color='green')))
+#+END_SRC
+
+#+RESULTS:
+[[file:oricat-sources.reg]]
+
+Accretion mass loss rates from Manara et al 2012
+
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Manara2012/mdot-catalog.fits')
+  regionfile = 'mdotcat.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='OM',
+                                                name_fmt='Mdot OM {:04d}',
+                                                color='#44cc44')))
+#+END_SRC
+
+#+RESULTS:
+[[file:mdotcat.reg]]
+
+*** Hillenbrand 1997 optical catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Hillenbrand1997/hillenbrand-V-I.fits')
+  regionfile = 'hill97.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='ID',
+                                                name_fmt='H97 {:04d}',
+                                                color='#ff8888')))
+#+END_SRC
+
+#+RESULTS:
+[[file:hill97.reg]]
+
+*** Hillenbrand 1998 IR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Hillenbrand1998/hillenbrand-J-Q.fits')
+  regionfile = 'hill98.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='ID',
+                                                ra='_RA', dec='_DE',
+                                                name_fmt='H98 {:04d}',
+                                                color='#aa4444')))
+#+END_SRC
+
+#+RESULTS:
+[[file:hill98.reg]]
+
+*** Hillenbrand 2000 IR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Hillenbrand2000/hillenbrand-J-K.fits')
+  regionfile = 'hill00.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='__HC2000_',
+                                                name_fmt='H00 {:04d}',
+                                                color='#ff44aa')))
+#+END_SRC
+
+#+RESULTS:
+[[file:hill00.reg]]
+
+*** Robberto 2010 wide field NIR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Robberto2010/RSS2010-core.fits')
+  regionfile = 'rss2010.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='ID',
+                                                name_fmt='RSS00 {:05d}',
+                                                color='#aa22aa')))
+#+END_SRC
+
+#+RESULTS:
+[[file:rss2010.reg]]
+
++ In order to give a small enough region file for ds9, I have restricted the catalog to the following range: 
+  + RA = 83.78323 +/- 0.12
+  + Dec = -5.45435 +/- 0.12
+*** Robberto 2005 MIR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Robberto2005/robberto-mir.fits')
+  regionfile = 'robb05-mir.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='MAX',
+                                                name_fmt='MAX {:03d}',
+                                                color='#aaaa22')))
+#+END_SRC
+
+#+RESULTS:
+[[file:robb05-mir.reg]]
+
+*** Smith 2005 MIR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Smith2005/smith05-mir.fits')
+  regionfile = 'smith05-mir.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='recno',
+                                                name_fmt='Smith {:03d}',
+                                                color='#ffaa22')))
+#+END_SRC
+
+#+RESULTS:
+[[file:smith05-mir.reg]]
+
+*** YSOVAR MIR catalog
+#+BEGIN_SRC python :results file :return regionfile
+  from astropy.table import Table
+  from catalog_utils import region_lines_from_table
+  table = Table.read('Morales-Calderon2011/ysovar-stars.fits')
+  regionfile = 'ysovar.reg'
+  with open(regionfile, 'w') as f:
+      f.write('\n'.join(region_lines_from_table(table, name='ISOY',
+                                                name_fmt='{}',
+                                                color='#44cc66')))
+#+END_SRC
+
+#+RESULTS:
+[[file:ysovar.reg]]
+
+*** Conclusion so far
++ Hillenbrand 2000 is mostly complete for inner region
++ Hillenbrand 1998 is good for EON
+  + Note that Hillenbrand 1997 has offsets in coordinates of order 2 arcsec
++ But Robberto 2010 is the best
+  + Although I had to restrict it to a 0.24 x 0.24 degree box
+  + Otherwise, it was too many boxes for ds9!
++ The COUP x-ray catalog makes an interesting complement
+** Find the coincident stellar sources for each arc
+#+BEGIN_SRC python
+  import numpy as np
+  from astropy.table import Table, Column, MaskedColumn
+  import astropy.coordinates as coord
+
+  arctab = Table.read('luis-programas/arcs-summary-unique.tab', 
+                      format='ascii.commented_header', delimiter='\t',
+                      fill_values=('--', np.nan) ).filled(np.nan)
+  outcols = ['Object']
+
+  arctab['coord'] = coord.SkyCoord(ra=arctab['RA'], dec=arctab['Dec'],
+                                   unit=('hourangle', 'deg'))
+
+  catalogs = {'RSS': {'file': 'Robberto2010/RSS2010-core.fits',
+                      'ID': 'ID'},
+              'COUP': {'file': 'COUP/Getman2005/Getman-2005-Vizier.fits',
+                       'ID': 'COUP'},
+              'MAX': {'file': 'Robberto2005/robberto-mir.fits',
+                      'ID': 'MAX'},
+              'MIR': {'file': 'Smith2005/smith05-mir.fits',
+                      'ID': 'recno'},
+              'H00': {'file': 'Hillenbrand2000/hillenbrand-J-K.fits',
+                      'ID': '__HC2000_'},
+              'ISOY': {'file': 'Morales-Calderon2011/ysovar-stars.fits',
+                      'ID': 'ISOY'},
+              'ACS': {'file': 'Robberto2013/robberto-2013.fits',
+                      'ID': 'ONCacs'},
+  }
+
+  MAXSEP = 1.0
+  for cat, metadata in catalogs.items():
+      cattab = Table.read(metadata['file'])
+      cattab['coord'] = coord.SkyCoord(ra=cattab['RAJ2000'], dec=cattab['DEJ2000'],
+                                       unit=('deg', 'deg'))
+      sourcenames = []
+      sourceseps = []
+      for arc in arctab:
+          seps = arc['coord'].separation(cattab['coord']).arcsec
+          iclosest = seps.argmin()
+          sourcenames.append('{} {}'.format(cat, cattab[iclosest][metadata['ID']]))
+          sourceseps.append(seps[iclosest])
+
+      mask = np.array(sourceseps) > MAXSEP
+      outcols.append(cat)
+      arctab.add_column(
+          MaskedColumn(name=cat, data=sourcenames, mask=mask, meta=metadata,
+                       description='Closest source from the {} catalog'.format(cat)))
+      outcols.append(cat + ' sep')
+      arctab.add_column(
+          MaskedColumn(name=cat + ' sep', data=sourceseps, mask=mask, format='{:.3f}'))
+
+
+
+  outtab = arctab[outcols]
+  outtab.write('arc-stellar-sources.tab', format='ascii.tab')
+#+END_SRC
+
+#+RESULTS:
+: None
+
+[[file:arc-stellar-sources.tab]]
+
 * OSF 2014 Conference
 ** Resumen de Luis
 Catalog of stationary bowshock arcs in the Orion Nebula
@@ -7,6 +284,7 @@ Presentamos una lista completa de todos los choques estacionarios asociados a es
 Catalog of stationary bowshock arcs in the Orion Nebula
 
 We present a complete catalog of all the stationary emission line arcs (LL objects and proplyd bowshocks) found in archival HST imaging of the Orion Nebula.   The total number of objects detected is 73, of which 20 have not previously been reported in the literature.  We classify the shapes of emission line arcs by fitting conic sections to the inner and outer shell boundaries and calculate the background corrected H alpha surface brightness of each object.   We find significant differences in the shell shapes between the objects closest to the ionizing stars and those farther away.  The closer group, which all represent proplyd interactions with the hypersonic stellar wind, have relatively closed shapes, while the farther group, which are due to interactions with the transonic ionized champagne flow in the nebula, are more open and hyperbolic.  Although some of the latter group are also known proplyds, many are not, and the largest and brighest arcs tend to be associated with particularly luminous young stars, suggesting that the intrinsic T Tauri disk wind may play a role.  The orientations of the arcs, together with the stagnation pressures estimated from the surface brightness, allow the internal velocity field of the H II region to be probed.  We find that approximately radial flows from the core of the nebula dominate over disordered, turbulent flows.
+
 * Spatial groups of arcs
 + We can divide the arcs into 6 groups:
   1. LV knots and other very close-in arcs
@@ -35,8 +313,36 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 :PROPERTIES:
 :noweb:    yes
 :END:
+*** Eliminate duplicates
+#+BEGIN_SRC python :return newtabfile :results file
+  from astropy.table import Table
+  import numpy as np
+
+  table = Table.read("luis-programas/arcs-summary-merge.tab", 
+                   format="ascii.commented_header", delimiter="\t",
+                   fill_values=('--', np.nan) ).filled(np.nan)
+
+  # Eliminate duplicates, keeping only the first instance of each source
+  sources, idups = [], []
+  for i, source in  enumerate(table['Object']):
+      if source in sources:
+          idups.append(i)
+      sources.append(source)
+  if idups:
+      table.remove_rows(idups)
+      
+  newtabfile = "luis-programas/arcs-summary-unique.tab"
+  table.write(newtabfile, format="ascii.commented_header", delimiter="\t")
+
+#+END_SRC
+
+#+RESULTS:
+[[file:luis-programas/arcs-summary-unique.tab]]
 
 *** Read in the data
+
+
+
 #+name: read-data-for-classification
 #+BEGIN_SRC python
   import matplotlib.pyplot as plt
@@ -44,9 +350,14 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   from astropy.table import Table
   import numpy as np
 
-  table = Table.read("luis-programas/arcs-summary-merge.tab", 
+  table = Table.read("luis-programas/arcs-summary-unique.tab", 
                    format="ascii.commented_header", delimiter="\t",
                    fill_values=('--', np.nan) ).filled(np.nan)
+
+  # Eliminate duplicates 
+  table['Object']  
+
+  #
   with open("luis-programas/problem-sources.txt") as f:
       problem_sources = f.read().split('\n')
   with open("luis-programas/interproplyd.txt") as f:
@@ -206,7 +517,14 @@ Note that these run in the [[file:luis-programas]] folder
   not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
   maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
   
-  
+  def sanitize_source_label(inlabel):
+      if inlabel.startswith('w'):
+          outlabel = inlabel[1:]
+      else:
+          outlabel = inlabel
+      return outlabel
+
+  source_labels = np.array([sanitize_source_label(s) for s in tab['Object']])
 #+END_SRC
 
 #+RESULTS: classify-plots-setup
@@ -224,7 +542,7 @@ Note that these run in the [[file:luis-programas]] folder
       plt.scatter(Ain[mm], A[mm], s=20*tab['R_out'][mm], c=color,
                   label=group+' group',
                   alpha=0.8)
-  label_sources(tab['Object'], Ain, A, allmask=m,
+  label_sources(source_labels, Ain, A, allmask=m,
                 extramask=(A > 2*Ain) | (Ain > 2*A))
   plt.xlabel('Inner shock bluntness, A = Rc/r0')
   plt.ylabel('Outer shock bluntness, A = Rc/r0')
@@ -254,7 +572,8 @@ This diagnostic, Aout vs Ain, is actually not very useful.  A better way of look
       plt.scatter(q[mm], A[mm], s=20*tab['R_out'][mm], c=color,
                   label=group+' group',
                   alpha=0.8)
-  label_sources(tab['Object'], q, A, allmask=m)
+  label_sources(source_labels, q, A, allmask=m, 
+                extramask=(A > 5.0) | (A < 1.3) | (q > 0.2) | (q < 4e-3))
   plt.xlabel('Bowshock fractional size, q = r0/D')
   plt.ylabel('Bowshock bluntness, A = Rc/r0')
   ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
@@ -279,7 +598,8 @@ This diagnostic, Aout vs Ain, is actually not very useful.  A better way of look
       plt.scatter(q[mm], H[mm], s=20*tab['R_out'][mm], c=color,
                   label=group+' group',
                   alpha=0.8)
-  label_sources(tab['Object'], q, H, allmask=m)
+  label_sources(source_labels, q, H, allmask=m,
+                extramask=(H > 0.6) | (H < 0.2) | (q > 0.2) | (q < 4e-3))
   plt.xlabel('Bowshock fractional size, q = r0/D')
   plt.ylabel('Shell relative thickness, H = h/r0')
   plt.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
@@ -308,8 +628,8 @@ For the flaring, we take the geometric mean of the values calculated from the ce
       plt.scatter(H[mm], Flair[mm], s=20*tab['R_out'][mm], c=color,
                   label=group+' group',
                   alpha=0.8)
-  label_sources(tab['Object'], H, Flair, allmask=m,
-                extramask=(Flair > 2.0) | (Flair < -0.5) | tab['Object'] in ['308-3036'])
+  label_sources(source_labels, H, Flair, allmask=m,
+                extramask=(Flair > 2.0) | (Flair < -0.5))
   plt.xlabel('Shell relative thickness, H = h/r0')
   plt.ylabel('Shell flaring factor')
   ax.axhline(color='black', lw=0.5)
@@ -323,7 +643,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Flair-vs-H-class.pdf]]
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Flare-vs-H-class.pdf]]
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
@@ -341,7 +661,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
           if n > 0:
               plt.scatter(D60[mm], tab['R_out'][mm], s=100*H[mm], c=[color]*n,
                           label=label, marker=marker, alpha=0.8)
-  label_sources(tab['Object'], D60, tab['R_out'],
+  label_sources(source_labels, D60, tab['R_out'],
                 (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
   plt.xlabel('Projected distance from Trapezium, D / arcmin')
   plt.ylabel('Bowshock radius, r0 / arcsec')
@@ -363,6 +683,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
+  <<angle-stats>>
 
   pltfile = 'will-PA-vs-PA-class.pdf'
   sns.set_style('ticks')
@@ -377,20 +698,22 @@ For the flaring, we take the geometric mean of the values calculated from the ce
   plt.text(315.0, -80.0, 'NW\nquadrant', ha='center', fontsize='x-small')
   plt.axhline(zorder=-5, color='k', alpha=0.5)
   for group, color in groups_and_colors:
-      mm = m & (tab['Group'] == group)
+      mm = m & (tab['Group'] == group) & (np.abs(dPA) < 90.0)
+      label = '{} group:'.format(group).ljust(10)
+      s = '+' if dPA[mm].mean() >= 0.0 else '−'
+      label += '{}{:02d}±{:02d}'.format(s, abs(int(dPA[mm].mean())), int(dPA[mm].std()))
       plt.scatter(PA_star[mm], dPA[mm], s=20*tab['R_out'][mm], c=color,
-                  label=group+' group',
-                  alpha=0.8)
-  label_sources(tab['Object'], PA_star, dPA, np.abs(dPA) > 45.0, allmask=m)
+                  label=label, alpha=0.8)
+  label_sources(source_labels, PA_star, dPA, np.abs(dPA) > 30.0, allmask=m)
   plt.xlabel('PA of source from Trapezium, deg')
   plt.ylabel('Angle between bowshock axis and radial direction, deg')
   plt.text(0.05, 0.95, 'Symbol size indicates outer shell radius, R0',
            transform=ax.transAxes, fontsize='x-small')
-  ax.set_xlim(-30.0, 375.0)
+  ax.set_xlim(-30.0, 390.0)
   ax.set_xticks(np.arange(0, 360+1, 45))
   ax.set_yticks([-60, -30, 0, 30, 60])
   ax.set_ylim(-90.0, 90.0)
-  ax.legend(**lgd_kws)
+  ax.legend(prop={'family': 'monospace', 'size': 'x-small'}, **lgd_kws)
   fig.savefig(pltfile)
 #+END_SRC
 
@@ -398,8 +721,61 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 [[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-PA-vs-PA-class.pdf]]
 
 
+#+name: angle-stats
+#+BEGIN_SRC python
+  def anglestats(PA, dth, th1, th2):
+      mask = (PA >= th1) & (PA <= th2) & (np.abs(dth) < 90.0)
+      return '({:+.0f} +/- {:.0f})'.format(dth[mask].mean(), dth[mask].std())
+
+#+END_SRC
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+  <<angle-stats>>
+  ddPA = tab['PA_out'] - tab['PA_in']
+
+  pltfile = 'will-PA-out-vs-in-class.pdf'
+  sns.set_style('ticks')
+  fig = plt.figure(figsize=(7,6))
+  ax = fig.add_subplot(111)
+  plt.fill_betweenx([-90.0, 90.0], [0.0, 0.0], [90.0, 90.0], zorder=-10, alpha=0.08)
+  plt.fill_betweenx([-90.0, 90.0], [180.0, 180.0], [270.0, 270.0], zorder=-10, alpha=0.08)
+  plt.fill_betweenx([-90.0, 90.0], [360.0, 360.0], [450.0, 450.0], zorder=-10, alpha=0.08)
+  plt.text(45.0, -80.0, 'NE\nquadrant',  ha='center', fontsize='x-small')
+  plt.text(135.0, -80.0, 'SE\nquadrant', ha='center', fontsize='x-small')
+  plt.text(225.0, -80.0, 'SW\nquadrant', ha='center', fontsize='x-small')
+  plt.text(315.0, -80.0, 'NW\nquadrant', ha='center', fontsize='x-small')
+  plt.axhline(zorder=-5, color='k', alpha=0.5)
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group) & (np.abs(ddPA) < 90.0)
+      n = mm.sum()
+      label = '{} group:'.format(group).ljust(10)
+      s = '+' if ddPA[mm].mean() >= 0.0 else '−'
+      label += '{}{:02d}±{:02d}'.format(s, abs(int(ddPA[mm].mean())), int(ddPA[mm].std()))
+      plt.scatter(PA_star[mm], ddPA[mm], s=20*tab['R_out'][mm], c=[color]*mm.sum(),
+                  label=label, alpha=0.8)
+  label_sources(source_labels, PA_star, ddPA, np.abs(ddPA) > 30.0, allmask=m)
+  plt.xlabel('PA of source from Trapezium, deg')
+  plt.ylabel('Angle between outer and inner bowshock axes, deg')
+  plt.text(0.05, 0.95, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(-30.0, 390.0)
+  ax.set_xticks(np.arange(0, 360+1, 45))
+  ax.set_yticks([-60, -30, 0, 30, 60])
+  ax.set_ylim(-90.0, 90.0)
+  ax.legend(prop={'family': 'monospace', 'size': 'x-small'}, **lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-PA-out-vs-in-class.pdf]]
 
 
+
+
+
+*** Plot the spiral distribution back into real space
+This is done in [[file:programas/plot-ll-spiral.py]]
 *** Output a latex table for the catalog paper, which includes the groups
 :LOGBOOK:  
 CLOCK: [2014-12-05 Fri 12:46]--[2014-12-05 Fri 12:47] =>  0:01
@@ -535,22 +911,39 @@ But what we really want is a separate table for each spatial group.  This is wha
 : 5:35:02.200
 : 05:35:02.20
 
-*** [1/4] Output latex figures with the individual sources
+*** [7/7] Output latex figures with the individual sources
 :LOGBOOK:  
-CLOCK: [2014-12-05 Fri 12:47]
+CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
 :END:      
 - This is similar to what [[id:E783982D-1FC7-4E2A-B2FE-C49BE0A5AAF5][we did for the Greece poster]]
 - But we want a separate figure for each group
 - [X] first version failed because '158-323' is not in =db=
   - this is because it is actually LV5, and called such in ll-data.json
   - Use a similar fix to what we did here: [[id:013B7A01-2624-435F-8B47-B591397F507C][Make a table of Jorge's measurements]]
-- [ ] Duplicate proplyd: w005-514
-- [ ] 204-330 should be in the interproplyd group
-- [ ] Should be using images from ../JorgeBowshocks/ETC
+- [X] Duplicate proplyd: w005-514
+- [X] 204-330 should be in the interproplyd group
+- [X] Should be using images from ../JorgeBowshocks/ETC
+- [X] Some of the sources need to use images that are not from Bally
+  - We list these in the following table
+- [X] LL7 was missing - it was in a strange folder
+  - =~/Dropbox/LuisBowshocks/wfpc2_64_f656n/=
+- [X] Copy all the figure files to =catalog-paper/figs=
 
-#+BEGIN_SRC python
+#+name: non-Bally-images
+|  124-131 |  124-131 | Robberto_ACS_5l_f555w |
+|  160-350 |  160-350 | PC_mosaic_f502        |
+|  162-456 |  162-456 | Robberto_ACS_0l_f658n |
+|  163-317 |      LV3 | PC_mosaic_f547        |
+|  167-317 |      LV2 | PC_mosaic_f656        |
+|  158-323 |      LV5 | PC_mosaic_f656        |
+|      LL7 |      LL7 | Robberto_ACS_7l_f658n |
+| 4285-458 | 4285-458 | Robberto_ACS_1r_f658n |
+
+#+header: :var extratab=non-Bally-images
+#+BEGIN_SRC python :tangle generate-fig-table.py
   import json
   import os
+  import shutil
   from astropy.table import Table
 
   # This is the sample list with the group information (in astropy.table format)
@@ -560,24 +953,36 @@ CLOCK: [2014-12-05 Fri 12:47]
   # and this is the list from ll-data.json -> db, keys
   <<list-of-sources-sorted-by-ra>>
 
-  pdf_template = "j8oc{1:02d}010_wcs/{0:s}-Bally_{1:02d}-images.pdf"
-  fig_template = r'\BowshockFig{{{:s}}}{{{:02d}}}'
+  # Deal with the non-standard images
+  nonstandard = {}
+  for k, source, image in extratab:
+      nonstandard[k] = (source, image)
+
+  pc_will_dir = "../JorgeBowshocks/Jorge_prop/PC-will"
+  ll7_dir = "wfpc2_64_f656n"
+  bally_dir_template = "j8oc{:02d}010_wcs"
+  bally_pdf_template = "{:s}-Bally_{:02d}-images"
+  other_pdf_template = "{:s}-{:s}-images"
+  fig_template = r'\BowshockFig{{{:s}}}'
   nofig_template = r'\MissingFig{{{:s}}}{{{:02d}}}'
 
   <<extract-usual-name-of-each-source>>
   <<extract-which-of-bally-fields-contains-source>>
 
   ## First add new entries to db with the canonical names for LV knots
+  dbextra = {}
   for source, data in db.items():
       if "LV" in source or "HST" in source:
-          db[data["oname"]] = data
+          dbextra[data["oname"]] = data
+  db.update(dbextra)
+
   ## and remove w from names in the Object column of the table
   for row in arctab:
       if row['Object'].startswith('w'):
           row['Object'] = row['Object'][1:]
 
   groupdict = {
-      "LV": ("01-LV", "LV knots"),
+      "LV": ("01-LV", "LV knots group"),
       "SE": ("02-southeast", "Southeast group"),
       "N": ("03-north", "North group"),
       "NW": ("04-northwest", "Northwest group"),
@@ -597,14 +1002,22 @@ CLOCK: [2014-12-05 Fri 12:47]
 
       m = arctab['Group'] == group
       grouptab = arctab[m]
-      captiontext = "Stationary arc sources in the {} group.".format(cap)
+      captiontext = "Stationary arc sources in the {}.".format(cap)
       figs = []
       for k in grouptab['Object']:
-          if field(k):
-              if os.path.isfile(pdf_template.format(name(k), field(k))):
-                  figs.append(fig_template.format(name(k), field(k)))
-              else: 
-                  figs.append(nofig_template.format(name(k), field(k)))
+          if k in nonstandard:
+              fig_dir = ll7_dir if k == 'LL7' else pc_will_dir
+              fig_file = other_pdf_template.format(*nonstandard[k])
+          elif field(k):
+              fig_file = bally_pdf_template.format(name(k), field(k))
+              if os.path.isfile(os.path.join(pc_will_dir, fig_file) + '.pdf'):
+                  fig_dir = pc_will_dir
+              else:
+                  fig_dir = bally_dir_template.format(field(k))
+          else:
+              raise ValueError(k)
+          figs.append(fig_template.format(fig_file))
+          shutil.copy2(os.path.join(fig_dir, fig_file) + '.pdf', 'catalog-paper/figs')
 
       thisrow = []
       thistable = []
@@ -643,6 +1056,157 @@ CLOCK: [2014-12-05 Fri 12:47]
 #+RESULTS:
 : None
 
+** New images of each group
+:PROPERTIES:
+:dir:      /Users/will/Work/OrionTreasury/acs
+:ID:       171A91D5-C0D6-4411-9DB2-C1AB76D18E61
+:END:
+
++ Plan is to use the Robberto images:
+  + Red :: F658N
+  + Green :: F555W
+  + Blue :: F435W
++ Remove large-scale brightness structure by dividing by smoothed version
+
+#+name: smooth-image
+#+BEGIN_SRC python :tangle /Users/will/Work/OrionTreasury/acs/smooth-image.py
+  import argh
+  import numpy as np
+  from astropy.io import fits
+  from astropy.convolution import convolve_fft, Gaussian2DKernel
+
+  template = "hlsp_orion_hst_acs_strip{}_{}_v1_drz.fits"
+
+  def main(field: "Robberto field of view"="0l",
+           band: "ACS filter"="f658n",
+           width: "Width of Gaussian smoothing kernel in pixels"=20,
+           bbox: "Subimage to use: 'i1 j1 i2 j2'"='13000 5000 14000 6000',
+           suffix: "Extra id string to add to output filename"="",
+           twopass: "Whether to do a second pass for eliminating negative halos"=False,
+           threshold: "Mask out relative brightnesses higher than this in second pass"=1.5,
+       ):
+
+      infile = template.format(field, band)
+      hdu = fits.open(infile)['SCI']
+
+      i1, j1, i2, j2 = [int(s) for s in bbox.split()]
+      im = hdu.data[j1:j2, i1:i2]
+      gauss_kernel = Gaussian2DKernel(width)
+      smoothim = convolve_fft(im, gauss_kernel)
+      sharpim = im/smoothim
+
+      if twopass:
+          mask = (sharpim > threshold) | (im == 0.0)
+          im[mask] = np.nan
+          print('Starting second pass: N(masked) =', mask.sum())
+          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, interpolate_nan=True)
+          sharpim = im/smoothim
+
+      outhdu = fits.PrimaryHDU(data=smoothim, header=hdu.header)
+      outhdu.header['CRPIX1'] -= i1
+      outhdu.header['CRPIX2'] -= j1
+
+      outfile = infile.replace("_v1_drz.fits", "_smooth_{}{}.fits".format(width, suffix))
+      outhdu.writeto(outfile, clobber=True)
+
+      outhdu.data = sharpim
+      outfile = outfile.replace("_smooth_", "_sharp_")
+      outhdu.writeto(outfile, clobber=True)
+
+  if __name__ == "__main__":
+      argh.dispatch_command(main)
+
+#+END_SRC
+
+#+BEGIN_SRC sh
+python smooth-image.py --help
+#+END_SRC
+
+#+RESULTS:
+
+
+*** SW group
+Lower section of SW group: [[file:highpass-rgb-sw-lower.jpg]]
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j 1'
+$BGTASK python smooth-image.py --width 100 --bbox \'10600 3350 14800 6400\' --band f658n --field 1l --twopass --suffix sw-lower >/dev/null
+#+END_SRC
+
+#+RESULTS:
+: /var/folders/rm/hnrktx9s22g8sbms445k0z000000gn/T/pargfJfF.par
+
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j 1'
+$BGTASK python smooth-image.py --width 100 --bbox \'10600 3350 14800 6400\' --band f555w --field 1l --twopass --suffix sw-lower >/dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j 1'
+$BGTASK python smooth-image.py --width 100 --bbox \'10600 3350 14800 6400\' --band f435w --field 1l --twopass --suffix sw-lower >/dev/null
+#+END_SRC
+
+#+RESULTS:
+
+
+
+
+
+Upper section of SW group: [[file:highpass-rgb-sw-upper.jpg]]
+
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j -1'
+$BGTASK python smooth-image.py --width 100 --bbox \'9100 1800 14500 4600\' --band f658n --field 0l --twopass --suffix sw-upper > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j -1'
+$BGTASK python smooth-image.py --width 100 --bbox \'9100 1800 14500 4600\' --band f555w --field 0l --twopass --suffix sw-upper > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh 
+BGTASK='sem --files --id hipass -j -1'
+$BGTASK python smooth-image.py --width 100 --bbox \'9100 1800 14500 4600\' --band f435w --field 0l --twopass --suffix sw-upper > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+
+* Three dimensional structure
+
+** 3D Modeling Workflow
++ Basic plan is to do the initial layout in 123D Design on the iPad, then export STL from 123D Design on Mac
++ Import STL into Blender where we can do the
+  + Material properties
+  + Adding text
+  + Rendering
+*** Autodesk 123D Design
+**** On iPad
++ This is the most intuitive way to do the initial modelling
++ Direct manipulation of the objects
++ Export to iCloud
+**** on Mac
++ Can read in the projects from iCloud
++ Can save as STL for import into Blender
+*** Blender
++ Can import STL files
+  + has object shapes but loses the color information
++ Need to scale all the objects before doing anything
+  + otherwise they get clipped when you zoom out because of the cameras settings
+  + I tried to fix this by changing the camera clipping plane but to no avail
+    + I think this is because the camera is only used for rendering
+
+**** Splitting objects
++ Change to edit mode
++ Type "P" and choose "By loose parts"
++ This can take a minute or so for a big mesh
+**** 
+
 * Informes semestrales
 ** 2014-II [2014-07-02 Wed]
 Durante este semestre, el estudiante ha cursado el Seminario de
@@ -679,7 +1243,7 @@ CLOCK: [2014-11-07 Fri 09:45]--[2014-11-07 Fri 11:55] =>  2:10
 + Gain tells you how many ADU you get for each electron, but in a strange upside down way
 + It is typically measured in e^{-}/ADU
 + "High gain" means a /lower/ numerical value of e^{-}/ADU
-  + So Robberto's gain of 15 e^{-}/ADU is lower than the standard 17 e^{-}/ADU
+  + So Robberto's gain of 15 e^{-}/ADU is lower than the standard 7 e^{-}/ADU
   + That is because the numbers are technically "inverse gain"
 + A "standard" gain would be such that the full well of the CCD (in electrons) matches the full range of the digitizer (e.g., 65536 for 16 bits)
   + Then having a "high gain" (low inverse gain) would give you greater sensitivity at the expense of easier saturation
@@ -1695,6 +2259,9 @@ This is a good example of a high-incliation object, giving rise to low value of 
   #+call: arc-brightness("175-321", "01")
   #+call: plot-image("175-321", "01", "35", "90", zoom="1.3")
   #+call: view-pdf("175-321", "01")
+
+  #+RESULTS:
+
   + This is a shell that faces th1D, but probably not related with Ney-Allen
   + Luis has traced a sharp looking shock to the SW, but I don't think it is related
   + Should probably be eliminated from samples
@@ -2395,7 +2962,7 @@ Three categories:
 - [[file:luis-programas/will-nshell-vs-D.pdf][will-nshell-vs-D.pdf]]
 - [[file:luis-programas/will-Pshell-vs-D.pdf][will-Pshell-vs-D.pdf]]
 - [[file:luis-programas/will-Prad-frac-vs-D.pdf][will-Prad-frac-vs-D.pdf]]
-- [[file:luis-programas/will-MdotVout-vs-D.pdf][will-MdotVout-vs-D.pdf]]
+- [[file:luis-programas/will-MdotVout-vs-D.pdf][will-MdotVout-vs-D.pdf]] 
 - [[file:luis-programas/will-MdotV-vs-D.pdf][will-MdotV-vs-D.pdf]]
 
 
@@ -2436,6 +3003,9 @@ print(c0.dec.dms)
 : dms_tuple(d=-5.0, m=-23.0, s=-22.848554399998804)
 
 **** The stars
+:PROPERTIES:
+:ID:       191679EF-70AD-45D1-9019-5DC86335AF5A
+:END:
 #+BEGIN_SRC python :return tabfile :results file
   import numpy as np
   from astropy.table import Table
@@ -3200,7 +3770,7 @@ CLOCK: [2013-08-27 Tue 09:34]--[2013-08-27 Tue 10:04] =>  0:30
   + very weak shell
   + may not be real
 **** More new bowshocks: October 2014
-+ [ ] 124-131 - NE circumbinary proplyd
++ [X] 124-131 - NW circumbinary proplyd
   + 5:35:12.382 -5:21:31.40
   + Very weak stationary bowshock
     + The whole thing is visible in [O III]
@@ -3215,7 +3785,7 @@ CLOCK: [2013-08-27 Tue 09:34]--[2013-08-27 Tue 10:04] =>  0:30
   + First catalogued by [[http://adsabs.harvard.edu/abs/1996AJ....111..846O][O'Dell & Wong (1996)]] but they called it 124-132 and classified it as "irregular"
   + Was also reported by [[http://adsabs.harvard.edu/abs/2005AJ....129..382S][Smith (2005b)]]
     + Noted the possibility of a jet knot to the W, just outside the i-front, and jet base or reflect neb
-  + [ ] We see it definitely has a bipolar jet - I can see proper motions in knots to the W and E
+  + [X] We see it definitely has a bipolar jet - I can see proper motions in knots to the W and E
     + 
 
 **** Already in our list
@@ -3257,9 +3827,12 @@ Ones that might be salvageable are marked with checkboxes
   + and it is just to the west of the Trilobyte thingy
 + 131-046 - up near the Orion fingers zone
   + has a broad shell in front of it, but it looks too big to be associated
++ 132-053 - previously classified as a faint arc in H alpha.  However, there are many extinction filaments that cross this object and it looks like the arc is just an illusion caused by two intersecting dark filaments in front of the star
+
 + 132-042 - this is an amazing object, looking like a proplyd that is pointing the wrong way
-  + [ ] It has a jet that goes straight back into the heart of the nebula
+  + [X] It has a jet that goes straight back into the heart of the nebula
     + I think I can see some knots to the south
+    + [2020-07-05 Sun] Seems to be related to BN/KL bullets
 + 159-729 or thereabouts
   + [ ] might be a very flat LL-type arc, but without an inner edge
   + more likely just a chance superposition of something else
@@ -3361,7 +3934,7 @@ Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]]
 
  
 + "Arc" column is for noting which objects have had the arcs measured by Luis Angel
-  + 005-514 has been measured twice!
+  + 005-514 has been measured twice! 
   + A "?" is for objects that still have issues
   + A "B" for interproplyd shells means that we have redone the arc fitting using the binary axis
 **** New rejections
@@ -3371,6 +3944,8 @@ These are sources that, on reflection, we have decided should not be in the cata
   + it is completely invisible in [O III], despite this being an inner proplyd
 **** Map of the LL objects
 :LOGBOOK:
+- Note taken on [2015-01-28 Wed 10:59] \\
+  This is now obsolete.  It is replaced by [[file:programas/plot-ll-mapimage.py][file:~/Dropbox/LuisBowshocks/programas/plot-ll-mapimage.py]]
 - Note taken on [2013-08-17 Sat 18:51] \\
   Copied from [[id:A0F1F456-E918-4AB5-A97D-951E4BC82952][llobjects.org]]
 :END:
@@ -3740,6 +4315,9 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
 [[file:ricci-data.json]]
 
 **** Write ds9 region file for the LL objects
+:PROPERTIES:
+:ID:       0552A67D-F467-4F41-BD5D-DF5212B4AB35
+:END:
 #+header: :var table=orion-ll-objects
 #+BEGIN_SRC python :results file
   region_hdr_lines = [
