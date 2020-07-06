@@ -1,4 +1,7 @@
 * Looking at the stellar sources
+:PROPERTIES:
+:ID:       F4110680-613F-4ED9-AC81-8AF6D404AE90
+:END:
 ** Write out a region file for all the sources
 + This is based on [[id:0552A67D-F467-4F41-BD5D-DF5212B4AB35][Write ds9 region file for the LL objects]]
 
@@ -213,6 +216,9 @@ Accretion mass loss rates from Manara et al 2012
   + Otherwise, it was too many boxes for ds9!
 + The COUP x-ray catalog makes an interesting complement
 ** Find the coincident stellar sources for each arc
+:PROPERTIES:
+:ID:       F7BCAB63-E507-48FD-B594-09F82ED6F7A3
+:END:
 #+BEGIN_SRC python
   import numpy as np
   from astropy.table import Table, Column, MaskedColumn
@@ -912,6 +918,9 @@ But what we really want is a separate table for each spatial group.  This is wha
 : 05:35:02.20
 
 *** [7/7] Output latex figures with the individual sources
+:PROPERTIES:
+:ID:       F5BEFDCB-D776-4CD5-B6BA-E93439AF7A8F
+:END:
 :LOGBOOK:  
 CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
 :END:      
@@ -2509,6 +2518,7 @@ python arcs-summary.py
 ** Look at correlations
 :PROPERTIES:
 :dir:      luis-programas
+:ID:       95244DE6-CB85-41CB-A6AC-286BEFE625B3
 :END:
 
 #+name: annotations
