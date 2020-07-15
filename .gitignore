@@ -1,4 +1,7 @@
 *
+!j8oc17010_wcs
+j8oc17010_wcs/*.pdf
+j8oc17010_wcs/*.fits
 !COUP
 !Morales-Calderon2011
 !Andersen2011
@@ -35,3 +38,5 @@
 
 *_flymake.py
 /_region_.tex
+/j8oc17010_wcs/*.fits
+/j8oc17010_wcs/*.pdf
