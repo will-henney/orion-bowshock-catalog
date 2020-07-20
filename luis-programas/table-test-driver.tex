@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{longtable}
+\begin{document}
+
+\LARGE
+
+\newcommand\TestTableHeader{
+  \hline
+  Object & \(D\) &   \(R_{\mathrm{out}}\) & \(R_{\mathrm{in}}\) \\
+  \hline 
+}
+
+\begin{longtable}{cccc}
+  \caption{Orion bowshock sizes and distances \label{tab:test}}\\
+  \TestTableHeader\endfirsthead
+  \caption[]{(cont.) Orion bowshock sizes and distances}\\
+  \TestTableHeader\endhead
+  \hline \endfoot
+  \input{table-test}
+\end{longtable}
+
+See Table~\ref{tab:test}. 
+\end{document}
+  
