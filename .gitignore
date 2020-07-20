@@ -22,9 +22,11 @@
 !*.pdf
 !programas
 !programas/*.py
+!luis-programas
 !luis-programas/*.txt
 !luis-programas/*.py
 !luis-programas/*.pdf
+!luis-programas/*.tab
 !*.tab
 !*/*.fits
 !*/*.png
