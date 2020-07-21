@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from  astropy.table import Table
@@ -61,8 +60,7 @@ def draw_inclination_arrow(x0, y0, inc=45):
     plt.plot(x0, y0, 'ok', ms=3.5)
     plt.plot(x1, y0, '>k', ms=3.5)
     plt.text(x1, y0, '   i = {}'.format(inc), va='center', fontsize='x-small')
-tab = Table.read("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t",
-                 fill_values=('--', np.nan) )
+tab = Table.read("arcs-summary-merge.ecsv", format="ascii.ecsv")
 with open("problem-sources.txt") as f:
     problem_sources = f.read().split('\n')
 with open("interproplyd.txt") as f:
@@ -141,9 +139,9 @@ eV = 1.602176462e-12
 Eion = 1.3*13.6*eV              # assume mean energy of 1.3 Ryd
 Prad_H = (Eion/light_speed)*alpha_B * nshell**2 * h0
 
-proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
-not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
-maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
+proplyd_mask = np.array([is_proplyd.get(source) == 1 for source in tab['Object']])
+not_proplyd_mask = np.array([is_proplyd.get(source) == -1 for source in tab['Object']])
+maybe_proplyd_mask = np.array([is_proplyd.get(source) == 0 for source in tab['Object']])
 
 figlist = []
 
@@ -163,7 +161,7 @@ def OH_lower(D):
 
 pltfile = 'will-nshell-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
-ax = fig.add_subplot(111, axisbg="#eeeeee")
+ax = fig.add_subplot(111, facecolor="#eeeeee")
 plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
 label_sources(tab['Object'], D60, nshell, (nshell > 3500.0/D60) | (nshell < 1000.0/D60), allmask=m)
 cb = plt.colorbar()
@@ -187,7 +185,7 @@ figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
 pltfile = 'will-Pshell-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
-ax = fig.add_subplot(111, axisbg="#eeeeee")
+ax = fig.add_subplot(111, facecolor="#eeeeee")
 plt.scatter(D60[m], pshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
 label_sources(tab['Object'], D60, pshell, allmask=m)
 cb = plt.colorbar()
@@ -206,7 +204,7 @@ figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
 pltfile = 'will-Prad-frac-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
-ax = fig.add_subplot(111, axisbg="#eeeeee")
+ax = fig.add_subplot(111, facecolor="#eeeeee")
 plt.scatter(D60[m], tau_D[m], s=10*deltal[m]/cm_per_arcsec, c='brown', label='Shell optical depth', alpha=0.6)
 plt.scatter(D60[m], Prad_H[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, c='yellow', label='Prad hydrogen', alpha=0.6)
 plt.scatter(D60[m], Prad_D[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, label='Prad dust', c='red', alpha=0.6)
@@ -223,7 +221,7 @@ figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
 pltfile = 'will-MdotVout-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
-ax = fig.add_subplot(111, axisbg="#eeeeee")
+ax = fig.add_subplot(111, facecolor="#eeeeee")
 plt.scatter(D60[m], MdotV_out[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
 label_sources(tab['Object'], D60, MdotV_out, allmask=m)
 cb = plt.colorbar()
@@ -249,7 +247,7 @@ figlist.append('[[file:luis-programas/{0}][{0}]]'.format(pltfile))
 
 pltfile = 'will-MdotV-vs-D.pdf'
 fig = plt.figure(figsize=(7,6))
-ax = fig.add_subplot(111, axisbg="#eeeeee")
+ax = fig.add_subplot(111, facecolor="#eeeeee")
 mm = m & proplyd_mask
 plt.scatter(D60[mm], MdotV_in[mm], s=10*deltal[mm]/cm_per_arcsec, c='red', alpha=0.6)
 mm = m & maybe_proplyd_mask

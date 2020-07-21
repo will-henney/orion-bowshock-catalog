@@ -167,9 +167,7 @@ if __name__ == "__main__":
     # Set up arc data
     #
 
-    table = Table.read("luis-programas/arcs-summary-merge.tab", 
-                     format="ascii.commented_header", delimiter="\t",
-                     fill_values=('--', np.nan) ).filled(np.nan)
+    table = Table.read("luis-programas/arcs-summary-merge.ecsv")
     names = table["Object"].data
     RAs = table["RA"].data
     Decs = table["Dec"].data
@@ -212,8 +210,8 @@ if __name__ == "__main__":
 
     zoombox = [-50, 50, -35, 65]
     fullbox = [-325, 775, -725, 275]
-    plot_map(fullbox, "ll-positions.pdf", (10, 10), innerbox=zoombox, arrowscale=2.0)
-    plot_map(zoombox, "ll-positions-zoom.pdf", (10, 10), arrowscale=0.7)
+    plot_map(fullbox, "ll-positions-2020.pdf", (10, 10), innerbox=zoombox, arrowscale=2.0)
+    plot_map(zoombox, "ll-positions-zoom-2020.pdf", (10, 10), arrowscale=0.7)
 
 
 

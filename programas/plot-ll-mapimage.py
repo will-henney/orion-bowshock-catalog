@@ -196,7 +196,7 @@ if __name__ == "__main__":
         problem_sources = f.read().split('\n')
     with open("luis-programas/interproplyd.txt") as f:
         interprop_sources = f.read().split('\n')
-
+        
     c0 = coord.SkyCoord("05:35:16.463", "-05:23:23.18",
                         unit=(u.hourangle, u.degree))
 

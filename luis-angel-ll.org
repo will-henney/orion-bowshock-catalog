@@ -317,17 +317,15 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
      - 
 ** Finding the spatial groups
 :PROPERTIES:
-:noweb:    yes
+:header-args: :noweb yes
 :END:
 *** Eliminate duplicates
 #+BEGIN_SRC python :return newtabfile :results file
   from astropy.table import Table
   import numpy as np
 
-  table = Table.read("luis-programas/arcs-summary-merge.tab", 
-                   format="ascii.commented_header", delimiter="\t",
-                   fill_values=('--', np.nan) ).filled(np.nan)
-
+  table = Table.read("luis-programas/arcs-summary-merge.ecsv", 
+                     format="ascii.ecsv")
   # Eliminate duplicates, keeping only the first instance of each source
   sources, idups = [], []
   for i, source in  enumerate(table['Object']):
@@ -336,14 +334,14 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
       sources.append(source)
   if idups:
       table.remove_rows(idups)
-      
-  newtabfile = "luis-programas/arcs-summary-unique.tab"
-  table.write(newtabfile, format="ascii.commented_header", delimiter="\t")
+
+  newtabfile = "luis-programas/arcs-summary-unique.ecsv"
+  table.write(newtabfile, format="ascii.ecsv")
 
 #+END_SRC
 
 #+RESULTS:
-[[file:luis-programas/arcs-summary-unique.tab]]
+[[file:luis-programas/arcs-summary-unique.ecsv]]
 
 *** Read in the data
 
@@ -356,13 +354,8 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   from astropy.table import Table
   import numpy as np
 
-  table = Table.read("luis-programas/arcs-summary-unique.tab", 
-                   format="ascii.commented_header", delimiter="\t",
-                   fill_values=('--', np.nan) ).filled(np.nan)
-
-  # Eliminate duplicates 
-  table['Object']  
-
+  table = Table.read("luis-programas/arcs-summary-unique.ecsv", 
+                     format="ascii.ecsv")
   #
   with open("luis-programas/problem-sources.txt") as f:
       problem_sources = f.read().split('\n')
@@ -461,8 +454,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
       "SE": (D60 >= 0.2) & (D60 < 1.2) & (PA > 60) & (PA < 200),
       "N": (D60 >= 0.2) & (D60 < 1.2) & ((PA + 100) % 360 < 150),
       "NW": (D60 >= 1.2) & (D60 < 5.0) & ((PA - 60) % 360 > 210),
-      "SW": (D60 >= 1.2) & (D60 < 6.0) & (PA > 200) & (PA < 290),
-      "W": (D60 >= 7.0) & (PA > 210) & (PA < 290),
+      "W": (D60 >= 1.2) & (PA > 210) & (PA < 290),
       "S": (D60 >= 3.0) & (PA > 100) & (PA < 210),
   }
 
@@ -472,29 +464,26 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   table["Group"][problem_mask] = '*P'
   table["Group"][interprop_mask] = '*I'
 
-  newtabfile = "luis-programas/arcs-summary-classify.tab"
-  table.write(newtabfile, format="ascii.commented_header", delimiter="\t")
+  newtabfile = "luis-programas/arcs-summary-classify.ecsv"
+  table.write(newtabfile, format="ascii.ecsv")
 
 #+END_SRC
 
 #+RESULTS:
-[[file:luis-programas/arcs-summary-classify.tab]]
+[[file:luis-programas/arcs-summary-classify.ecsv]]
 
 + This program adds an extra column to the table, which is a 2-character string representing the spatial group.
 + We also use =*I= and =*P= to represent interproplyd arcs and "problematic" arcs
 *** Repeat the earlier diagnostic graphs, but classifying by spatial group
 :PROPERTIES:
-:dir:      luis-programas
-:noweb:    yes    
+:header-args: :noweb yes :dir luis-programas
 :END:
 
 Note that these run in the [[file:luis-programas]] folder
 
 #+name: read-classify-table
 #+BEGIN_SRC python
-  tab = Table.read("arcs-summary-classify.tab",
-                   format="ascii.commented_header", delimiter="\t",
-                   fill_values=('--', np.nan) )
+  tab = Table.read("arcs-summary-classify.ecsv", format="ascii.ecsv")
 #+END_SRC
 
 #+name: classify-plots-setup
@@ -510,19 +499,19 @@ Note that these run in the [[file:luis-programas]] folder
   <<mask-out-unwanted>>
   <<set-common-vars>>
 
-  groups = [ "LV", "SE", "N", "NW", "SW", "W", "S", ]
-  colors = [ "light brown", "light orange", "pale yellow", "dark pink", "purple", "cerulean",
-             "mint green", ]
+  groups = [ "LV", "SE", "N", "NW", "W", "S", ]
+  colors = [ "light brown", "light orange", "cerulean", "dark pink", "purple", 
+             "forest green", ]
   colors = sns.xkcd_palette(colors)
   groups_and_colors = zip(groups, colors)
 
   lgd_kws = {'frameon': True, 'fancybox': True, 'shadow': True}
 
   <<identify-proplyds>>
-  proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
-  not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
-  maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
-  
+  proplyd_mask = np.array([is_proplyd.get(source) == 1 for source in tab['Object']])
+  not_proplyd_mask = np.array([is_proplyd.get(source) == -1 for source in tab['Object']])
+  maybe_proplyd_mask = np.array([is_proplyd.get(source) == 0 for source in tab['Object']])
+
   def sanitize_source_label(inlabel):
       if inlabel.startswith('w'):
           outlabel = inlabel[1:]
@@ -563,7 +552,7 @@ Note that these run in the [[file:luis-programas]] folder
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Aout-vs-Ain-class.pdf]]
+[[file:luis-programas/will-Aout-vs-Ain-class.pdf]]
 
 This diagnostic, Aout vs Ain, is actually not very useful.  A better way of looking at it is the flare parameter that we use below. 
 
@@ -591,7 +580,7 @@ This diagnostic, Aout vs Ain, is actually not very useful.  A better way of look
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-A-vs-q-class.pdf]]
+[[file:luis-programas/will-A-vs-q-class.pdf]]
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
@@ -617,7 +606,7 @@ This diagnostic, Aout vs Ain, is actually not very useful.  A better way of look
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-H-vs-q-class.pdf]]
+[[file:luis-programas/will-H-vs-q-class.pdf]]
 
 For the flaring, we take the geometric mean of the values calculated from the center of curvature of the inner and outer shells.  
 #+BEGIN_SRC python :return pltfile :results file 
@@ -649,7 +638,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-Flare-vs-H-class.pdf]]
+[[file:luis-programas/will-Flare-vs-H-class.pdf]]
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
@@ -666,7 +655,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
           n = len(D60[mm])
           if n > 0:
               plt.scatter(D60[mm], tab['R_out'][mm], s=100*H[mm], c=[color]*n,
-                          label=label, marker=marker, alpha=0.8)
+                          label=label, marker=marker, alpha=0.8, zorder=100)
   label_sources(source_labels, D60, tab['R_out'],
                 (tab['R_out'] >= 5.0) | (tab['R_out'] <= 0.8), allmask=m)
   plt.xlabel('Projected distance from Trapezium, D / arcmin')
@@ -685,7 +674,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-r0-vs-D-class.pdf]]
+[[file:luis-programas/will-r0-vs-D-class.pdf]]
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
@@ -724,7 +713,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-PA-vs-PA-class.pdf]]
+[[file:luis-programas/will-PA-vs-PA-class.pdf]]
 
 
 #+name: angle-stats
@@ -758,7 +747,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
       label = '{} group:'.format(group).ljust(10)
       s = '+' if ddPA[mm].mean() >= 0.0 else '−'
       label += '{}{:02d}±{:02d}'.format(s, abs(int(ddPA[mm].mean())), int(ddPA[mm].std()))
-      plt.scatter(PA_star[mm], ddPA[mm], s=20*tab['R_out'][mm], c=[color]*mm.sum(),
+      plt.scatter(PA_star[mm], ddPA[mm], s=20*tab['R_out'][mm], color=color,
                   label=label, alpha=0.8)
   label_sources(source_labels, PA_star, ddPA, np.abs(ddPA) > 30.0, allmask=m)
   plt.xlabel('PA of source from Trapezium, deg')
@@ -774,7 +763,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+END_SRC
 
 #+RESULTS:
-[[file:/Users/will/Dropbox/LuisBowshocks/luis-programas/will-PA-out-vs-in-class.pdf]]
+[[file:luis-programas/will-PA-out-vs-in-class.pdf]]
 
 
 
@@ -2503,17 +2492,19 @@ python arcs-summary.py
     mtab.write("arcs-summary-merge.tab",
                format="ascii.commented_header",
                delimiter="\t")
+    mtab.write("arcs-summary-merge.ecsv",
+               format="ascii.ecsv")
 
   #+END_SRC
 
   #+RESULTS:
   : Row [17] updating LV4 to 161-324
   : Row [18] updating LV5 to 158-323
+  : Row [15] updating LV2b to 166-316
+  : Row [13] updating HST1 to 177-341
   : Row [14] updating LV2 to 167-317
   : Row [16] updating LV3 to 163-317
-  : Row [13] updating HST1 to 177-341
-  : Row [15] updating LV2b to 166-316
-+ This write the final table to [[file:luis-programas/arcs-summary-merge.tab]]
+
 
 ** Look at correlations
 :PROPERTIES:
@@ -2547,14 +2538,12 @@ python arcs-summary.py
 
 #+name: read-merge-table
 #+BEGIN_SRC python
-  tab = Table.read("arcs-summary-merge.tab", format="ascii.commented_header", delimiter="\t",
-                   fill_values=('--', np.nan) )
+  tab = Table.read("arcs-summary-merge.ecsv", format="ascii.ecsv")
 #+END_SRC
 
 #+name: read-luis-table
 #+BEGIN_SRC python
-  tab = Table.read("arcs-summary.tab", format="ascii.commented_header", delimiter="\t",
-                   fill_values=('-', np.nan) )
+  tab = Table.read("arcs-summary.ecsv", format="ascii.ecsv")
 #+END_SRC
 
 #+name: mask-out-unwanted
@@ -2840,9 +2829,9 @@ Three categories:
   Eion = 1.3*13.6*eV              # assume mean energy of 1.3 Ryd
   Prad_H = (Eion/light_speed)*alpha_B * nshell**2 * h0
 
-  proplyd_mask = np.array([is_proplyd[source] == 1 for source in tab['Object']])
-  not_proplyd_mask = np.array([is_proplyd[source] == -1 for source in tab['Object']])
-  maybe_proplyd_mask = np.array([is_proplyd[source] == 0 for source in tab['Object']])
+  proplyd_mask = np.array([is_proplyd.get(source) == 1 for source in tab['Object']])
+  not_proplyd_mask = np.array([is_proplyd.get(source) == -1 for source in tab['Object']])
+  maybe_proplyd_mask = np.array([is_proplyd.get(source) == 0 for source in tab['Object']])
 
   figlist = []
 
@@ -2862,7 +2851,7 @@ Three categories:
 
   pltfile = 'will-nshell-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
-  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  ax = fig.add_subplot(111, facecolor="#eeeeee")
   plt.scatter(D60[m], nshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
   label_sources(tab['Object'], D60, nshell, (nshell > 3500.0/D60) | (nshell < 1000.0/D60), allmask=m)
   cb = plt.colorbar()
@@ -2886,7 +2875,7 @@ Three categories:
 
   pltfile = 'will-Pshell-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
-  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  ax = fig.add_subplot(111, facecolor="#eeeeee")
   plt.scatter(D60[m], pshell[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
   label_sources(tab['Object'], D60, pshell, allmask=m)
   cb = plt.colorbar()
@@ -2905,7 +2894,7 @@ Three categories:
 
   pltfile = 'will-Prad-frac-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
-  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  ax = fig.add_subplot(111, facecolor="#eeeeee")
   plt.scatter(D60[m], tau_D[m], s=10*deltal[m]/cm_per_arcsec, c='brown', label='Shell optical depth', alpha=0.6)
   plt.scatter(D60[m], Prad_H[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, c='yellow', label='Prad hydrogen', alpha=0.6)
   plt.scatter(D60[m], Prad_D[m]/pshell[m], s=10*deltal[m]/cm_per_arcsec, label='Prad dust', c='red', alpha=0.6)
@@ -2922,7 +2911,7 @@ Three categories:
 
   pltfile = 'will-MdotVout-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
-  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  ax = fig.add_subplot(111, facecolor="#eeeeee")
   plt.scatter(D60[m], MdotV_out[m], s=10*deltal[m]/cm_per_arcsec, c=np.log10(Sha[m]), cmap=plt.cm.hot, alpha=0.6)
   label_sources(tab['Object'], D60, MdotV_out, allmask=m)
   cb = plt.colorbar()
@@ -2948,7 +2937,7 @@ Three categories:
 
   pltfile = 'will-MdotV-vs-D.pdf'
   fig = plt.figure(figsize=(7,6))
-  ax = fig.add_subplot(111, axisbg="#eeeeee")
+  ax = fig.add_subplot(111, facecolor="#eeeeee")
   mm = m & proplyd_mask
   plt.scatter(D60[mm], MdotV_in[mm], s=10*deltal[mm]/cm_per_arcsec, c='red', alpha=0.6)
   mm = m & maybe_proplyd_mask
