@@ -477,6 +477,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
 *** Repeat the earlier diagnostic graphs, but classifying by spatial group
 :PROPERTIES:
 :header-args: :noweb yes :dir luis-programas
+:ID:       761C80D7-EBD1-46FC-87B9-26CF28BD6201
 :END:
 
 Note that these run in the [[file:luis-programas]] folder
@@ -525,6 +526,40 @@ Note that these run in the [[file:luis-programas]] folder
 #+RESULTS: classify-plots-setup
 : None
 
+#+BEGIN_SRC python :return pltfile :results file
+  <<classify-plots-setup>>
+  xmin, xmax = 0.05, 20.0
+
+  pltfile = 'distro-D-PA-class.pdf'
+  fig, ax = plt.subplots(figsize=(5, 5))
+
+  pagrid = np.linspace(-360.0, 720.0)
+  rgrid = np.exp(-4*pagrid/360.0)
+  for dpa in -360, 0, 360, 720:
+      ax.plot(rgrid, pagrid + dpa, color="k", ls=":", alpha=0.5, zorder=-100)
+
+  for group, color in groups_and_colors:
+      mm = m & (tab['Group'] == group)
+      x = np.concatenate((D60[mm], D60[mm], D60[mm]))
+      y = np.concatenate((PA_star[mm]-360, PA_star[mm], PA_star[mm]+360))
+      ax.scatter(x, y, s=100, color=color, alpha=0.7)
+  ax.fill_between([xmin, xmax], [0.0, 0.0], [360.0, 360.0], alpha=0.05, color='k')
+  ax.set(
+      xlim=[xmin, xmax],
+      xscale="log",
+      # ylim=[-180.0, 360.0 + 180.0],
+      ylim=[-240.0, 200.0],
+      xlabel="Projected distance, arcmin",
+      ylabel="Position angle, degrees",
+  )
+  fig.tight_layout()
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:luis-programas/distro-D-PA-class.pdf]]
+
+
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
 
@@ -543,10 +578,14 @@ Note that these run in the [[file:luis-programas]] folder
   plt.ylabel('Outer shock bluntness, A = Rc/r0')
   ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
            transform=ax.transAxes, fontsize='x-small')
-  ax.set_xlim(0.0, 10.0)
-  ax.set_ylim(0.0, 10.0)
-  ax.axis('equal')
-  ax.legend(loc='upper left', **lgd_kws)
+  ax.set(
+      xscale="log",
+      yscale="log",
+      xlim=[0.66, 15.0],
+      ylim=[0.66, 15.0],
+  )
+  ax.set_aspect('equal')
+  ax.legend(loc='upper left', ncol=2, **lgd_kws)
   fig.tight_layout()
   fig.savefig(pltfile)
 #+END_SRC
