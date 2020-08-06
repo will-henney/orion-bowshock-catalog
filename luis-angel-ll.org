@@ -4290,6 +4290,9 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
       + indentation 
 
 ***** LL object database
+:PROPERTIES:
+:ID:       D793BFA8-E258-4B2E-B7E6-34302B2C994B
+:END:
 #+header: :var table=orion-ll-objects
 #+BEGIN_SRC python :results list :return filelist
   import json
@@ -4729,8 +4732,42 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
 
 **** Notes
 + extract-image.py must encode the camera/instrument in the output file somehow
-** Using circle-fit instead of read-shapes-LL/fit-circle-shell.py
-*** Test using circle-fit on a single source
+** Using circle_fit to replace read-shapes-LL/fit-circle-shell.py
+*** Systematic application of circle_fit to all sources
++ Only do \delta\theta = 60, 65, 70, 75
++ We can get the list of sources from ~luis-programas/arcs-summary-classify.ecsv~
+  + But how do we find which field each source is in?
+  + We seem to have already solved that problem in [[id:F5BEFDCB-D776-4CD5-B6BA-E93439AF7A8F][Output latex figures with the individual sources]]
+    + This uses ~ll-data.json~ in addition to the astropy table
+    + Why do we have data in two places?
+    + The file is written in [[id:D793BFA8-E258-4B2E-B7E6-34302B2C994B][LL object database]] with data from [[id:B35A749C-92D8-4A89-8821-A6A03CE75A4D][Tabla de objetos LL]]
+#+begin_src python :eval no :tangle apply-circle-fit/all-sources-circle-fit.py
+  import sys
+  from pathlib import Path
+  from circle_fit import circle_fit
+  from astropy.table import Table
+  import pandas as pd
+
+  df = Table.read(
+      "luis-programas/arcs-summary-classify.ecsv",
+      format="ascii.ecsv").to_pandas()
+  qstring = "~((Group == '*P') | (Group == '*I'))"
+  print(df.columns)
+#+end_src
+
+#+begin_src sh :results verbatim
+export PYTHONPATH=.
+python apply-circle-fit/all-sources-circle-fit.py
+#+end_src
+
+#+RESULTS:
+: Index(['Object', 'h_old', 'Value_Bally', 'Value_bg_Bally', 'Delta',
+:        'Dif_Bally', 'Value_Robberto', 'Value_bg_Robberto_f656',
+:        'Dif_Robberto_f656', 'RA', 'Dec', 'D', 'PA_star', 'h', 'PA_out',
+:        'PA_in', 'R_out', 'R_in', 'Rc_out', 'Rc_in', 'Group'],
+:       dtype='object')
+
+*** Test using circle_fit on a individual sources
 #+begin_src python :eval no :tangle apply-circle-fit/test-circle-fit.py
   import sys
   from pathlib import Path
@@ -4743,25 +4780,577 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
   except IndexError:
       sys.exit(f"Usage: {sys.argv[0]} SOURCE_ID FITS_ID")
 
-    
-  #for delta_theta in 45, 50, 55, 60, 65, 70, 75, 80:
-  for delta_theta in 60, 70:
-      plotfile = SOURCE_DIR / f"{SOURCE_ID}-outer-{delta_theta:02d}.pdf"
-      print('#### '*10)
-      print("Creating", plotfile)
-      circle_fit.plot_solution(
-          SOURCE_DIR / f"{SOURCE_ID}-forma.reg",
-          SOURCE_DIR / f"{SOURCE_ID}-{FITS_ID}-extract.fits",
-          plotfile,
-          delta_theta=delta_theta, maxiter=5)
+
+  circle_fit.PT_STAR = "o"
+  for arc, circle_fit.PT_ARC in ["outer", "x"], ["inner", "+"]:
+      for delta_theta in 45, 50, 55, 60, 65, 70, 75, 80:
+          plotfile = SOURCE_DIR / f"{SOURCE_ID}-{arc}-{delta_theta:02d}.pdf"
+          print('#### '*10)
+          print("Creating", plotfile)
+          circle_fit.plot_solution(
+              SOURCE_DIR / f"{SOURCE_ID}-forma.reg",
+              SOURCE_DIR / f"{SOURCE_ID}-{FITS_ID}-extract.fits",
+              plotfile,
+              delta_theta=delta_theta, maxiter=5)
 #+end_src
+
+
++ I try it on the four new sources from Bally field 17
++ In general it works well
+  + Stable results with low variation for \delta\theta = 60 \to 75 degrees at least
++ Some comments
+  + 4491-627 has very few points in inner arc, so that many different values of \delta\theta fit to the same point set
+  + Also, the inner arc is not traced far enough to get \Lambda - but maybe this is not possible
 
 #+begin_src sh :results output verbatim
   export PYTHONPATH=.
-  python apply-circle-fit/test-circle-fit.py j8oc17010_wcs 4417-653 Bally_17
+  time python apply-circle-fit/test-circle-fit.py j8oc17010_wcs 4417-653 Bally_17
 #+end_src
 
 #+RESULTS:
+#+begin_example
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-45.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-50.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+CircleFit(Pi = 3.603, Lambda = 3.173, dLambda = -0.027)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-55.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 3.701, Lambda = 3.175, dLambda = -0.029)
+CircleFit(Pi = 3.701, Lambda = 3.175, dLambda = -0.029)
+CircleFit(Pi = 3.701, Lambda = 3.175, dLambda = -0.029)
+CircleFit(Pi = 3.701, Lambda = 3.175, dLambda = -0.029)
+CircleFit(Pi = 3.701, Lambda = 3.175, dLambda = -0.029)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-60.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 3.387, Lambda = 3.162, dLambda = -0.001)
+CircleFit(Pi = 3.387, Lambda = 3.162, dLambda = -0.001)
+CircleFit(Pi = 3.387, Lambda = 3.162, dLambda = -0.001)
+CircleFit(Pi = 3.387, Lambda = 3.162, dLambda = -0.001)
+CircleFit(Pi = 3.387, Lambda = 3.162, dLambda = -0.001)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-65.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 3.671, Lambda = 3.177, dLambda = 0.001)
+CircleFit(Pi = 3.671, Lambda = 3.177, dLambda = 0.001)
+CircleFit(Pi = 3.671, Lambda = 3.177, dLambda = 0.001)
+CircleFit(Pi = 3.671, Lambda = 3.177, dLambda = 0.001)
+CircleFit(Pi = 3.671, Lambda = 3.177, dLambda = 0.001)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-70.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 4.156, Lambda = 3.204, dLambda = 0.063)
+CircleFit(Pi = 4.252, Lambda = 3.209, dLambda = 0.051)
+CircleFit(Pi = 4.252, Lambda = 3.209, dLambda = 0.051)
+CircleFit(Pi = 4.252, Lambda = 3.209, dLambda = 0.051)
+CircleFit(Pi = 4.252, Lambda = 3.209, dLambda = 0.051)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-75.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 4.453, Lambda = 3.222, dLambda = 0.073)
+CircleFit(Pi = 4.211, Lambda = 3.207, dLambda = 0.055)
+CircleFit(Pi = 4.211, Lambda = 3.207, dLambda = 0.055)
+CircleFit(Pi = 4.211, Lambda = 3.207, dLambda = 0.055)
+CircleFit(Pi = 4.211, Lambda = 3.207, dLambda = 0.055)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-outer-80.pdf
+CircleFit(Pi = 6.169, Lambda = 3.368, dLambda = 0.019)
+CircleFit(Pi = 4.541, Lambda = 3.229, dLambda = 0.099)
+CircleFit(Pi = 4.541, Lambda = 3.229, dLambda = 0.099)
+CircleFit(Pi = 4.541, Lambda = 3.229, dLambda = 0.099)
+CircleFit(Pi = 4.541, Lambda = 3.229, dLambda = 0.099)
+CircleFit(Pi = 4.541, Lambda = 3.229, dLambda = 0.099)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-45.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 1.943, Lambda = 3.389, dLambda = -1.220)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-50.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+CircleFit(Pi = 5.650, Lambda = 3.330, dLambda = -0.569)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-55.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-60.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 4.416, Lambda = 3.187, dLambda = -0.325)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+CircleFit(Pi = 3.806, Lambda = 3.157, dLambda = -0.289)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-65.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 4.179, Lambda = 3.245, dLambda = -0.423)
+CircleFit(Pi = 4.179, Lambda = 3.245, dLambda = -0.423)
+CircleFit(Pi = 4.179, Lambda = 3.245, dLambda = -0.423)
+CircleFit(Pi = 4.179, Lambda = 3.245, dLambda = -0.423)
+CircleFit(Pi = 4.179, Lambda = 3.245, dLambda = -0.423)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-70.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 3.816, Lambda = 3.165, dLambda = -0.332)
+CircleFit(Pi = 5.034, Lambda = 3.208, dLambda = -0.288)
+CircleFit(Pi = 5.034, Lambda = 3.208, dLambda = -0.288)
+CircleFit(Pi = 5.034, Lambda = 3.208, dLambda = -0.288)
+CircleFit(Pi = 5.034, Lambda = 3.208, dLambda = -0.288)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-75.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 4.446, Lambda = 3.183, dLambda = -0.210)
+CircleFit(Pi = 4.446, Lambda = 3.183, dLambda = -0.210)
+CircleFit(Pi = 4.446, Lambda = 3.183, dLambda = -0.210)
+CircleFit(Pi = 4.446, Lambda = 3.183, dLambda = -0.210)
+CircleFit(Pi = 4.446, Lambda = 3.183, dLambda = -0.210)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4417-653-inner-80.pdf
+CircleFit(Pi = 7.466, Lambda = 3.556, dLambda = -0.036)
+CircleFit(Pi = 4.438, Lambda = 3.180, dLambda = -0.119)
+CircleFit(Pi = 4.438, Lambda = 3.180, dLambda = -0.119)
+CircleFit(Pi = 4.438, Lambda = 3.180, dLambda = -0.119)
+CircleFit(Pi = 4.438, Lambda = 3.180, dLambda = -0.119)
+CircleFit(Pi = 4.438, Lambda = 3.180, dLambda = -0.119)
+#+end_example
+
+#+begin_src sh :results output verbatim
+  export PYTHONPATH=.
+  time python apply-circle-fit/test-circle-fit.py j8oc17010_wcs 4491-627 Bally_17
+#+end_src
+
+#+RESULTS:
+#+begin_example
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-45.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 2.035, Lambda = 1.530, dLambda = 0.369)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-50.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-55.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+CircleFit(Pi = 1.992, Lambda = 1.525, dLambda = 0.365)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-60.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-65.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-70.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+CircleFit(Pi = 1.926, Lambda = 1.529, dLambda = 0.371)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-75.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-outer-80.pdf
+CircleFit(Pi = 2.396, Lambda = 1.574, dLambda = 0.393)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+CircleFit(Pi = 2.254, Lambda = 1.545, dLambda = 0.373)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-45.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-50.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+CircleFit(Pi = 160.137, Lambda = 1.349, dLambda = 0.075)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-55.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-60.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+CircleFit(Pi = 2.242, Lambda = 1.294, dLambda = 0.072)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-65.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-70.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-75.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+CircleFit(Pi = 2.028, Lambda = 1.283, dLambda = 0.071)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4491-627-inner-80.pdf
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+CircleFit(Pi = 1.595, Lambda = 1.241, dLambda = 0.069)
+#+end_example
+
+
+#+begin_src sh :results output verbatim
+  export PYTHONPATH=.
+  time python apply-circle-fit/test-circle-fit.py j8oc17010_wcs 4520-419 Bally_17
+#+end_src
+
+#+RESULTS:
+#+begin_example
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-45.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 4.686, Lambda = 1.705, dLambda = -0.299)
+CircleFit(Pi = 4.686, Lambda = 1.705, dLambda = -0.299)
+CircleFit(Pi = 4.686, Lambda = 1.705, dLambda = -0.299)
+CircleFit(Pi = 4.686, Lambda = 1.705, dLambda = -0.299)
+CircleFit(Pi = 4.686, Lambda = 1.705, dLambda = -0.299)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-50.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.772, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.772, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.772, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.772, Lambda = 1.686, dLambda = -0.296)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-55.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+CircleFit(Pi = 2.768, Lambda = 1.686, dLambda = -0.296)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-60.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.704, Lambda = 1.684, dLambda = -0.295)
+CircleFit(Pi = 2.704, Lambda = 1.684, dLambda = -0.295)
+CircleFit(Pi = 2.704, Lambda = 1.684, dLambda = -0.295)
+CircleFit(Pi = 2.704, Lambda = 1.684, dLambda = -0.295)
+CircleFit(Pi = 2.704, Lambda = 1.684, dLambda = -0.295)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-65.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-70.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+CircleFit(Pi = 2.560, Lambda = 1.679, dLambda = -0.295)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-75.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-outer-80.pdf
+CircleFit(Pi = 2.572, Lambda = 1.682, dLambda = -0.295)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+CircleFit(Pi = 2.507, Lambda = 1.677, dLambda = -0.294)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-45.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-50.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+CircleFit(Pi = 4.149, Lambda = 1.795, dLambda = -0.356)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-55.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.971, Lambda = 1.775, dLambda = -0.352)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-60.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-65.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.366, Lambda = 1.750, dLambda = -0.347)
+CircleFit(Pi = 2.805, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 3.002, Lambda = 1.779, dLambda = -0.353)
+CircleFit(Pi = 3.002, Lambda = 1.779, dLambda = -0.353)
+CircleFit(Pi = 3.002, Lambda = 1.779, dLambda = -0.353)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-70.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.568, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.568, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.568, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.568, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.568, Lambda = 1.760, dLambda = -0.349)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-75.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4520-419-inner-80.pdf
+CircleFit(Pi = 2.690, Lambda = 1.772, dLambda = -0.351)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+CircleFit(Pi = 2.565, Lambda = 1.760, dLambda = -0.349)
+#+end_example
+
+
+#+begin_src sh :results output verbatim
+  export PYTHONPATH=.
+  time python apply-circle-fit/test-circle-fit.py j8oc17010_wcs 4505-336 Bally_17
+#+end_src
+
+#+RESULTS:
+#+begin_example
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-45.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.869, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.869, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.869, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.869, Lambda = 1.465, dLambda = -0.420)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-50.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-55.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-60.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 2.074, Lambda = 1.494, dLambda = -0.443)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+CircleFit(Pi = 1.797, Lambda = 1.465, dLambda = -0.420)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-65.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-70.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-75.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 2.434, Lambda = 1.549, dLambda = -0.491)
+CircleFit(Pi = 2.074, Lambda = 1.494, dLambda = -0.443)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+CircleFit(Pi = 1.951, Lambda = 1.477, dLambda = -0.430)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-outer-80.pdf
+CircleFit(Pi = 5.199, Lambda = 2.031, dLambda = -0.929)
+CircleFit(Pi = 2.434, Lambda = 1.549, dLambda = -0.491)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+CircleFit(Pi = 2.208, Lambda = 1.513, dLambda = -0.460)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-45.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 4.068, Lambda = 1.776, dLambda = -0.589)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-50.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 4.068, Lambda = 1.776, dLambda = -0.589)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+CircleFit(Pi = 5.167, Lambda = 1.787, dLambda = -0.597)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-55.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-60.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-65.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-70.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-75.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+CircleFit(Pi = 4.416, Lambda = 1.794, dLambda = -0.606)
+#### #### #### #### #### #### #### #### #### #### 
+Creating j8oc17010_wcs/4505-336-inner-80.pdf
+CircleFit(Pi = 12.878, Lambda = 3.002, dLambda = -1.715)
+CircleFit(Pi = 3.401, Lambda = 1.805, dLambda = -0.627)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+CircleFit(Pi = 2.804, Lambda = 1.724, dLambda = -0.566)
+#+end_example
 
 
 *** DONE Test import from the submodule
