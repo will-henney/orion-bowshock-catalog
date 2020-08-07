@@ -1,0 +1,11 @@
+{
+    "info": "Last iterated fit from circle_fit.py",
+    "region file": "j8oc16010_wcs/4582-635-forma.reg",
+    "FITS file": "j8oc16010_wcs/4582-635-Bally_16-extract.fits",
+    "d theta": 65,
+    "Pi": 3.900608397720197,
+    "Lambda": 1.7352034616579655,
+    "d Lambda": 0.4767371055559456,
+    "R0": 21.860237641929306,
+    "axis angle": -23.714431978261867
+}

@@ -4733,14 +4733,17 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
 **** Notes
 + extract-image.py must encode the camera/instrument in the output file somehow
 ** Using circle_fit to replace read-shapes-LL/fit-circle-shell.py
-*** Systematic application of circle_fit to all sources
+*** TODO Systematic application of circle_fit to all sources
 + Only do \delta\theta = 60, 65, 70, 75
 + We can get the list of sources from ~luis-programas/arcs-summary-classify.ecsv~
   + But how do we find which field each source is in?
   + We seem to have already solved that problem in [[id:F5BEFDCB-D776-4CD5-B6BA-E93439AF7A8F][Output latex figures with the individual sources]]
     + This uses ~ll-data.json~ in addition to the astropy table
-    + Why do we have data in two places?
-    + The file is written in [[id:D793BFA8-E258-4B2E-B7E6-34302B2C994B][LL object database]] with data from [[id:B35A749C-92D8-4A89-8821-A6A03CE75A4D][Tabla de objetos LL]]
+      + Why do we have data in two places?
+      + The file is written in [[id:D793BFA8-E258-4B2E-B7E6-34302B2C994B][LL object database]] with data from [[id:B35A749C-92D8-4A89-8821-A6A03CE75A4D][Tabla de objetos LL]]
+      + It seems that it uses the json file to find which Bally field is associated with each source, but we use a different approach here
+  + Parse the folder names to find the Bally field
++ So there is no need to use the ~.ecsv~ file. We just do the fitting on all the sources that we can find.  And we don't bother at this stage whether they are ~*I~ or ~*P~ sources
 #+begin_src python :eval no :tangle apply-circle-fit/all-sources-circle-fit.py
   import sys
   from pathlib import Path
@@ -4752,20 +4755,49 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
       "luis-programas/arcs-summary-classify.ecsv",
       format="ascii.ecsv").to_pandas()
   qstring = "~((Group == '*P') | (Group == '*I'))"
-  print(df.columns)
+  arcdata_paths = sorted(Path().rglob("*-arcdata.json"))
+
+  circle_fit.PT_STAR = "o"
+
+  for arcdata_path in arcdata_paths:
+      arcdata_file = arcdata_path.name
+      source_dir = arcdata_path.parent
+      source_id = arcdata_file.replace("-arcdata.json", "")
+      region_path = source_dir / f"{source_id}-forma.reg"
+      fits_paths = sorted(source_dir.glob(f"{source_id}-*-extract.fits"))
+      # Filter the list of fits files to choose the one that corresponds to the Bally field
+      # This is designed to fail if more than one file meets the filter
+      if str(source_dir).startswith("j8oc"):
+          bally_field = str(source_dir).replace("j8oc", "")[:2]
+          fits_path, = [_ for _ in fits_paths if f"-Bally_{bally_field}-" in str(_)]
+      else:
+          # Deal with the case of LL 7 that is only in WFPC2 
+          bally_field = str(source_dir).replace("wfpc2_", "")[:2]
+          fits_path, = [_ for _ in fits_paths if f"_WFPC2_{bally_field}_" in str(_)]
+      print('[][] '*10)
+      print(source_dir, source_id, bally_field, fits_path)
+
+      for arc, circle_fit.PT_ARC in ["outer", "x"], ["inner", "+"]:
+          for delta_theta in 60, 65, 70, 75:
+              plot_path = source_dir / f"{source_id}-{arc}-{delta_theta:02d}.pdf"
+              print('#### '*10)
+              print("Creating", plot_path)
+              try:
+                  circle_fit.plot_solution(
+                      source_dir / f"{source_id}-forma.reg",
+                      fits_path,
+                      plot_path,
+                      delta_theta=delta_theta, maxiter=5)
+              except AssertionError as e:
+                  print(f".@.@.@.@. Failed assertion: {e.args}")
+                  continue
 #+end_src
 
 #+begin_src sh :results verbatim
-export PYTHONPATH=.
-python apply-circle-fit/all-sources-circle-fit.py
+PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
 #+end_src
 
 #+RESULTS:
-: Index(['Object', 'h_old', 'Value_Bally', 'Value_bg_Bally', 'Delta',
-:        'Dif_Bally', 'Value_Robberto', 'Value_bg_Robberto_f656',
-:        'Dif_Robberto_f656', 'RA', 'Dec', 'D', 'PA_star', 'h', 'PA_out',
-:        'PA_in', 'R_out', 'R_in', 'Rc_out', 'Rc_in', 'Group'],
-:       dtype='object')
 
 *** Test using circle_fit on a individual sources
 #+begin_src python :eval no :tangle apply-circle-fit/test-circle-fit.py
