@@ -4733,7 +4733,8 @@ CLOCK: [2013-11-15 Fri 11:58]--[2013-11-15 Fri 13:47] =>  1:49
 **** Notes
 + extract-image.py must encode the camera/instrument in the output file somehow
 ** Using circle_fit to replace read-shapes-LL/fit-circle-shell.py
-*** TODO Systematic application of circle_fit to all sources
+*** DONE Systematic application of circle_fit to all sources
+CLOSED: [2020-08-06 Thu 23:39]
 + Only do \delta\theta = 60, 65, 70, 75
 + We can get the list of sources from ~luis-programas/arcs-summary-classify.ecsv~
   + But how do we find which field each source is in?
@@ -4798,6 +4799,158 @@ PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
 #+end_src
 
 #+RESULTS:
+
+*** TODO Collate the results of circle_fit
+
++ This time we do use the ~.ecsv~ table to get the list of sources, so we can winnow out the unwanted ones
+#+begin_src python :eval no :tangle apply-circle-fit/collate-results-circle-fit.py
+  import sys
+  from pathlib import Path
+  from astropy.table import Table
+  import pandas as pd
+  import numpy as np
+  import json
+
+
+  ROOT_PATH = Path()
+
+  # Query to exclude problematic and interproplyd sources
+  qstring = "~((Group == '*P') | (Group == '*I'))"
+  df = Table.read(
+      "luis-programas/arcs-summary-classify.ecsv",
+      format="ascii.ecsv").to_pandas().query(qstring)
+
+  # New columns for the circle_fit results
+  df = df.assign(
+      Pi_in=np.nan, e_Pi_in=np.nan,
+      Pi_out=np.nan, e_Pi_out=np.nan,
+      Lambda_in=np.nan, e_Lambda_in=np.nan, d_Lambda_in=np.nan,
+      Lambda_out=np.nan, e_Lambda_out=np.nan, d_Lambda_out=np.nan,
+  )
+
+  # Keys in JSON file for each variable
+  VARS = "Pi", "Lambda", "d Lambda", "R0"
+  # And a parallel version for the table column names (no spaces!)
+  VVARS = [_.replace(" ", "_") for _ in VARS]
+
+
+  def mad(x):
+      """Median absolute deviation rescaled to sigma for Gaussian"""
+      return 1.4826*np.nanmedian(np.abs(x - np.nanmedian(x)))
+
+
+  def collate_circle_fit_one_source(source_id):
+      rslt = {}
+    
+      for arc_long, arc in [["inner", "in"], ["outer", "out"]]:
+          json_paths = ROOT_PATH.glob(f"*/{source_id}-{arc_long}-*.json")
+
+          # Initialize empty lists for each variable
+          var_lists = {f"{vv}_{arc}": [] for vv in VVARS}
+
+          # Now fill in those lists with data from JSON files
+          for json_path in json_paths:
+              data = json.load(json_path.open())
+              if not 60 <= data["d theta"] <= 75:
+                  continue # skip anything outside this range of d theta
+              for v, vv in zip(VARS, VVARS):
+                  var_lists[f"{vv}_{arc}"].append(data.get(v))
+
+          # Finally, calculate median and dispersion
+          for vv in VVARS:
+              key = f"{vv}_{arc}"
+              vmedian = np.nanmedian(var_lists[key])
+              vsig = mad(np.array(var_lists[key]))
+              rslt[key] = vmedian
+              rslt[f"e_{key}"] = vsig
+              rslt[f"n_{key}"] = len(var_lists[key])
+              rslt[f"list_{key}"] = var_lists[key]
+
+      return rslt
+
+        
+  for source_id in df["Object"]:
+      cfit_files = ROOT_PATH.glob(f"*/{source_id}-*er-*.json")
+      print(source_id, sorted(cfit_files))
+
+#+end_src
+
+#+begin_src sh :results verbatim
+PYTHONPATH=. python apply-circle-fit/collate-results-circle-fit.py
+#+end_src
+
+#+RESULTS:
+#+begin_example
+022-635 [PosixPath('j8oc16010_wcs/022-635-inner-60.json'), PosixPath('j8oc16010_wcs/022-635-inner-65.json'), PosixPath('j8oc16010_wcs/022-635-inner-70.json'), PosixPath('j8oc16010_wcs/022-635-inner-75.json'), PosixPath('j8oc16010_wcs/022-635-outer-60.json'), PosixPath('j8oc16010_wcs/022-635-outer-65.json'), PosixPath('j8oc16010_wcs/022-635-outer-70.json'), PosixPath('j8oc16010_wcs/022-635-outer-75.json')]
+041-637 [PosixPath('j8oc16010_wcs/041-637-outer-60.json'), PosixPath('j8oc16010_wcs/041-637-outer-65.json'), PosixPath('j8oc16010_wcs/041-637-outer-70.json'), PosixPath('j8oc16010_wcs/041-637-outer-75.json')]
+042-628 [PosixPath('j8oc16010_wcs/042-628-inner-60.json'), PosixPath('j8oc16010_wcs/042-628-inner-65.json'), PosixPath('j8oc16010_wcs/042-628-inner-70.json'), PosixPath('j8oc16010_wcs/042-628-inner-75.json'), PosixPath('j8oc16010_wcs/042-628-outer-60.json'), PosixPath('j8oc16010_wcs/042-628-outer-65.json'), PosixPath('j8oc16010_wcs/042-628-outer-70.json'), PosixPath('j8oc16010_wcs/042-628-outer-75.json')]
+049-143 [PosixPath('j8oc09010_wcs/049-143-outer-60.json'), PosixPath('j8oc09010_wcs/049-143-outer-65.json'), PosixPath('j8oc09010_wcs/049-143-outer-70.json'), PosixPath('j8oc09010_wcs/049-143-outer-75.json')]
+051-024 [PosixPath('j8oc09010_wcs/051-024-inner-60.json'), PosixPath('j8oc09010_wcs/051-024-inner-65.json'), PosixPath('j8oc09010_wcs/051-024-inner-70.json'), PosixPath('j8oc09010_wcs/051-024-inner-75.json'), PosixPath('j8oc09010_wcs/051-024-outer-60.json'), PosixPath('j8oc09010_wcs/051-024-outer-65.json'), PosixPath('j8oc09010_wcs/051-024-outer-70.json'), PosixPath('j8oc09010_wcs/051-024-outer-75.json')]
+066-3251 []
+072-134 [PosixPath('j8oc09010_wcs/072-134-inner-60.json'), PosixPath('j8oc09010_wcs/072-134-inner-65.json'), PosixPath('j8oc09010_wcs/072-134-inner-70.json'), PosixPath('j8oc09010_wcs/072-134-inner-75.json'), PosixPath('j8oc09010_wcs/072-134-outer-60.json'), PosixPath('j8oc09010_wcs/072-134-outer-65.json'), PosixPath('j8oc09010_wcs/072-134-outer-70.json'), PosixPath('j8oc09010_wcs/072-134-outer-75.json')]
+074-229 [PosixPath('j8oc01010_wcs/074-229-outer-60.json'), PosixPath('j8oc01010_wcs/074-229-outer-65.json'), PosixPath('j8oc01010_wcs/074-229-outer-70.json'), PosixPath('j8oc01010_wcs/074-229-outer-75.json')]
+101-233 [PosixPath('j8oc01010_wcs/101-233-inner-60.json'), PosixPath('j8oc01010_wcs/101-233-inner-65.json'), PosixPath('j8oc01010_wcs/101-233-inner-70.json'), PosixPath('j8oc01010_wcs/101-233-inner-75.json'), PosixPath('j8oc01010_wcs/101-233-outer-60.json'), PosixPath('j8oc01010_wcs/101-233-outer-65.json'), PosixPath('j8oc01010_wcs/101-233-outer-70.json'), PosixPath('j8oc01010_wcs/101-233-outer-75.json')]
+102-157 [PosixPath('j8oc01010_wcs/102-157-inner-60.json'), PosixPath('j8oc01010_wcs/102-157-inner-65.json'), PosixPath('j8oc01010_wcs/102-157-inner-70.json'), PosixPath('j8oc01010_wcs/102-157-inner-75.json'), PosixPath('j8oc01010_wcs/102-157-outer-60.json'), PosixPath('j8oc01010_wcs/102-157-outer-65.json'), PosixPath('j8oc01010_wcs/102-157-outer-70.json'), PosixPath('j8oc01010_wcs/102-157-outer-75.json')]
+106-245 [PosixPath('j8oc01010_wcs/106-245-inner-60.json'), PosixPath('j8oc01010_wcs/106-245-inner-65.json'), PosixPath('j8oc01010_wcs/106-245-inner-70.json'), PosixPath('j8oc01010_wcs/106-245-inner-75.json'), PosixPath('j8oc01010_wcs/106-245-outer-60.json'), PosixPath('j8oc01010_wcs/106-245-outer-65.json'), PosixPath('j8oc01010_wcs/106-245-outer-70.json'), PosixPath('j8oc01010_wcs/106-245-outer-75.json')]
+109-246 [PosixPath('j8oc01010_wcs/109-246-inner-60.json'), PosixPath('j8oc01010_wcs/109-246-inner-65.json'), PosixPath('j8oc01010_wcs/109-246-inner-70.json'), PosixPath('j8oc01010_wcs/109-246-inner-75.json'), PosixPath('j8oc01010_wcs/109-246-outer-60.json'), PosixPath('j8oc01010_wcs/109-246-outer-65.json'), PosixPath('j8oc01010_wcs/109-246-outer-70.json'), PosixPath('j8oc01010_wcs/109-246-outer-75.json')]
+116-3101 [PosixPath('j8oc14010_wcs/116-3101-inner-60.json'), PosixPath('j8oc14010_wcs/116-3101-inner-65.json'), PosixPath('j8oc14010_wcs/116-3101-inner-70.json'), PosixPath('j8oc14010_wcs/116-3101-inner-75.json'), PosixPath('j8oc14010_wcs/116-3101-outer-60.json'), PosixPath('j8oc14010_wcs/116-3101-outer-65.json'), PosixPath('j8oc14010_wcs/116-3101-outer-70.json'), PosixPath('j8oc14010_wcs/116-3101-outer-75.json')]
+119-3155 [PosixPath('j8oc14010_wcs/119-3155-inner-60.json'), PosixPath('j8oc14010_wcs/119-3155-inner-65.json'), PosixPath('j8oc14010_wcs/119-3155-inner-70.json'), PosixPath('j8oc14010_wcs/119-3155-inner-75.json'), PosixPath('j8oc14010_wcs/119-3155-outer-60.json'), PosixPath('j8oc14010_wcs/119-3155-outer-65.json'), PosixPath('j8oc14010_wcs/119-3155-outer-70.json'), PosixPath('j8oc14010_wcs/119-3155-outer-75.json')]
+124-131 []
+136-3057 [PosixPath('j8oc14010_wcs/136-3057-inner-60.json'), PosixPath('j8oc14010_wcs/136-3057-inner-65.json'), PosixPath('j8oc14010_wcs/136-3057-inner-70.json'), PosixPath('j8oc14010_wcs/136-3057-inner-75.json'), PosixPath('j8oc14010_wcs/136-3057-outer-60.json'), PosixPath('j8oc14010_wcs/136-3057-outer-65.json'), PosixPath('j8oc14010_wcs/136-3057-outer-70.json'), PosixPath('j8oc14010_wcs/136-3057-outer-75.json')]
+138-3024 [PosixPath('j8oc14010_wcs/138-3024-inner-60.json'), PosixPath('j8oc14010_wcs/138-3024-inner-65.json'), PosixPath('j8oc14010_wcs/138-3024-inner-70.json'), PosixPath('j8oc14010_wcs/138-3024-inner-75.json'), PosixPath('j8oc14010_wcs/138-3024-outer-60.json'), PosixPath('j8oc14010_wcs/138-3024-outer-65.json'), PosixPath('j8oc14010_wcs/138-3024-outer-70.json'), PosixPath('j8oc14010_wcs/138-3024-outer-75.json')]
+142-301 [PosixPath('j8oc01010_wcs/142-301-inner-60.json'), PosixPath('j8oc01010_wcs/142-301-inner-65.json'), PosixPath('j8oc01010_wcs/142-301-inner-70.json'), PosixPath('j8oc01010_wcs/142-301-inner-75.json'), PosixPath('j8oc01010_wcs/142-301-outer-60.json'), PosixPath('j8oc01010_wcs/142-301-outer-65.json'), PosixPath('j8oc01010_wcs/142-301-outer-70.json'), PosixPath('j8oc01010_wcs/142-301-outer-75.json')]
+154-225 [PosixPath('j8oc01010_wcs/154-225-inner-60.json'), PosixPath('j8oc01010_wcs/154-225-inner-65.json'), PosixPath('j8oc01010_wcs/154-225-inner-70.json'), PosixPath('j8oc01010_wcs/154-225-inner-75.json'), PosixPath('j8oc01010_wcs/154-225-outer-60.json'), PosixPath('j8oc01010_wcs/154-225-outer-65.json'), PosixPath('j8oc01010_wcs/154-225-outer-70.json'), PosixPath('j8oc01010_wcs/154-225-outer-75.json')]
+154-240 [PosixPath('j8oc01010_wcs/154-240-inner-60.json'), PosixPath('j8oc01010_wcs/154-240-inner-65.json'), PosixPath('j8oc01010_wcs/154-240-inner-70.json'), PosixPath('j8oc01010_wcs/154-240-inner-75.json')]
+158-323 [PosixPath('j8oc01010_wcs/158-323-inner-60.json'), PosixPath('j8oc01010_wcs/158-323-inner-65.json'), PosixPath('j8oc01010_wcs/158-323-inner-70.json'), PosixPath('j8oc01010_wcs/158-323-inner-75.json'), PosixPath('j8oc01010_wcs/158-323-outer-60.json'), PosixPath('j8oc01010_wcs/158-323-outer-65.json'), PosixPath('j8oc01010_wcs/158-323-outer-70.json'), PosixPath('j8oc01010_wcs/158-323-outer-75.json')]
+159-221 [PosixPath('j8oc01010_wcs/159-221-inner-60.json'), PosixPath('j8oc01010_wcs/159-221-inner-65.json'), PosixPath('j8oc01010_wcs/159-221-inner-70.json'), PosixPath('j8oc01010_wcs/159-221-inner-75.json')]
+161-324 [PosixPath('j8oc01010_wcs/161-324-inner-60.json'), PosixPath('j8oc01010_wcs/161-324-inner-65.json'), PosixPath('j8oc01010_wcs/161-324-inner-70.json'), PosixPath('j8oc01010_wcs/161-324-inner-75.json'), PosixPath('j8oc01010_wcs/161-324-outer-60.json'), PosixPath('j8oc01010_wcs/161-324-outer-65.json'), PosixPath('j8oc01010_wcs/161-324-outer-70.json'), PosixPath('j8oc01010_wcs/161-324-outer-75.json')]
+163-222 [PosixPath('j8oc01010_wcs/163-222-inner-60.json'), PosixPath('j8oc01010_wcs/163-222-inner-65.json'), PosixPath('j8oc01010_wcs/163-222-inner-70.json'), PosixPath('j8oc01010_wcs/163-222-inner-75.json'), PosixPath('j8oc01010_wcs/163-222-outer-70.json'), PosixPath('j8oc01010_wcs/163-222-outer-75.json')]
+163-317 [PosixPath('j8oc01010_wcs/163-317-inner-60.json'), PosixPath('j8oc01010_wcs/163-317-inner-65.json'), PosixPath('j8oc01010_wcs/163-317-inner-70.json'), PosixPath('j8oc01010_wcs/163-317-inner-75.json'), PosixPath('j8oc01010_wcs/163-317-outer-60.json'), PosixPath('j8oc01010_wcs/163-317-outer-65.json'), PosixPath('j8oc01010_wcs/163-317-outer-70.json'), PosixPath('j8oc01010_wcs/163-317-outer-75.json')]
+165-235 [PosixPath('j8oc01010_wcs/165-235-inner-60.json'), PosixPath('j8oc01010_wcs/165-235-inner-65.json'), PosixPath('j8oc01010_wcs/165-235-inner-70.json'), PosixPath('j8oc01010_wcs/165-235-inner-75.json'), PosixPath('j8oc01010_wcs/165-235-outer-60.json'), PosixPath('j8oc01010_wcs/165-235-outer-65.json'), PosixPath('j8oc01010_wcs/165-235-outer-70.json'), PosixPath('j8oc01010_wcs/165-235-outer-75.json')]
+166-316 [PosixPath('j8oc01010_wcs/166-316-inner-60.json'), PosixPath('j8oc01010_wcs/166-316-inner-65.json'), PosixPath('j8oc01010_wcs/166-316-inner-70.json'), PosixPath('j8oc01010_wcs/166-316-inner-75.json'), PosixPath('j8oc01010_wcs/166-316-outer-60.json'), PosixPath('j8oc01010_wcs/166-316-outer-65.json'), PosixPath('j8oc01010_wcs/166-316-outer-70.json'), PosixPath('j8oc01010_wcs/166-316-outer-75.json')]
+167-317 []
+168-326 [PosixPath('j8oc01010_wcs/168-326-inner-60.json'), PosixPath('j8oc01010_wcs/168-326-inner-65.json'), PosixPath('j8oc01010_wcs/168-326-inner-70.json'), PosixPath('j8oc01010_wcs/168-326-inner-75.json'), PosixPath('j8oc01010_wcs/168-326-outer-60.json'), PosixPath('j8oc01010_wcs/168-326-outer-65.json'), PosixPath('j8oc01010_wcs/168-326-outer-70.json'), PosixPath('j8oc01010_wcs/168-326-outer-75.json')]
+168-328 [PosixPath('j8oc01010_wcs/168-328-inner-60.json'), PosixPath('j8oc01010_wcs/168-328-inner-65.json'), PosixPath('j8oc01010_wcs/168-328-inner-70.json'), PosixPath('j8oc01010_wcs/168-328-outer-60.json'), PosixPath('j8oc01010_wcs/168-328-outer-65.json'), PosixPath('j8oc01010_wcs/168-328-outer-70.json'), PosixPath('j8oc01010_wcs/168-328-outer-75.json')]
+169-338 []
+170-249 [PosixPath('j8oc01010_wcs/170-249-outer-60.json'), PosixPath('j8oc01010_wcs/170-249-outer-65.json'), PosixPath('j8oc01010_wcs/170-249-outer-70.json'), PosixPath('j8oc01010_wcs/170-249-outer-75.json')]
+177-341 [PosixPath('j8oc01010_wcs/177-341-inner-70.json'), PosixPath('j8oc01010_wcs/177-341-inner-75.json'), PosixPath('j8oc01010_wcs/177-341-outer-60.json'), PosixPath('j8oc01010_wcs/177-341-outer-65.json'), PosixPath('j8oc01010_wcs/177-341-outer-70.json'), PosixPath('j8oc01010_wcs/177-341-outer-75.json')]
+178-258 [PosixPath('j8oc01010_wcs/178-258-inner-60.json'), PosixPath('j8oc01010_wcs/178-258-inner-65.json'), PosixPath('j8oc01010_wcs/178-258-inner-70.json'), PosixPath('j8oc01010_wcs/178-258-inner-75.json'), PosixPath('j8oc01010_wcs/178-258-outer-60.json'), PosixPath('j8oc01010_wcs/178-258-outer-65.json'), PosixPath('j8oc01010_wcs/178-258-outer-70.json'), PosixPath('j8oc01010_wcs/178-258-outer-75.json')]
+180-331 [PosixPath('j8oc01010_wcs/180-331-inner-60.json'), PosixPath('j8oc01010_wcs/180-331-inner-65.json'), PosixPath('j8oc01010_wcs/180-331-inner-70.json'), PosixPath('j8oc01010_wcs/180-331-inner-75.json'), PosixPath('j8oc01010_wcs/180-331-outer-60.json'), PosixPath('j8oc01010_wcs/180-331-outer-65.json'), PosixPath('j8oc01010_wcs/180-331-outer-70.json'), PosixPath('j8oc01010_wcs/180-331-outer-75.json')]
+189-329 [PosixPath('j8oc01010_wcs/189-329-inner-60.json'), PosixPath('j8oc01010_wcs/189-329-inner-65.json'), PosixPath('j8oc01010_wcs/189-329-inner-70.json'), PosixPath('j8oc01010_wcs/189-329-inner-75.json'), PosixPath('j8oc01010_wcs/189-329-outer-60.json'), PosixPath('j8oc01010_wcs/189-329-outer-65.json'), PosixPath('j8oc01010_wcs/189-329-outer-70.json'), PosixPath('j8oc01010_wcs/189-329-outer-75.json')]
+203-3039 [PosixPath('j8oc14010_wcs/203-3039-outer-60.json'), PosixPath('j8oc14010_wcs/203-3039-outer-65.json'), PosixPath('j8oc14010_wcs/203-3039-outer-70.json'), PosixPath('j8oc14010_wcs/203-3039-outer-75.json')]
+206-043 [PosixPath('j8oc02010_wcs/206-043-inner-60.json'), PosixPath('j8oc02010_wcs/206-043-inner-65.json'), PosixPath('j8oc02010_wcs/206-043-inner-70.json'), PosixPath('j8oc02010_wcs/206-043-inner-75.json'), PosixPath('j8oc02010_wcs/206-043-outer-60.json'), PosixPath('j8oc02010_wcs/206-043-outer-65.json'), PosixPath('j8oc02010_wcs/206-043-outer-70.json'), PosixPath('j8oc02010_wcs/206-043-outer-75.json')]
+261-3018 [PosixPath('j8oc07010_wcs/261-3018-inner-60.json'), PosixPath('j8oc07010_wcs/261-3018-inner-65.json'), PosixPath('j8oc07010_wcs/261-3018-inner-70.json'), PosixPath('j8oc07010_wcs/261-3018-inner-75.json'), PosixPath('j8oc07010_wcs/261-3018-outer-60.json'), PosixPath('j8oc07010_wcs/261-3018-outer-65.json'), PosixPath('j8oc07010_wcs/261-3018-outer-70.json'), PosixPath('j8oc07010_wcs/261-3018-outer-75.json')]
+305-811 [PosixPath('j8oc07010_wcs/305-811-inner-60.json'), PosixPath('j8oc07010_wcs/305-811-inner-65.json'), PosixPath('j8oc07010_wcs/305-811-inner-70.json'), PosixPath('j8oc07010_wcs/305-811-inner-75.json'), PosixPath('j8oc07010_wcs/305-811-outer-60.json'), PosixPath('j8oc07010_wcs/305-811-outer-65.json'), PosixPath('j8oc07010_wcs/305-811-outer-70.json'), PosixPath('j8oc07010_wcs/305-811-outer-75.json')]
+308-3036 [PosixPath('j8oc08010_wcs/308-3036-inner-60.json'), PosixPath('j8oc08010_wcs/308-3036-inner-65.json'), PosixPath('j8oc08010_wcs/308-3036-inner-70.json'), PosixPath('j8oc08010_wcs/308-3036-inner-75.json'), PosixPath('j8oc08010_wcs/308-3036-outer-60.json'), PosixPath('j8oc08010_wcs/308-3036-outer-65.json'), PosixPath('j8oc08010_wcs/308-3036-outer-70.json'), PosixPath('j8oc08010_wcs/308-3036-outer-75.json')]
+344-3020 [PosixPath('j8oc08010_wcs/344-3020-inner-60.json'), PosixPath('j8oc08010_wcs/344-3020-inner-65.json'), PosixPath('j8oc08010_wcs/344-3020-inner-70.json'), PosixPath('j8oc08010_wcs/344-3020-inner-75.json'), PosixPath('j8oc08010_wcs/344-3020-outer-60.json'), PosixPath('j8oc08010_wcs/344-3020-outer-65.json'), PosixPath('j8oc08010_wcs/344-3020-outer-70.json'), PosixPath('j8oc08010_wcs/344-3020-outer-75.json')]
+362-3137 [PosixPath('j8oc08010_wcs/362-3137-inner-60.json'), PosixPath('j8oc08010_wcs/362-3137-inner-65.json'), PosixPath('j8oc08010_wcs/362-3137-inner-75.json'), PosixPath('j8oc08010_wcs/362-3137-outer-60.json'), PosixPath('j8oc08010_wcs/362-3137-outer-65.json'), PosixPath('j8oc08010_wcs/362-3137-outer-70.json'), PosixPath('j8oc08010_wcs/362-3137-outer-75.json')]
+4285-458 []
+4417-653 [PosixPath('j8oc17010_wcs/4417-653-inner-45.json'), PosixPath('j8oc17010_wcs/4417-653-inner-50.json'), PosixPath('j8oc17010_wcs/4417-653-inner-55.json'), PosixPath('j8oc17010_wcs/4417-653-inner-60.json'), PosixPath('j8oc17010_wcs/4417-653-inner-65.json'), PosixPath('j8oc17010_wcs/4417-653-inner-70.json'), PosixPath('j8oc17010_wcs/4417-653-inner-75.json'), PosixPath('j8oc17010_wcs/4417-653-inner-80.json'), PosixPath('j8oc17010_wcs/4417-653-outer-45.json'), PosixPath('j8oc17010_wcs/4417-653-outer-50.json'), PosixPath('j8oc17010_wcs/4417-653-outer-55.json'), PosixPath('j8oc17010_wcs/4417-653-outer-60.json'), PosixPath('j8oc17010_wcs/4417-653-outer-65.json'), PosixPath('j8oc17010_wcs/4417-653-outer-70.json'), PosixPath('j8oc17010_wcs/4417-653-outer-75.json'), PosixPath('j8oc17010_wcs/4417-653-outer-80.json')]
+4468-605 [PosixPath('j8oc17010_wcs/4468-605-outer-60.json'), PosixPath('j8oc17010_wcs/4468-605-outer-65.json'), PosixPath('j8oc17010_wcs/4468-605-outer-70.json'), PosixPath('j8oc17010_wcs/4468-605-outer-75.json')]
+4491-627 [PosixPath('j8oc17010_wcs/4491-627-inner-45.json'), PosixPath('j8oc17010_wcs/4491-627-inner-50.json'), PosixPath('j8oc17010_wcs/4491-627-inner-55.json'), PosixPath('j8oc17010_wcs/4491-627-inner-60.json'), PosixPath('j8oc17010_wcs/4491-627-inner-65.json'), PosixPath('j8oc17010_wcs/4491-627-inner-70.json'), PosixPath('j8oc17010_wcs/4491-627-inner-75.json'), PosixPath('j8oc17010_wcs/4491-627-inner-80.json'), PosixPath('j8oc17010_wcs/4491-627-outer-45.json'), PosixPath('j8oc17010_wcs/4491-627-outer-50.json'), PosixPath('j8oc17010_wcs/4491-627-outer-55.json'), PosixPath('j8oc17010_wcs/4491-627-outer-60.json'), PosixPath('j8oc17010_wcs/4491-627-outer-65.json'), PosixPath('j8oc17010_wcs/4491-627-outer-70.json'), PosixPath('j8oc17010_wcs/4491-627-outer-75.json'), PosixPath('j8oc17010_wcs/4491-627-outer-80.json')]
+4505-336 [PosixPath('j8oc17010_wcs/4505-336-inner-45.json'), PosixPath('j8oc17010_wcs/4505-336-inner-50.json'), PosixPath('j8oc17010_wcs/4505-336-inner-55.json'), PosixPath('j8oc17010_wcs/4505-336-inner-60.json'), PosixPath('j8oc17010_wcs/4505-336-inner-65.json'), PosixPath('j8oc17010_wcs/4505-336-inner-70.json'), PosixPath('j8oc17010_wcs/4505-336-inner-75.json'), PosixPath('j8oc17010_wcs/4505-336-inner-80.json'), PosixPath('j8oc17010_wcs/4505-336-outer-45.json'), PosixPath('j8oc17010_wcs/4505-336-outer-50.json'), PosixPath('j8oc17010_wcs/4505-336-outer-55.json'), PosixPath('j8oc17010_wcs/4505-336-outer-60.json'), PosixPath('j8oc17010_wcs/4505-336-outer-65.json'), PosixPath('j8oc17010_wcs/4505-336-outer-70.json'), PosixPath('j8oc17010_wcs/4505-336-outer-75.json'), PosixPath('j8oc17010_wcs/4505-336-outer-80.json')]
+4520-419 [PosixPath('j8oc17010_wcs/4520-419-inner-45.json'), PosixPath('j8oc17010_wcs/4520-419-inner-50.json'), PosixPath('j8oc17010_wcs/4520-419-inner-55.json'), PosixPath('j8oc17010_wcs/4520-419-inner-60.json'), PosixPath('j8oc17010_wcs/4520-419-inner-65.json'), PosixPath('j8oc17010_wcs/4520-419-inner-70.json'), PosixPath('j8oc17010_wcs/4520-419-inner-75.json'), PosixPath('j8oc17010_wcs/4520-419-inner-80.json'), PosixPath('j8oc17010_wcs/4520-419-outer-45.json'), PosixPath('j8oc17010_wcs/4520-419-outer-50.json'), PosixPath('j8oc17010_wcs/4520-419-outer-55.json'), PosixPath('j8oc17010_wcs/4520-419-outer-60.json'), PosixPath('j8oc17010_wcs/4520-419-outer-65.json'), PosixPath('j8oc17010_wcs/4520-419-outer-70.json'), PosixPath('j8oc17010_wcs/4520-419-outer-75.json'), PosixPath('j8oc17010_wcs/4520-419-outer-80.json')]
+4531-628 [PosixPath('j8oc16010_wcs/4531-628-inner-60.json'), PosixPath('j8oc16010_wcs/4531-628-inner-65.json'), PosixPath('j8oc16010_wcs/4531-628-inner-70.json'), PosixPath('j8oc16010_wcs/4531-628-inner-75.json'), PosixPath('j8oc16010_wcs/4531-628-outer-60.json'), PosixPath('j8oc16010_wcs/4531-628-outer-65.json'), PosixPath('j8oc16010_wcs/4531-628-outer-70.json'), PosixPath('j8oc16010_wcs/4531-628-outer-75.json')]
+4550-659 [PosixPath('j8oc16010_wcs/4550-659-inner-60.json'), PosixPath('j8oc16010_wcs/4550-659-inner-65.json'), PosixPath('j8oc16010_wcs/4550-659-inner-70.json'), PosixPath('j8oc16010_wcs/4550-659-inner-75.json'), PosixPath('j8oc16010_wcs/4550-659-outer-60.json'), PosixPath('j8oc16010_wcs/4550-659-outer-65.json'), PosixPath('j8oc16010_wcs/4550-659-outer-70.json'), PosixPath('j8oc16010_wcs/4550-659-outer-75.json')]
+4578-251 [PosixPath('j8oc09010_wcs/4578-251-inner-60.json'), PosixPath('j8oc09010_wcs/4578-251-inner-65.json'), PosixPath('j8oc09010_wcs/4578-251-inner-70.json'), PosixPath('j8oc09010_wcs/4578-251-inner-75.json'), PosixPath('j8oc09010_wcs/4578-251-outer-60.json'), PosixPath('j8oc09010_wcs/4578-251-outer-65.json'), PosixPath('j8oc09010_wcs/4578-251-outer-70.json'), PosixPath('j8oc09010_wcs/4578-251-outer-75.json')]
+4582-635 [PosixPath('j8oc16010_wcs/4582-635-inner-60.json'), PosixPath('j8oc16010_wcs/4582-635-inner-65.json'), PosixPath('j8oc16010_wcs/4582-635-inner-70.json'), PosixPath('j8oc16010_wcs/4582-635-inner-75.json'), PosixPath('j8oc16010_wcs/4582-635-outer-60.json'), PosixPath('j8oc16010_wcs/4582-635-outer-65.json'), PosixPath('j8oc16010_wcs/4582-635-outer-70.json'), PosixPath('j8oc16010_wcs/4582-635-outer-75.json')]
+LL1 [PosixPath('j8oc01010_wcs/LL1-inner-60.json'), PosixPath('j8oc01010_wcs/LL1-inner-65.json'), PosixPath('j8oc01010_wcs/LL1-inner-70.json'), PosixPath('j8oc01010_wcs/LL1-inner-75.json'), PosixPath('j8oc01010_wcs/LL1-outer-60.json'), PosixPath('j8oc01010_wcs/LL1-outer-65.json'), PosixPath('j8oc01010_wcs/LL1-outer-70.json'), PosixPath('j8oc01010_wcs/LL1-outer-75.json')]
+LL2 [PosixPath('j8oc18010_wcs/LL2-inner-65.json'), PosixPath('j8oc18010_wcs/LL2-inner-70.json'), PosixPath('j8oc18010_wcs/LL2-inner-75.json'), PosixPath('j8oc18010_wcs/LL2-outer-60.json'), PosixPath('j8oc18010_wcs/LL2-outer-65.json'), PosixPath('j8oc18010_wcs/LL2-outer-70.json'), PosixPath('j8oc18010_wcs/LL2-outer-75.json')]
+LL3 [PosixPath('j8oc17010_wcs/LL3-inner-60.json'), PosixPath('j8oc17010_wcs/LL3-inner-65.json'), PosixPath('j8oc17010_wcs/LL3-inner-70.json'), PosixPath('j8oc17010_wcs/LL3-inner-75.json'), PosixPath('j8oc17010_wcs/LL3-outer-60.json'), PosixPath('j8oc17010_wcs/LL3-outer-65.json'), PosixPath('j8oc17010_wcs/LL3-outer-70.json'), PosixPath('j8oc17010_wcs/LL3-outer-75.json')]
+LL4 [PosixPath('j8oc24010_wcs/LL4-inner-60.json'), PosixPath('j8oc24010_wcs/LL4-inner-65.json'), PosixPath('j8oc24010_wcs/LL4-inner-70.json'), PosixPath('j8oc24010_wcs/LL4-inner-75.json'), PosixPath('j8oc24010_wcs/LL4-outer-60.json'), PosixPath('j8oc24010_wcs/LL4-outer-65.json'), PosixPath('j8oc24010_wcs/LL4-outer-70.json'), PosixPath('j8oc24010_wcs/LL4-outer-75.json')]
+LL5 [PosixPath('j8oc07010_wcs/LL5-inner-60.json'), PosixPath('j8oc07010_wcs/LL5-inner-65.json'), PosixPath('j8oc07010_wcs/LL5-inner-70.json'), PosixPath('j8oc07010_wcs/LL5-inner-75.json'), PosixPath('j8oc07010_wcs/LL5-outer-60.json'), PosixPath('j8oc07010_wcs/LL5-outer-65.json'), PosixPath('j8oc07010_wcs/LL5-outer-70.json'), PosixPath('j8oc07010_wcs/LL5-outer-75.json')]
+LL6 [PosixPath('j8oc08010_wcs/LL6-inner-60.json'), PosixPath('j8oc08010_wcs/LL6-inner-65.json'), PosixPath('j8oc08010_wcs/LL6-inner-70.json'), PosixPath('j8oc08010_wcs/LL6-inner-75.json'), PosixPath('j8oc08010_wcs/LL6-outer-60.json'), PosixPath('j8oc08010_wcs/LL6-outer-65.json'), PosixPath('j8oc08010_wcs/LL6-outer-70.json'), PosixPath('j8oc08010_wcs/LL6-outer-75.json')]
+LL7 [PosixPath('wfpc2_64_f656n/LL7-inner-60.json'), PosixPath('wfpc2_64_f656n/LL7-inner-65.json'), PosixPath('wfpc2_64_f656n/LL7-inner-70.json'), PosixPath('wfpc2_64_f656n/LL7-inner-75.json'), PosixPath('wfpc2_64_f656n/LL7-outer-60.json'), PosixPath('wfpc2_64_f656n/LL7-outer-65.json'), PosixPath('wfpc2_64_f656n/LL7-outer-70.json'), PosixPath('wfpc2_64_f656n/LL7-outer-75.json')]
+w000-400 [PosixPath('j8oc09010_wcs/w000-400-inner-60.json'), PosixPath('j8oc09010_wcs/w000-400-inner-65.json'), PosixPath('j8oc09010_wcs/w000-400-inner-70.json'), PosixPath('j8oc09010_wcs/w000-400-inner-75.json'), PosixPath('j8oc09010_wcs/w000-400-outer-60.json'), PosixPath('j8oc09010_wcs/w000-400-outer-65.json'), PosixPath('j8oc09010_wcs/w000-400-outer-70.json'), PosixPath('j8oc09010_wcs/w000-400-outer-75.json')]
+w005-514 [PosixPath('j8oc01010_wcs/w005-514-inner-60.json'), PosixPath('j8oc01010_wcs/w005-514-inner-65.json'), PosixPath('j8oc01010_wcs/w005-514-inner-70.json'), PosixPath('j8oc01010_wcs/w005-514-inner-75.json'), PosixPath('j8oc01010_wcs/w005-514-outer-60.json'), PosixPath('j8oc01010_wcs/w005-514-outer-65.json'), PosixPath('j8oc01010_wcs/w005-514-outer-70.json'), PosixPath('j8oc01010_wcs/w005-514-outer-75.json'), PosixPath('j8oc16010_wcs/w005-514-inner-60.json'), PosixPath('j8oc16010_wcs/w005-514-inner-65.json'), PosixPath('j8oc16010_wcs/w005-514-inner-70.json'), PosixPath('j8oc16010_wcs/w005-514-inner-75.json'), PosixPath('j8oc16010_wcs/w005-514-outer-60.json'), PosixPath('j8oc16010_wcs/w005-514-outer-65.json'), PosixPath('j8oc16010_wcs/w005-514-outer-70.json'), PosixPath('j8oc16010_wcs/w005-514-outer-75.json')]
+w012-407 [PosixPath('j8oc01010_wcs/w012-407-inner-70.json'), PosixPath('j8oc01010_wcs/w012-407-inner-75.json'), PosixPath('j8oc01010_wcs/w012-407-outer-60.json'), PosixPath('j8oc01010_wcs/w012-407-outer-65.json'), PosixPath('j8oc01010_wcs/w012-407-outer-70.json'), PosixPath('j8oc01010_wcs/w012-407-outer-75.json')]
+w014-414 [PosixPath('j8oc01010_wcs/w014-414-inner-60.json'), PosixPath('j8oc01010_wcs/w014-414-inner-65.json'), PosixPath('j8oc01010_wcs/w014-414-inner-70.json'), PosixPath('j8oc01010_wcs/w014-414-inner-75.json'), PosixPath('j8oc01010_wcs/w014-414-outer-65.json'), PosixPath('j8oc01010_wcs/w014-414-outer-70.json'), PosixPath('j8oc01010_wcs/w014-414-outer-75.json')]
+w030-524 [PosixPath('j8oc01010_wcs/w030-524-inner-60.json'), PosixPath('j8oc01010_wcs/w030-524-inner-65.json'), PosixPath('j8oc01010_wcs/w030-524-inner-70.json'), PosixPath('j8oc01010_wcs/w030-524-inner-75.json'), PosixPath('j8oc01010_wcs/w030-524-outer-60.json'), PosixPath('j8oc01010_wcs/w030-524-outer-65.json'), PosixPath('j8oc01010_wcs/w030-524-outer-70.json'), PosixPath('j8oc01010_wcs/w030-524-outer-75.json')]
+w044-527 [PosixPath('j8oc01010_wcs/w044-527-outer-75.json')]
+w069-601 [PosixPath('j8oc01010_wcs/w069-601-inner-60.json'), PosixPath('j8oc01010_wcs/w069-601-inner-65.json'), PosixPath('j8oc01010_wcs/w069-601-inner-70.json'), PosixPath('j8oc01010_wcs/w069-601-inner-75.json'), PosixPath('j8oc01010_wcs/w069-601-outer-60.json'), PosixPath('j8oc01010_wcs/w069-601-outer-65.json'), PosixPath('j8oc01010_wcs/w069-601-outer-70.json'), PosixPath('j8oc01010_wcs/w069-601-outer-75.json')]
+w073-227 [PosixPath('j8oc01010_wcs/w073-227-inner-60.json'), PosixPath('j8oc01010_wcs/w073-227-inner-65.json'), PosixPath('j8oc01010_wcs/w073-227-inner-70.json'), PosixPath('j8oc01010_wcs/w073-227-inner-75.json'), PosixPath('j8oc01010_wcs/w073-227-outer-60.json'), PosixPath('j8oc01010_wcs/w073-227-outer-65.json'), PosixPath('j8oc01010_wcs/w073-227-outer-70.json'), PosixPath('j8oc01010_wcs/w073-227-outer-75.json')]
+w266-558 [PosixPath('j8oc06010_wcs/w266-558-inner-60.json'), PosixPath('j8oc06010_wcs/w266-558-inner-65.json'), PosixPath('j8oc06010_wcs/w266-558-inner-70.json'), PosixPath('j8oc06010_wcs/w266-558-inner-75.json'), PosixPath('j8oc06010_wcs/w266-558-outer-60.json'), PosixPath('j8oc06010_wcs/w266-558-outer-65.json'), PosixPath('j8oc06010_wcs/w266-558-outer-70.json'), PosixPath('j8oc06010_wcs/w266-558-outer-75.json')]
+#+end_example
 
 *** Test using circle_fit on a individual sources
 #+begin_src python :eval no :tangle apply-circle-fit/test-circle-fit.py
