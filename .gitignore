@@ -1,4 +1,6 @@
 *
+!notebooks
+!notebooks/*.py
 !circle_fit
 !j8oc17010_wcs
 !j8oc16010_wcs

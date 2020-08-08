@@ -4803,6 +4803,19 @@ PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
 *** TODO Collate the results of circle_fit
 
 + This time we do use the ~.ecsv~ table to get the list of sources, so we can winnow out the unwanted ones
++ This is currently better implemented in the notebook
+  + [[file:notebooks/First look at statistics of applying circle_fit to all sources.ipynb]]
+  + [[file:notebooks/First look at statistics of applying circle_fit to all sources.py]]
+  + which generated the following figures:
+    + [[file:all-sources-Pi_out-Lambda_out.pdf]]
+    + [[file:all-sources-Pi_in-Lambda_in.pdf]]
+  + Once everything is debugged, I want to port the notebook stuff to the following script, which will write out a table of the results
++ Current status [2020-08-08 Sat]
+  1. From the Pi--Lambda plots for both inner and outer arcs, we find smaller values of Lambda than in other samples
+     - Lots of points are in the oblate-spheroid region of the graph
+     - I suspect this is because ~circle_fit~ is failing to measure R90 correctly for arcs that stop before getting to 90 degrees from axis
+  2. Also, there seem to be a lot of sources with very few points in the arcs, which makes some of the fitting unreliable
+
 #+begin_src python :eval no :tangle apply-circle-fit/collate-results-circle-fit.py
   import sys
   from pathlib import Path
