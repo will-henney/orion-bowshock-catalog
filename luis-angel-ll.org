@@ -4983,7 +4983,19 @@ w266-558 [PosixPath('j8oc06010_wcs/w266-558-inner-60.json'), PosixPath('j8oc0601
   3. Filled if \Lambda_{in} on at least one side
   4. Filled if \Lambda_{in} on both sides
 + Sources where the folder is blank don't have any planitude measurements either
-  + In many cases, this is due to insufficient points in arc 
+  + In many cases, this is due to insufficient points in arc
++ Some sources seem to have changed since the ~*-images.pdf~ was generated
+  + For instance, LL4 has much fewer points in the outer arc, and so no longer reaches \pm90 deg
+  + Presumably, we removed them for what seemed like a good reason - possibly the thought that the arc wings are affected by the jet
++ [ ] Other region files for arc shapes
+  + [[file:~/Work/Bowshocks/Jorge/bowshock-shape/LL-shapes-2017/][bowshock-shape/LL-shapes-2017/]] from Paper IV of the main bow shock project
+    + I ended up using the ridge of the arc (brightness maximum), instead of inner or outer boundary
+    + These are files like ~new-LL4-ridge.reg~, which have a lot of points
+  + Fits to infrared images of LV arcs in [[id:00D55CC8-DE20-4A18-8718-633BEA319A52][Second opinion on proplyd shapes]]
+    + We should maybe use some of these, since we manage to get alatude for LV1, LV3, and LV4
+    + LV5, as traced, does not get to 90 deg, but looking at the image it seems that the arc can be traced further
+    + These all use the ridge method, since the MIR resolution is not good enough to clearly see the inner and outer boundaries
+
 |   Object | Group | Folder         | ⬜⬜⬜⬜ |
 |----------+-------+----------------+----------|
 |  022-635 | W     | j8oc16010_wcs  | ⬜⬜⬜⬜ |
