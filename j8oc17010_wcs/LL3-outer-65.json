@@ -4,8 +4,8 @@
     "FITS file": "j8oc17010_wcs/LL3-Bally_17-extract.fits",
     "d theta": 65,
     "Pi": 1.9715129400825693,
-    "Lambda": 1.7916771826179907,
-    "d Lambda": -0.04287990487941218,
+    "Lambda": 1.7487972777385785,
+    "d Lambda": NaN,
     "R0": 62.43102341288577,
     "axis angle": -33.73564598742676
 }

@@ -64,14 +64,20 @@ def collate_circle_fit_one_source(source_id):
     rslt = {"Object": source_id}
     
     for arc_long, arc in [["inner", "in"], ["outer", "out"]]:
-        json_paths = ROOT_PATH.glob(f"*/{source_id}-{arc_long}-*.json")
+        json_paths = sorted(ROOT_PATH.glob(f"*/{source_id}-{arc_long}-*.json"))
+        try:
+            rslt["Folder"] = str(json_paths[0].parent.name)
+        except IndexError:
+            rslt["Folder"] = ""
 
         # Initialize empty lists for each variable
         var_lists = {f"{vv}_{arc}": [] for vv in VVARS}
 
         # Now fill in those lists with data from JSON files
+        # print(json_paths)
         for json_path in json_paths:
             data = json.load(json_path.open())
+            # print(data)
             if not 60 <= data["d theta"] <= 75:
                 continue # skip anything outside this range of d theta
             for v, vv in zip(VARS, VVARS):
@@ -85,7 +91,7 @@ def collate_circle_fit_one_source(source_id):
             rslt[key] = vmedian
             rslt[f"e_{key}"] = vsig
             rslt[f"n_{key}"] = len(var_lists[key])
-            # rslt[f"list_{key}"] = var_lists[key]
+            #rslt[f"list_{key}"] = var_lists[key]
 
     return rslt
 
@@ -117,7 +123,7 @@ dff_log = pd.concat([
 
 dff_log
 
-fig = sn.pairplot(dff_log, hue="Group", palette="magma")
+fig = sn.pairplot(dff_log.dropna(), hue="Group", palette="magma")
 for i, row in enumerate(fig.axes):
     for j, ax in enumerate(row):
         if i != j:
@@ -197,7 +203,7 @@ ax.set(xlim=[0.35, 15.0], ylim=[0.35, 15.0], xscale="log", yscale="log")
 ax.set_aspect("equal")
 ax.set(xlabel=r"$\Pi_\mathrm{out}$", ylabel=r"$\Lambda_\mathrm{out}$")
 
-fig.savefig(ROOT_PATH / "all-sources-Pi_out-Lambda_out.pdf")
+fig.savefig(ROOT_PATH / "all-sources-new-Pi_out-Lambda_out.pdf")
 
 # +
 fig, ax = plt.subplots(figsize=(12, 12))
@@ -235,9 +241,36 @@ ax.legend(ncol=2).set_title("Group")
 ax.set(xlim=[0.35, 15.0], ylim=[0.35, 15.0], xscale="log", yscale="log")
 ax.set_aspect("equal")
 ax.set(xlabel=r"$\Pi_\mathrm{in}$", ylabel=r"$\Lambda_\mathrm{in}$")
-fig.savefig(ROOT_PATH / "all-sources-Pi_in-Lambda_in.pdf")
+fig.savefig(ROOT_PATH / "all-sources-new-Pi_in-Lambda_in.pdf")
 # -
 
 groups_and_colors
+
+# Look at which sources to not have valid outer alatude, $\Lambda_\mathrm{out}$
+
+" ".join(dff[~np.isfinite(dff["Lambda_out"])]["Object"].to_list())
+
+" ".join(dff[~np.isfinite(dff["Lambda_in"])]["Object"].to_list())
+
+" ".join(dff[(np.isfinite(dff["Lambda_out"])) & (~np.isfinite(dff["d_Lambda_out"]))]["Object"].to_list())
+
+" ".join(dff[(np.isfinite(dff["Lambda_in"])) & (~np.isfinite(dff["d_Lambda_in"]))]["Object"].to_list())
+
+
+def flag(x):
+    return np.char.array(np.where(np.isfinite(x), "🟨", "⬜️"))
+
+
+flag(dff.Lambda_out) + flag(dff.d_Lambda_out) + flag(dff.Lambda_in) + flag(dff.d_Lambda_in)
+
+dff["Lam_flags"] = flag(dff.Lambda_out) + flag(dff.d_Lambda_out) + flag(dff.Lambda_in) + flag(dff.d_Lambda_in)
+
+pd.options.display.max_rows = 999
+
+dff[["Object", "Group", "Folder", "Lam_flags"]]
+
+dff[["Object", "Group", "Folder", "Lam_flags"]].to_csv(ROOT_PATH / "missing_lambdas.csv", index=False)
+
+Path("xx/yy/zz.txt").parent
 
 

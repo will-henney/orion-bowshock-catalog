@@ -4815,6 +4815,15 @@ PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
      - Lots of points are in the oblate-spheroid region of the graph
      - I suspect this is because ~circle_fit~ is failing to measure R90 correctly for arcs that stop before getting to 90 degrees from axis
   2. Also, there seem to be a lot of sources with very few points in the arcs, which makes some of the fitting unreliable
++ That turned out to be correct [2020-08-08 Sat 20:23]
+  + I now set Lambda = NaN if the arc doesn't get far enough on either side (R90+ and R90- do not exist)
+  + If only one of R90+ or R90- exists, then we use that for Lambda but set d Lambda to NaN
+  + So, we need R90+ and R90- to both exist in order to have valid values of both Lambda and d Lambda
+  + New figures are:
+    + [[file:all-sources-new-Pi_out-Lambda_out.pdf]]
+    + [[file:all-sources-new-Pi_in-Lambda_in.pdf]]
+  + These eliminate the big clump of points in the oblate spheroid region
+  + But they also have much fewer points 
 
 #+begin_src python :eval no :tangle apply-circle-fit/collate-results-circle-fit.py
   import sys
@@ -4964,6 +4973,90 @@ w069-601 [PosixPath('j8oc01010_wcs/w069-601-inner-60.json'), PosixPath('j8oc0101
 w073-227 [PosixPath('j8oc01010_wcs/w073-227-inner-60.json'), PosixPath('j8oc01010_wcs/w073-227-inner-65.json'), PosixPath('j8oc01010_wcs/w073-227-inner-70.json'), PosixPath('j8oc01010_wcs/w073-227-inner-75.json'), PosixPath('j8oc01010_wcs/w073-227-outer-60.json'), PosixPath('j8oc01010_wcs/w073-227-outer-65.json'), PosixPath('j8oc01010_wcs/w073-227-outer-70.json'), PosixPath('j8oc01010_wcs/w073-227-outer-75.json')]
 w266-558 [PosixPath('j8oc06010_wcs/w266-558-inner-60.json'), PosixPath('j8oc06010_wcs/w266-558-inner-65.json'), PosixPath('j8oc06010_wcs/w266-558-inner-70.json'), PosixPath('j8oc06010_wcs/w266-558-inner-75.json'), PosixPath('j8oc06010_wcs/w266-558-outer-60.json'), PosixPath('j8oc06010_wcs/w266-558-outer-65.json'), PosixPath('j8oc06010_wcs/w266-558-outer-70.json'), PosixPath('j8oc06010_wcs/w266-558-outer-75.json')]
 #+end_example
+
+
+*** Sources with missing \Lambda measurements
++ Results of trying to find alatude for arcs
++ Four squares show status:
+  1. Filled if \Lambda_{out} on at least one side
+  2. Filled if \Lambda_{out} on both sides
+  3. Filled if \Lambda_{in} on at least one side
+  4. Filled if \Lambda_{in} on both sides
++ Sources where the folder is blank don't have any planitude measurements either
+  + In many cases, this is due to insufficient points in arc 
+|   Object | Group | Folder         | ⬜⬜⬜⬜ |
+|----------+-------+----------------+----------|
+|  022-635 | W     | j8oc16010_wcs  | ⬜⬜⬜⬜ |
+|  041-637 | W     | j8oc16010_wcs  | ⬛⬜⬜⬜ |
+|  042-628 | W     | j8oc16010_wcs  | ⬛⬜⬜⬜ |
+|  049-143 | NW    | j8oc09010_wcs  | ⬜⬜⬜⬜ |
+|  051-024 | NW    | j8oc09010_wcs  | ⬜⬜⬜⬜ |
+| 066-3251 | S     |                | ⬜⬜⬜⬜ |
+|  072-134 | NW    | j8oc09010_wcs  | ⬛⬜⬜⬜ |
+|  074-229 | NW    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  101-233 | NW    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  102-157 | NW    | j8oc01010_wcs  | ⬛⬜⬜⬜ |
+|  106-245 | NW    | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+|  109-246 | NW    | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| 116-3101 | S     | j8oc14010_wcs  | ⬛⬜⬜⬜ |
+| 119-3155 | S     | j8oc14010_wcs  | ⬛⬜⬛⬜ |
+|  124-131 | NW    |                | ⬜⬜⬜⬜ |
+| 136-3057 | S     | j8oc14010_wcs  | ⬛⬛⬛⬜ |
+| 138-3024 | S     | j8oc14010_wcs  | ⬜⬜⬜⬜ |
+|  142-301 | N     | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+|  154-225 | N     | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  154-240 | N     |                | ⬜⬜⬛⬜ |
+|  158-323 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  159-221 | N     |                | ⬜⬜⬛⬜ |
+|  161-324 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  163-222 | N     | j8oc01010_wcs  | ⬛⬜⬜⬜ |
+|  163-317 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  165-235 | N     | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  166-316 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  167-317 | LV    |                | ⬜⬜⬜⬜ |
+|  168-326 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  168-328 | LV    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  169-338 | SE    |                | ⬜⬜⬜⬜ |
+|  170-249 | N     | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  177-341 | SE    | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  178-258 | N     | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+|  180-331 | SE    | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+|  189-329 | SE    | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| 203-3039 | S     | j8oc14010_wcs  | ⬛⬜⬜⬜ |
+|  206-043 | NW    | j8oc02010_wcs  | ⬜⬜⬜⬜ |
+| 261-3018 | S     | j8oc07010_wcs  | ⬛⬜⬜⬜ |
+|  305-811 | S     | j8oc07010_wcs  | ⬜⬜⬜⬜ |
+| 308-3036 | S     | j8oc08010_wcs  | ⬛⬜⬛⬜ |
+| 344-3020 | S     | j8oc08010_wcs  | ⬜⬜⬜⬜ |
+| 362-3137 | S     | j8oc08010_wcs  | ⬜⬜⬛⬜ |
+| 4285-458 | W     |                | ⬜⬜⬜⬜ |
+| 4417-653 | W     | j8oc17010_wcs  | ⬛⬛⬛⬛ |
+| 4468-605 | W     | j8oc17010_wcs  | ⬜⬜⬜⬜ |
+| 4491-627 | W     | j8oc17010_wcs  | ⬛⬜⬜⬜ |
+| 4505-336 | W     | j8oc17010_wcs  | ⬛⬜⬛⬜ |
+| 4520-419 | W     | j8oc17010_wcs  | ⬜⬜⬜⬜ |
+| 4531-628 | W     | j8oc16010_wcs  | ⬜⬜⬜⬜ |
+| 4550-659 | W     | j8oc16010_wcs  | ⬛⬜⬛⬜ |
+| 4578-251 | W     | j8oc09010_wcs  | ⬛⬜⬜⬜ |
+| 4582-635 | W     | j8oc16010_wcs  | ⬛⬜⬜⬜ |
+|      LL1 | W     | j8oc01010_wcs  | ⬛⬛⬛⬛ |
+|      LL2 | W     | j8oc18010_wcs  | ⬛⬜⬛⬜ |
+|      LL3 | W     | j8oc17010_wcs  | ⬛⬜⬜⬜ |
+|      LL4 | W     | j8oc24010_wcs  | ⬜⬜⬜⬜ |
+|      LL5 | S     | j8oc07010_wcs  | ⬛⬛⬛⬜ |
+|      LL6 | S     | j8oc08010_wcs  | ⬛⬜⬛⬜ |
+|      LL7 | S     | wfpc2_64_f656n | ⬜⬜⬜⬜ |
+| w000-400 | W     | j8oc09010_wcs  | ⬛⬛⬛⬛ |
+| w005-514 | W     | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| w012-407 | W     | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| w014-414 | W     | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| w030-524 | W     | j8oc01010_wcs  | ⬛⬛⬜⬜ |
+| w044-527 | W     | j8oc01010_wcs  | ⬜⬜⬜⬜ |
+| w069-601 | W     | j8oc01010_wcs  | ⬛⬜⬛⬜ |
+| w073-227 | NW    | j8oc01010_wcs  | ⬛⬜⬜⬜ |
+| w266-558 | S     | j8oc06010_wcs  | ⬛⬜⬜⬜ |
+
+
 
 *** Test using circle_fit on a individual sources
 #+begin_src python :eval no :tangle apply-circle-fit/test-circle-fit.py
