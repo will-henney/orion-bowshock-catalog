@@ -1,0 +1,7 @@
+# Region file format: DS9 version 4.1
+global color=red dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+fk5
+circle(5:35:17.2296,-5:23:41.4842,2.37384056617") # color=magenta text={}
+point(5:35:17.2296,-5:23:41.4842) # point=diamond color=magenta text={inner}
+circle(5:35:17.1961,-5:23:41.7765,3.27764366763") # color=green text={}
+point(5:35:17.1961,-5:23:41.7765) # point=diamond color=green text={outer}

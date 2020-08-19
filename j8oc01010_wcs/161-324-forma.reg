@@ -1,0 +1,45 @@
+# Region file format: DS9 version 4.1
+global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+fk5
+point(5:35:16.052,-5:23:24.35) # point=circle
+point(5:35:16.117,-5:23:24.95) # point=cross
+point(5:35:16.113,-5:23:24.65) # point=cross
+point(5:35:16.113,-5:23:24.36) # point=cross
+point(5:35:16.111,-5:23:24.06) # point=cross
+point(5:35:16.102,-5:23:23.71) # point=cross
+point(5:35:16.094,-5:23:23.47) # point=cross
+point(5:35:16.140,-5:23:25.16) # point=x
+point(5:35:16.141,-5:23:24.82) # point=x
+point(5:35:16.138,-5:23:24.45) # point=x
+point(5:35:16.135,-5:23:24.08) # point=x
+point(5:35:16.127,-5:23:23.68) # point=x
+point(5:35:16.114,-5:23:23.36) # point=x
+point(5:35:16.101,-5:23:23.09) # point=x
+point(5:35:16.089,-5:23:22.79) # point=x
+point(5:35:16.075,-5:23:22.56) # point=x
+point(5:35:16.145,-5:23:25.46) # point=x
+point(5:35:16.058,-5:23:22.49) # point=x
+point(5:35:16.048,-5:23:22.40) # point=x
+point(5:35:16.082,-5:23:22.68) # point=x
+point(5:35:16.092,-5:23:22.89) # point=x
+point(5:35:16.096,-5:23:22.97) # point=x
+point(5:35:16.131,-5:23:23.86) # point=x
+point(5:35:16.121,-5:23:23.51) # point=x
+point(5:35:16.109,-5:23:23.20) # point=x
+point(5:35:16.140,-5:23:24.25) # point=x
+point(5:35:16.141,-5:23:24.61) # point=x
+point(5:35:16.141,-5:23:24.98) # point=x
+point(5:35:16.115,-5:23:24.80) # point=cross
+point(5:35:16.112,-5:23:24.52) # point=cross
+point(5:35:16.111,-5:23:24.20) # point=cross
+point(5:35:16.105,-5:23:23.88) # point=cross
+point(5:35:16.096,-5:23:23.57) # point=cross
+point(5:35:16.088,-5:23:23.34) # point=cross
+point(5:35:16.081,-5:23:23.20) # point=cross
+point(5:35:16.074,-5:23:23.08) # point=cross
+point(5:35:16.069,-5:23:23.03) # point=cross
+point(5:35:16.115,-5:23:25.10) # point=cross
+point(5:35:16.117,-5:23:25.24) # point=cross
+point(5:35:16.116,-5:23:25.38) # point=cross
+point(5:35:16.103,-5:23:23.79) # point=cross
+point(5:35:16.099,-5:23:23.64) # point=cross
