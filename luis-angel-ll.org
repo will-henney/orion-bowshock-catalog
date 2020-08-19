@@ -4795,7 +4795,7 @@ CLOSED: [2020-08-06 Thu 23:39]
 #+end_src
 
 #+begin_src sh :results verbatim
-PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
+  PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
 #+end_src
 
 #+RESULTS:

@@ -21,6 +21,7 @@ from astropy.table import Table
 import pandas as pd
 import numpy as np
 import json
+import seaborn as sn
 
 ROOT_PATH = Path("..") # necessary since we are in the `notebooks/` sub-folder
 # -
@@ -99,7 +100,7 @@ def collate_circle_fit_one_source(source_id):
 
 # -
 
-data = collate_circle_fit_one_source("LL2")
+data = collate_circle_fit_one_source("LL7")
 data
 
 df3 = pd.DataFrame([collate_circle_fit_one_source(source_id) for source_id in df2["Object"]])
@@ -112,8 +113,6 @@ columns_to_drop = [_ for _ in dff.columns if _.startswith("n_")]
 dff.drop(columns_to_drop, axis=1, inplace=True)
 
 dff.groupby(by="Group").mean().sort_values(by="D")
-
-import seaborn as sn
 
 dff_log = pd.concat([
     dff[["Object", "Group"]],
