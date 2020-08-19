@@ -272,4 +272,169 @@ dff[["Object", "Group", "Folder", "Lam_flags"]].to_csv(ROOT_PATH / "missing_lamb
 
 Path("xx/yy/zz.txt").parent
 
+# ## Check for significant differences between inner/outer shapes
+#
+# Use K-S or Anderson-Darling
+
+m = dff["Pi_in"] < 20.0
+dff["log_Pi_in"] = np.log10(dff["Pi_in"])
+dff["log_Pi_out"] = np.log10(dff["Pi_out"])
+ax = sn.jointplot(dff[m]["log_Pi_out"], dff[m]["log_Pi_in"], kind="reg")
+ax.ax_joint.set(
+    xticks=[0, 0.5, 1.0],
+    yticks=[0, 0.5, 1.0],    
+#    xlim=[0.9, 15.0], ylim=[0.9, 15.0], 
+#    xscale="log", yscale="log",
+)
+ax.ax_joint.set_aspect("equal")
+
+ax = sn.jointplot(dff["Lambda_out"], dff["Lambda_in"], kind="reg")
+#ax.ax_joint.set(xlim=[0.9, 15.0], ylim=[0.9, 15.0], xscale="log", yscale="log")
+ax.ax_joint.set(
+    xticks=[0, 1, 2, 3, 4, 5],
+    yticks=[0, 1, 2, 3, 4, 5],    
+)
+ax.ax_joint.set_aspect("equal")
+
+# Import all the stat tests ...
+
+from astropy.stats import kuiper_two
+from scipy.stats import ks_2samp, anderson_ksamp, pearsonr, levene
+
+
+def print_stats(var1, var2):
+    m = np.isfinite(dff[var1]) & np.isfinite(dff[var2])
+    x, y = dff[m][var1], dff[m][var2]
+    _, p_kuiper = kuiper_two(x, y)
+    _, p_KS = ks_2samp(x, y)
+    _, _, p_AD = anderson_ksamp([x, y], midrank=False)
+    _, p_BF = levene(x, y, center="median")
+    r_P, p_P = pearsonr(x, y)
+    print(f"Pearson rank correlation between {var1} and {var2}: {r_P:.5f} (p = {p_P:.5f})")
+    print(f"P values for tests of difference between {var1} and {var2}:")
+    print("Kuiper test:", np.round(p_kuiper, 5))
+    print("Kolmogorov–Smirnov test:", np.round(p_KS, 5))
+    print("Anderson–Darling test:", np.round(p_AD, 5))
+    print("Brown–Forsyth test (variance):", np.round(p_BF, 5))    
+
+
+print_stats("Pi_out", "Pi_in")
+
+print_stats("Pi_out", "Lambda_out")
+
+print_stats("Lambda_out", "Lambda_in")
+
+print_stats("Pi_in", "Lambda_in")
+
+print_stats("Pi_out", "old_Pi_out")
+
+print_stats("Pi_in", "old_Pi_in")
+
+print_stats("log_Pi_out", "log_Pi_in")
+
+# Next one is a but silly.  Of course, the difference tests will be significant between one value that is logged and one that isn't ...
+
+print_stats("log_Pi_out", "Lambda_out")
+print()
+print_stats("log_Pi_in", "Lambda_in")
+
+# ### Summary of statistical tests
+#
+# We use two different types of tests:
+#
+# 1. Pearson rank correlation, which ignores the absolute values, but looks at between-source relative change in the two variables.
+#
+# 2. The difference tests, which *are* sensitive to the absolute values but ignore only look at the two distributions, ignoring the correlations between sources.  Kuiper, K–S, and A–D are mainly sensitive to central tendency, while B–F is sensitive to width.
+#
+# Prinipal findings are:
+#
+# * Strong correlation between `Lambda_out` and `Lambda_in`: $r = 0.61$, $p = 0.0005$.  All difference tests non-significant. 
+# * Weaker (but still significant) correlation between `log_Pi_out` and `log_Pi_in`: $r = 0.39$, $p = 0.002$.  Again, all difference tests non-significant.
+# * `Lambda` versus `Pi` has strong correlation (both out and in).  The Brown–Forsyth test is the only one that shows a significant difference, presumably because `Lambda` does not have the fat tail towards high values that `Pi` has.
+#
+# Conclusions are that it is fine to merge the outer and inner arc values, since there is no significant difference between the two.
+
+# ## Merging the inner and outer arcs
+#
+# We will do this by the following steps
+#
+# 1. Separate out the inner and outer arc columns into two separate data frames
+# 2. Rename `Pi`, `Lambda` (and `d_...`) columns in both to remove `_in` and `_out` suffixes.
+# 3. Add an `Arc` column to each (value `in` or `out`)
+# 4. Concatenate the tables. 
+
+VVARS
+
+
+# Steps 1, 2, 3, for outer arcs:
+
+# +
+def strip_suffix(s):
+    return s.replace("_out", "").replace("_in", "")
+
+COLS = ["Object", "Group", "Folder"] + [f"{v}_out" for v in VVARS] + [f"e_{v}_out" for v in VVARS]
+dff_out = dff[COLS].rename(strip_suffix, axis="columns")
+dff_out["Arc"] = "out"
+dff_out
+# -
+
+# Steps 1, 2, 3, for inner arcs:
+
+COLS = ["Object", "Group", "Folder"] + [f"{v}_in" for v in VVARS] + [f"e_{v}_in" for v in VVARS]
+dff_in = dff[COLS].rename(strip_suffix, axis="columns")
+dff_in["Arc"] = "in"
+dff_in
+
+# Step 4 to put them both together.
+
+dff_merge = pd.concat([dff_out, dff_in], ignore_index=True)
+dff_merge
+
+# Now we can plot the merged dataset as before
+
+# +
+fig, ax = plt.subplots(figsize=(12, 12))
+
+
+Rc_grid = np.linspace(0.0, 15.0, 2000)
+R90_T0_grid = np.sqrt(2*Rc_grid)
+R90_T1_grid = np.sqrt(2*Rc_grid - 1.0)
+R90_T1_grid[~np.isfinite(R90_T1_grid)] = 0.0 
+
+ax.fill_between(Rc_grid, R90_T1_grid, R90_T0_grid, color='k', alpha=0.2)
+ax.fill_between(Rc_grid, R90_T0_grid, color='k', alpha=0.1)
+ax.plot(Rc_grid, R90_T0_grid, c='k', lw=0.5)
+ax.axhline(1.0, lw=0.5, alpha=0.5, color='k', zorder=-1)
+ax.axvline(1.0, lw=0.5, alpha=0.5, color='k', zorder=-1)
+ax.plot([0.0, 10.0], [0.0, 10.0], lw=0.5, alpha=0.5, color='k', zorder=-1)
+
+
+m = np.isfinite(dff_merge["Pi"]) & np.isfinite(dff_merge["Lambda"])
+sn.kdeplot(dff_merge[m]["Pi"], dff_merge[m]["Lambda"], ax=ax, 
+           bw=(0.05, 0.025), levels=[0.5, 1.0, 2.0, 4.0, 8.0, 12.0], norm=PowerNorm(0.5),
+           cmap="Purples",
+          )
+
+
+
+ax.errorbar(x=dff_merge["Pi"], y=dff_merge["Lambda"], xerr=dff_merge["e_Pi"], yerr=dff_merge["d_Lambda"], 
+            fmt='none', alpha=0.3)
+
+for group, color in groups_and_colors:
+    m = dff_merge["Group"] == group
+    ax.scatter(x=dff_merge[m]["Pi"], y=dff_merge[m]["Lambda"], 
+               marker="o", c=[color], label=group, edgecolors="w")
+ax.legend(ncol=2).set_title("Group")    
+ax.set(xlim=[0.35, 15.0], ylim=[0.35, 15.0], xscale="log", yscale="log")
+ax.set_aspect("equal")
+ax.set(xlabel=r"$\Pi_\mathrm{in}$", ylabel=r"$\Lambda_\mathrm{in}$")
+fig.savefig(ROOT_PATH / "all-sources-merge-Pi-Lambda.pdf")
+# -
+
+# This looks very promising.  We now have enough points that we can reduce the bandwidth (smoothing) of the KDE.  
+#
+# It appears that the shape distribution is bimodal (at least).  There is a cluster at $(\Pi, \Lambda) = (2, 2)$ and another at $(\Pi, \Lambda) \approx (3, 3)$.  Then some outliers around $(1.4, 1.4)$ and other outliers with $\Pi > 5$. 
+#
+# *We should model this with a Gaussian Mixture Model when we have more data.*  (See Jake VdP book) 
+
 

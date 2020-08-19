@@ -1,96 +1,385 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>luis-angel-ll</title>
-<!-- 2013-08-22 Thu 13:25 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="generator" content="Org-mode"/>
-<meta name="author" content="William Henney"/>
+<!-- 2020-08-19 Wed 00:22 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sources with missing &Lambda; measurements</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="William Henney" />
 <style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
-  .title  { text-align: center; }
-  .todo   { font-family: monospace; color: red; }
-  .done   { color: green; }
-  .tag    { background-color: #eee; font-family: monospace;
-            padding: 2px; font-size: 80%; font-weight: normal; }
-  .timestamp { color: #bebebe; }
-  .timestamp-kwd { color: #5f9ea0; }
-  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .center { margin-left: auto; margin-right: auto; text-align: center; }
-  .underline { text-decoration: underline; }
-  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
-  p.verse { margin-left: 3%; }
-  pre {
+<!--/*--><![CDATA[/*><!--*/
+/* 18 Jan 2016: Modified from the stylesheet by Zhitao Gong on
+https://github.com/gongzhitaao/orgcss/
+ */
+
+body {
+    max-width: 100%;
+    margin: 1% 1%;
+    font: normal normal normal 16px/1.6em 'Open Sans', sans-serif;
+    color: #333;
+}
+
+@media all and (min-width: 95ex) {
+    body {
+        max-width: 95ex;
+        margin: 1% auto;
+    }
+
+    .creator {
+        float: right;
+    }
+}
+
+@media not all and (min-width: 110ex) {
+
+    .creator {
+        float: left;
+    }
+
+    p img {
+        width: 95%;
+    }
+}
+
+.title {
+    padding: .5em 0;
+    text-align: center;
+    color: black;
+}
+
+.subtitle {
+    font-size: medium;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: center;
+}
+
+.abstract {
+    width: 80%;
+    margin: auto;
+    font-style: italic;
+}
+
+.abstract p:last-of-type:before {
+    content: "    ";
+    white-space: pre;
+}
+
+.status {
+    font-size: 90%;
+    margin: 2em auto;
+}
+
+[class^="section-number-"] {
+    margin-right: .5em;
+}
+
+#footnotes {
+    font-size: 90%;
+}
+
+.footpara {
+    display: inline;
+    margin: .2em auto;
+}
+
+.footdef {
+    margin-bottom: 1em;
+}
+
+.footdef sup {
+    padding-right: .5em;
+}
+
+a {
+    color: #527d9a;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #003355;
+    border-bottom: 1px dotted;
+}
+
+p img {
+    vertical-align: middle;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: #A5573E;
+    line-height: 1.6em;
+    font-family: 'Droid Serif', serif;
+}
+
+h4,h5,h6 {
+    font-size: 1em;
+}
+
+table {
+    border-top: 2px solid;
+    border-bottom: 2px solid;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+thead {
+    border-bottom: 2px solid;
+}
+
+table td + td, table th + th {
+    border-left: 1px solid gray;
+}
+
+table tr {
+    border-top: 1px solid lightgray;
+}
+
+td,th {
+    padding: 5px 10px;
+    vertical-align: middle;
+}
+
+code {
+    padding: 2px 5px;
+    margin: auto 1px;
+    border: 1px solid #DDD;
+    border-radius: 3px;
+    background-clip: padding-box;
+    color: #333;
+    font-size: 90%;
+}
+
+blockquote {
+    margin: 1em 2em;
+    padding-left: 1em;
+    border-left: 3px solid #ccc;
+}
+
+kbd {
+    background-color: #f7f7f7;
+    font-size: 14px;
+    margin: 0 .1em;
+    padding: .1em .6em;
+}
+
+.figure {
+    padding: 1em;
+}
+
+.figure p {
+    text-align: center;
+}
+
+.todo {
+    color: red;
+    font-family: monospace;
+}
+
+.done {
+    color: green;
+    font-family: monospace;
+}
+
+.priority {
+    color: orange;
+    font-family: monospace;
+}
+
+.tag {
+    background-color: #eee;
+    font-family: monospace;
+    font-size: 80%;
+    font-weight: normal;
+    padding: 2px;
+}
+
+.timestamp {
+    color: #bebebe;
+}
+
+.timestamp-kwd {
+    color: #5f9ea0;
+}
+
+.org-right {
+    margin-left: auto;
+    margin-right: 0px;
+    text-align: right;
+}
+
+.org-left {
+    margin-left: 0px;
+    margin-right: auto;
+    text-align: left;
+}
+
+.org-center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+#postamble p, #preamble p {
+    font-size: 90%;
+    margin: .2em;
+}
+
+p.verse {
+    margin-left: 3%;
+}
+
+pre {
     border: 1px solid #ccc;
     box-shadow: 3px 3px 3px #eee;
-    padding: 8pt;
     font-family: monospace;
-    overflow: auto;
     margin: 1.2em;
-  }
-  pre.src {
-    position: relative;
-    overflow: visible;
-    padding-top: 1.2em;
-  }
-  pre.src:before {
-    display: none;
-    position: absolute;
-    background-color: white;
-    top: -10px;
-    right: 10px;
-    padding: 3px;
-    border: 1px solid black;
-  }
-  pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
-  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+    padding: 8pt;
+}
 
-  table { border-collapse:collapse; }
-  td, th { vertical-align:top;  }
-  th.right  { text-align: center;  }
-  th.left   { text-align: center;   }
-  th.center { text-align: center; }
-  td.right  { text-align: right;  }
-  td.left   { text-align: left;   }
-  td.center { text-align: center; }
-  dt { font-weight: bold; }
-  .footpara:nth-child(2) { display: inline; }
-  .footpara { display: block; }
-  .footdef  { margin-bottom: 1em; }
-  .figure { padding: 1em; }
-  .figure p { text-align: center; }
-  .inlinetask {
-    padding: 10px;
+pre.src {
+    overflow: auto;
+    padding-top: 1.2em;
+    position: relative;
+    font-size: 90%;
+    color: #dcdccc;
+    background-color: #3f3f3f; 
+}
+
+pre.src:before {
+    background-color: gray;
+    border: 1px solid black;
+    display: none;
+    padding: 3px;
+    position: absolute;
+    right: 10px;
+    /* top: -10px; */
+}
+
+pre.src:hover:before {
+    display: inline;
+}
+
+pre.src-sh:before {
+    content: 'sh';
+}
+pre.src-bash:before {
+    content: 'bash';
+}
+pre.src-emacs-lisp:before {
+    content: 'Emacs Lisp';
+}
+pre.src-R:before {
+    content: 'R';
+}
+pre.src-python:before {
+    content: 'Python';
+}
+pre.src-org:before {
+    content: 'Org';
+}
+pre.src-c++:before {
+    content: 'C++';
+}
+pre.src-c:before {
+    content: 'C';
+}
+pre.src-html:before {
+    content: 'HTML'
+}
+
+caption.t-above {
+    caption-side: top;
+}
+
+caption.t-bottom {
+    caption-side: bottom;
+}
+
+th.org-right {
+    text-align: center;
+}
+
+th.org-left {
+    text-align: center;
+}
+
+th.org-center {
+    text-align: center;
+}
+
+td.org-right {
+    text-align: right;
+}
+
+td.org-left {
+    text-align: left;
+}
+
+td.org-center {
+    text-align: center;
+}
+
+dt {
+    font-weight: bold;
+}
+
+.inlinetask {
+    background: #ffffcc;
     border: 2px solid gray;
     margin: 10px;
-    background: #ffffcc;
-  }
-  #org-div-home-and-up
-   { text-align: right; font-size: 70%; white-space: nowrap; }
-  textarea { overflow-x: auto; }
-  .linenr { font-size: smaller }
-  .code-highlighted { background-color: #ffff00; }
-  .org-info-js_info-navigation { border-style: none; }
-  #org-info-js_console-label
-    { font-size: 10px; font-weight: bold; white-space: nowrap; }
-  .org-info-js_search-highlight
-    { background-color: #ffff00; color: #000000; font-weight: bold; }
-  /*]]>*/-->
+    padding: 10px;
+}
+
+#org-div-home-and-up {
+    font-size: 70%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.linenr {
+    font-size: smaller;
+}
+
+.code-highlighted {
+    background-color: #ffff00;
+}
+
+#bibliography {
+    font-size: 90%;
+}
+
+#bibliography table {
+    width: 100%;
+}
+
+/* .org-info-js_info-navigation { */
+/*     border-style: none; */
+/* } */
+/* #org-info-js_console-label { */
+/*     font-size: 10px; */
+/*     font-weight: bold; */
+/*     white-space: nowrap; */
+/* } */
+/* .org-info-js_search-highlight { */
+/*     background-color: #ffff00; */
+/*     color: #000000; */
+/*     font-weight: bold; */
+/* } */
+/*]]>*/-->
 </style>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -131,905 +420,627 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
-<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
-<!--/*--><![CDATA[/*><!--*/
-    MathJax.Hub.Config({
-        // Only one of the two following lines, depending on user settings
-        // First allows browser-native MathML display, second forces HTML/CSS
-        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
-            jax: ["input/TeX", "output/HTML-CSS"],
-        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
-                     "TeX/noUndefined.js"],
-        tex2jax: {
-            inlineMath: [ ["\\(","\\)"] ],
-            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
-            skipTags: ["script","noscript","style","textarea","pre","code"],
-            ignoreClass: "tex2jax_ignore",
-            processEscapes: false,
-            processEnvironments: true,
-            preview: "TeX"
-        },
-        showProcessingMessages: true,
-        displayAlign: "center",
-        displayIndent: "2em",
-
-        "HTML-CSS": {
-             scale: 100,
-             availableFonts: ["STIX","TeX"],
-             preferredFont: "TeX",
-             webFont: "TeX",
-             imageFont: "TeX",
-             showMathMenu: true,
-        },
-        MMLorHTML: {
-             prefer: {
-                 MSIE:    "MML",
-                 Firefox: "MML",
-                 Opera:   "HTML",
-                 other:   "HTML"
-             }
-        }
-    });
-/*]]>*///-->
-</script>
 </head>
 <body>
 <div id="content">
-<h1 class="title">luis-angel-ll</h1>
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#sec-1">1. Objetos LL</a>
-<ul>
-<li><a href="#sec-1-1">1.1. Encontrar lista completa de todos los objetos</a>
-<ul>
-<li><a href="#sec-1-1-1">1.1.1. Get the GO-9825 data</a></li>
-<li><a href="#sec-1-1-2">1.1.2. Tabla de objetos LL</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-2">1.2. Buscar objetos LL adicionales</a>
-<ul>
-<li><a href="#sec-1-2-1">1.2.1. An LL object in Carina</a></li>
-<li><a href="#sec-1-2-2">1.2.2. A new LL object: LL 261-3018!</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-3">1.3. Llenar datos faltantes en la tabla</a></li>
-<li><a href="#sec-1-4">1.4. Medir los radios R0 y R90 para los objetos LL</a></li>
-<li><a href="#sec-1-5">1.5. Comparar los LL que son proplyds con los que no son</a></li>
-<li><a href="#sec-1-6">1.6. Surface brightness measurements</a>
-<ul>
-<li><a href="#sec-1-6-1">1.6.1. Comparison of WFPC2 and ACS images</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> Objetos LL</h2>
-<div class="outline-text-2" id="text-1">
-</div>
-
-<div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Encontrar lista completa de todos los objetos</h3>
-<div class="outline-text-3" id="text-1-1">
+<h1 class="title">Sources with missing &Lambda; measurements</h1>
 <ul class="org-ul">
-<li>Hay varios artículos de Bally que listan estos objetos.  Sin embargo, no hay ninguna lista completa de todos publicado.  
-</li>
-
-<li>Algunos están en BOM2000 - ver figura 2. Son los objetos con designación que empieza con "w". Por ejemplo, w069-600
-</li>
-<li>Algunos otros están en BR2001 - ver figura 1.  Se llaman LL3, LL4, etc
-</li>
-<li>Algunos otros están en BLSW2006 - ver Tabla 2.  Los que se llaman LL4, LL5, etc son iguales a en BR2001, pero hay otros que se llaman algo como "LL 344-3020" y creo que son nuevos.
-</li>
-</ul>
-</div>
-<div id="outline-container-sec-1-1-1" class="outline-4">
-<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> <span class="todo TODO">TODO</span> Get the GO-9825 data</h4>
-<div class="outline-text-4" id="text-1-1-1">
-<ul class="org-ul">
-<li>GO 9825 (Cycle 12)  is a Bally program that covers much of Orion with ACS in just f658n
-<ul class="org-ul">
-<li>It is not quite as wide a field as the Robberto program, but almost
-</li>
-</ul>
-</li>
-<li>There is also GO 9460 (Cycle 11) which uses both f658n and f660n, and also f502n and f550m
-<ul class="org-ul">
-<li>The latter is useful since it passes only [N II]
-</li>
-<li>However, this is only 4 pointings:
+<li>Results of trying to find alatude for arcs</li>
+<li>Four squares show status:
 <ol class="org-ol">
-<li>HH 502 - this may cover some LL objects
-</li>
-<li>HH 505 - LL 2
-</li>
-<li>M43-West
-</li>
-<li>OMC-2
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-sec-1-1-2" class="outline-4">
-<h4 id="sec-1-1-2"><a id="ID-B35A749C-92D8-4A89-8821-A6A03CE75A4D" name="ID-B35A749C-92D8-4A89-8821-A6A03CE75A4D"></a><span class="section-number-4">1.1.2</span> Tabla de objetos LL</h4>
-<div class="outline-text-4" id="text-1-1-2">
-<p>
-Este viene de <a href="../Org/llobjects.html#ID-AA16BA5A-46A2-4D21-A453-972F273FB962">llobjects.org</a>
-</p>
-
-<table id="orion-ll-objects" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col class="left"/>
-
-<col class="left"/>
-
-<col class="left"/>
-
-<col class="right"/>
-
-<col class="right"/>
-
-<col class="left"/>
-
-<col class="right"/>
-
-<col class="right"/>
-
-<col class="right"/>
-
-<col class="left"/>
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="left">Bally name</th>
-<th scope="col" class="left">OW name</th>
-<th scope="col" class="left">Star</th>
-<th scope="col" class="right">RA</th>
-<th scope="col" class="right">Dec</th>
-<th scope="col" class="left">Ref</th>
-<th scope="col" class="right">PA</th>
-<th scope="col" class="right">D</th>
-<th scope="col" class="right">d<sub>s</sub></th>
-<th scope="col" class="left">Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="left">LL2</td>
-<td class="left">&#xa0;</td>
-<td class="left">IX Ori</td>
-<td class="right">5:34:40.8</td>
-<td class="right">-5:22:43</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">LL3</td>
-<td class="left">&#xa0;</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:40.8</td>
-<td class="right">-5:26:39</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">LL4</td>
-<td class="left">LL 4427-838</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:42.7</td>
-<td class="right">-5:28:38</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 4468-605</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:46.8</td>
-<td class="right">-5:26:05</td>
-<td class="left">BLSW06</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd - axial jet</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 4578-251</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:57.79</td>
-<td class="right">-5:22:51.1</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 4582-635</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:58.17</td>
-<td class="right">-5:26:35.1</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd - very faint</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w000-400</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:34:59.57</td>
-<td class="right">-5:24:00.4</td>
-<td class="left">BOM00</td>
-<td class="right">80</td>
-<td class="right">256</td>
-<td class="right">1.3</td>
-<td class="left">proplyd? 4596-400</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w005-514</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:00.49</td>
-<td class="right">-5:25:14.4</td>
-<td class="left">BOM00</td>
-<td class="right">65</td>
-<td class="right">264</td>
-<td class="right">1.6</td>
-<td class="left">proplyd <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup></td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w012-407</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:01.20</td>
-<td class="right">-5:24:07.0</td>
-<td class="left">BOM00</td>
-<td class="right">80</td>
-<td class="right">239</td>
-<td class="right">1.0</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w014-414</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:01.40</td>
-<td class="right">-5:24:13.8</td>
-<td class="left">BOM00</td>
-<td class="right">80</td>
-<td class="right">231</td>
-<td class="right">0.9</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 022-635</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:02.20</td>
-<td class="right">-5:26:35.3</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w030-524</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:03.02</td>
-<td class="right">-5:25:24.4</td>
-<td class="left">BOM00</td>
-<td class="right">80</td>
-<td class="right">239</td>
-<td class="right">0.5</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 041-637</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:04.05</td>
-<td class="right">-5:26:37.3</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 042-628</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:04.19</td>
-<td class="right">-5:26:27.7</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd 038-627</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w044-527</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:04.44</td>
-<td class="right">-5:25:27.4</td>
-<td class="left">BOM00</td>
-<td class="right">70</td>
-<td class="right">219</td>
-<td class="right">2.1</td>
-<td class="left"><sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup></td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 049-143</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:04.95</td>
-<td class="right">-5:21:42.9</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 051-024</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:05.13</td>
-<td class="right">-5:20:24.3</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd</td>
-</tr>
-
-<tr>
-<td class="left">LL1</td>
-<td class="left">w056-519</td>
-<td class="left">LL Ori</td>
-<td class="right">5:35:05.64</td>
-<td class="right">-5:25:19.4</td>
-<td class="left">BR01, BOM00</td>
-<td class="right">70</td>
-<td class="right">200</td>
-<td class="right">3.2</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w069-601</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:06.91</td>
-<td class="right">-5:26:00.6</td>
-<td class="left">BOM00</td>
-<td class="right">70</td>
-<td class="right">213</td>
-<td class="right">0.8</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 072-134</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:07.20</td>
-<td class="right">-5:21:34.3</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd - thin shell</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w073-227</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:07.27</td>
-<td class="right">-5:22:26.6</td>
-<td class="left">BOM00</td>
-<td class="right">105</td>
-<td class="right">150</td>
-<td class="right">2.0</td>
-<td class="left">proplyd <sup><a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a></sup></td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 102-157</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:10.18</td>
-<td class="right">-5:21:56.7</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">very faint</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 101-233</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:10.14</td>
-<td class="right">-5:22:32.6</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LLP 116-3101</td>
-<td class="left">V488 Ori</td>
-<td class="right">5:35:11.6</td>
-<td class="right">-5:31:01</td>
-<td class="left">BLSW06</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 136-3057</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:13.60</td>
-<td class="right">-5:30:57.4</td>
-<td class="left">WJH</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">faint XX</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 261-3018</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:26.1</td>
-<td class="right">-5:30:18</td>
-<td class="left">WJH (BLSW06)</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">w266-558</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:26.62</td>
-<td class="right">-5:25:58.4</td>
-<td class="left">BOM00</td>
-<td class="right">315</td>
-<td class="right">218</td>
-<td class="right">1.9</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 305-811</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:30.5</td>
-<td class="right">-5:28:11</td>
-<td class="left">BLSW06</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 308-3036</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:30.8</td>
-<td class="right">-5:30:36</td>
-<td class="left">BLSW06</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">LL5</td>
-<td class="left">LLP 315-816</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:31.5</td>
-<td class="right">-5:28:16</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd 314-816</td>
-</tr>
-
-<tr>
-<td class="left">LL6</td>
-<td class="left">LL 329-3021</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:32.85</td>
-<td class="right">-5:30:21.6</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">&#xa0;</td>
-<td class="left">LL 344-3020</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:34.4</td>
-<td class="right">-5:30:20</td>
-<td class="left">BLSW06</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="left">LL7</td>
-<td class="left">LL 351-3349</td>
-<td class="left">&#xa0;</td>
-<td class="right">5:35:35.1</td>
-<td class="right">-5:33:49</td>
-<td class="left">BR01</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="right">&#xa0;</td>
-<td class="left">proplyd <sup><a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a></sup></td>
-</tr>
-</tbody>
-</table>
-
-
-
+<li>Filled if &Lambda;<sub>out</sub> on at least one side</li>
+<li>Filled if &Lambda;<sub>out</sub> on both sides</li>
+<li>Filled if &Lambda;<sub>in</sub> on at least one side</li>
+<li>Filled if &Lambda;<sub>in</sub> on both sides</li>
+</ol></li>
+<li>Sources where the folder is blank don't have any planitude measurements either
 <ul class="org-ul">
-<li>I don't believe those position angles
-</li>
-</ul>
-</div>
-
-
-
-<ol class="org-ol"><li>Notes to LL object table<br/><div class="outline-text-5" id="text-1-1-2-1">
-</div>
-</li>
-
-<li>Map of the LL objects<br/><div class="outline-text-5" id="text-1-1-2-2">
-<div class="org-src-container">
-
-<pre class="src src-python"><span style="color: #b9d3ee; font-weight: bold;">import</span> astropysics
-<span style="color: #b9d3ee; font-weight: bold;">from</span> astropysics <span style="color: #b9d3ee; font-weight: bold;">import</span> coords
-<span style="color: #b9d3ee; font-weight: bold;">import</span> numpy <span style="color: #b9d3ee; font-weight: bold;">as</span> np
-<span style="color: #b9d3ee; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #b9d3ee; font-weight: bold;">as</span> plt
-
-<span style="color: #dfaf8f;">names</span>, <span style="color: #dfaf8f;">RAs</span>, <span style="color: #dfaf8f;">Decs</span> = <span style="color: #DCDCCC; font-weight: bold;">list</span>(), <span style="color: #DCDCCC; font-weight: bold;">list</span>(), <span style="color: #DCDCCC; font-weight: bold;">list</span>()
-<span style="color: #b9d3ee; font-weight: bold;">for</span> bname, oname, sname, RA, Dec, Ref, PA, D, d_s, Notes <span style="color: #b9d3ee; font-weight: bold;">in</span> table:
-<span style="color: #7f7f7f; background-color: #484848;"> </span>   names.append(bname <span style="color: #b9d3ee; font-weight: bold;">or</span> oname <span style="color: #b9d3ee; font-weight: bold;">or</span> sname)
-<span style="color: #7f7f7f; background-color: #484848;"> </span>   RAs.append(RA)
-<span style="color: #7f7f7f; background-color: #484848;"> </span>   Decs.append(Dec)
-
-[x0], [y0] = coords.radec_str_to_decimal([<span style="color: #eee8aa; font-style: italic;">"05:35:16.463"</span>], [<span style="color: #eee8aa; font-style: italic;">"-05:23:23.18"</span>])
-<span style="color: #dfaf8f;">x</span>, <span style="color: #dfaf8f;">y</span> = coords.radec_str_to_decimal(RAs, Decs) 
-<span style="color: #dfaf8f;">x</span> = -(x - x0)*3600.0
-<span style="color: #dfaf8f;">y</span> = (y - y0)*3600.0
-plt.plot(x, y, <span style="color: #eee8aa; font-style: italic;">"."</span>)
-<span style="color: #b9d3ee; font-weight: bold;">for</span> label, xx, yy <span style="color: #b9d3ee; font-weight: bold;">in</span> <span style="color: #DCDCCC; font-weight: bold;">zip</span>(names, x, y):
-<span style="color: #7f7f7f; background-color: #484848;"> </span>   plt.annotate(label, (xx, yy), size=<span style="color: #eee8aa; font-style: italic;">"xx-small"</span>, xytext=(-2,2), textcoords=<span style="color: #eee8aa; font-style: italic;">'offset points'</span>, ha=<span style="color: #eee8aa; font-style: italic;">'right'</span>, va=<span style="color: #eee8aa; font-style: italic;">'bottom'</span>,)
-plt.xlabel(<span style="color: #eee8aa; font-style: italic;">"RA offset, arcsec"</span>)
-plt.ylabel(<span style="color: #eee8aa; font-style: italic;">"Dec offset, arcsec"</span>)
-plt.title(<span style="color: #eee8aa; font-style: italic;">"Positions of LL objects in the Orion Nebula"</span>)
-plt.axis(<span style="color: #eee8aa; font-style: italic;">"equal"</span>)
-plt.grid()
-plt.gcf().set_size_inches( (20, 20) )
-<span style="color: #dfaf8f;">figname</span> = <span style="color: #eee8aa; font-style: italic;">"ll-positions.pdf"</span>
-plt.savefig(figname)
-<span style="color: #b9d3ee; font-weight: bold;">return</span> figname
-</pre>
-</div>
-</div>
-</li></ol>
-</div>
-</div>
-
-<div id="outline-container-sec-1-2" class="outline-3">
-<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Buscar objetos LL adicionales</h3>
-<div class="outline-text-3" id="text-1-2">
-<p>
-El mosaico de Robberto cubre una área mayor que las observaciones de BR2001.  Es posible que hay más objetos para descubrir. 
-</p>
-</div>
-
-<div id="outline-container-sec-1-2-1" class="outline-4">
-<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> An LL object in Carina</h4>
-<div class="outline-text-4" id="text-1-2-1">
+<li>In many cases, this is due to insufficient points in arc</li>
+</ul></li>
+<li>Some sources seem to have changed since the <code>*-images.pdf</code> was generated
 <ul class="org-ul">
-<li>\cite{Smith:2010} find a object in the Carina Nebula (HH 1012) that looks identical to the LL objects.  See their Fig 14.
-</li>
-<li>There is also the object HHc-9 (see their Fig 24), which they say is a jet bowshock, but it looks to me like it might be a LL bow too.  However, there is no central star to be seen, which is rather odd. 
-</li>
-</ul>
-
-
-<div class="org-src-container">
-
-<pre class="src src-bibtex"><span style="color: #87cefa; font-weight: bold;">@article</span>{<span style="color: #BFEBBF;">Smith:2010</span>,
-  <span style="color: #dfaf8f;">Abstract</span> =     {We report the discovery of new Herbig-Haro (HH) jets
-                  in the Carina Nebula, and we discuss the
-                  protostellar outflow activity of a young OB
-                  association. These are the first results of an
-                  Halpha imaging survey of Carina conducted with the
-                  Hubble Space Telescope (HST)/Advanced Camera for
-                  Surveys. Adding to the one previously known example
-                  (HH 666), we detect 21 new HH jets, plus 17 new
-                  candidate jets, ranging in length from 0.005 to
-                  3pc. Using the Halpha emission measure to estimate
-                  jet densities, we derive jet mass-loss rates ranging
-                  from 8 &#215; 10-9 to ~10-6Msolaryr-1, but a comparison
-                  to the distribution of jet mass-loss rates in Orion
-                  suggests that we may be missing a large fraction of
-                  the jets below 10-8Msolaryr-1. A key qualitative
-                  result is that even some of the smallest dark
-                  globules with sizes of &lt;~1 arcsec (0.01pc) are
-                  active sites of ongoing star formation because we
-                  see HH jets emerging from them, and that these offer
-                  potential analogues to the cradle of our Solar
-                  system because of their proximity to dozens of
-                  imminent supernovae that will enrich them with
-                  radioactive nuclides like 60Fe. Although most
-                  proplyd candidates identified from ground-based data
-                  are dark cometary globules, HST images now reveal
-                  proplyd structures in the core of the Tr 14 cluster,
-                  only 0.1-0.2 pc from several extreme O-type
-                  stars. Throughout Carina, some HH jets have axes
-                  bent away from nearby massive stars, while others
-                  show no bend, and still others are bent toward the
-                  massive stars. These jet morphologies serve as `wind
-                  socks' strong photoevaporative flows can shape the
-                  jets, competing with the direct winds and radiation
-                  from massive stars. We find no clear tendency for
-                  jets to be aligned perpendicular to the axes of dust
-                  pillars. Finally, even allowing for a large number
-                  of jets that may escape detection, we find that HH
-                  jets are negligible to the global turbulence of the
-                  surrounding region, which is driven by massive star
-                  feedback.  Based on observations made with the
-                  NASA/ESA Hubble Space Telescope, obtained at the
-                  Space Telescope Science Institute, which is operated
-                  by the Association of Universities for Research in
-                  Astronomy, Inc., under NASA contract NAS5-26555.
-                  E-mail: nathans@astro.berkeley.edu},
-  <span style="color: #dfaf8f;">Adsnote</span> =      {Provided by the SAO/NASA Astrophysics Data System},
-  <span style="color: #dfaf8f;">Adsurl</span> =       {http://adsabs.harvard.edu/abs/2010MNRAS.405.1153S},
-  <span style="color: #dfaf8f;">Archiveprefix</span> ={arXiv},
-  <span style="color: #dfaf8f;">Author</span> =       {{Smith}, N. and {Bally}, J. and {Walborn}, N.~R.},
-  <span style="color: #dfaf8f;">Date-Added</span> =   {2012-02-28 03:16:39 +0000},
-  <span style="color: #dfaf8f;">Date-Modified</span> ={2012-02-28 03:16:39 +0000},
-  <span style="color: #dfaf8f;">Doi</span> =          {10.1111/j.1365-2966.2010.16520.x},
-  <span style="color: #dfaf8f;">Eprint</span> =       {1002.4898},
-  <span style="color: #dfaf8f;">Journal</span> =      {\mnras},
-  <span style="color: #dfaf8f;">Keywords</span> =     {stars: formation, stars: pre-main-sequence, ISM:
-                  Herbig-Haro objects, ISM: individual: NGC 3372, ISM:
-                  individual: NGC 3324, ISM: jets and outflows},
-  <span style="color: #dfaf8f;">Month</span> =        jun,
-  <span style="color: #dfaf8f;">Pages</span> =        {1153-1186},
-  <span style="color: #dfaf8f;">Primaryclass</span> = {astro-ph.SR},
-  <span style="color: #dfaf8f;">Title</span> =        {{HST/ACS H{<span style="color: #eee8aa; font-style: italic;">$\alpha$</span>} imaging of the Carina Nebula:
-                  outflow activity traced by irradiated Herbig-Haro
-                  Jets}},
-  <span style="color: #dfaf8f;">Volume</span> =       405,
-  <span style="color: #dfaf8f;">Year</span> =         2010,
-  <span style="color: #dfaf8f;">Bdsk-Url-1</span> =   {http://dx.doi.org/10.1111/j.1365-2966.2010.16520.x}
-}
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-1-2-2" class="outline-4">
-<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> A new LL object: LL 261-3018!</h4>
-<div class="outline-text-4" id="text-1-2-2">
+<li>For instance, LL4 has much fewer points in the outer arc, and so no longer reaches &plusmn;90 deg</li>
+<li>Presumably, we removed them for what seemed like a good reason - possibly the thought that the arc wings are affected by the jet</li>
+</ul></li>
+<li class="off"><code>[&#xa0;]</code> Other region files for arc shapes
 <ul class="org-ul">
-<li>I just found a new object while looking at the Bally 2006 paper!
+<li><a href="file:///Users/will/Work/Bowshocks/Jorge/bowshock-shape/LL-shapes-2017/">bowshock-shape/LL-shapes-2017/</a> from Paper IV of the main bow shock project
 <ul class="org-ul">
-<li>It is along the southern side of the HH 502 jet
+<li>I ended up using the ridge of the arc (brightness maximum), instead of inner or outer boundary</li>
+<li>These are files like <code>new-LL4-ridge.reg</code>, which have a lot of points</li>
+</ul></li>
+<li>Fits to infrared images of LV arcs in <a href="../../tmp/bowshock-shape/MIR-shapes/mir-proplyd-shapes.html#ID-150F249D-1943-457D-AEC6-2A9189EF5160">Second opinion on proplyd shapes</a>
 <ul class="org-ul">
-<li>Same RA as knot S6 (boxes 18, 19): 05 35 26.1
-</li>
-<li>Nearly same Dec as knot S5 (box 17): say -05 30 18
-</li>
+<li>We should maybe use some of these, since we manage to get alatude for LV1, LV3, and LV4</li>
+<li>LV5, as traced, does not get to 90 deg, but looking at the image it seems that the arc can be traced further</li>
+<li>These all use the ridge method, since the MIR resolution is not good enough to clearly see the inner and outer boundaries</li>
+</ul></li>
+</ul></li>
 </ul>
-</li>
-</ul>
-</li>
 
-<li>I thought I had found another one too, but it is already catalogued as 308-3036, just to W of LL6
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-1-3" class="outline-3">
-<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Llenar datos faltantes en la tabla</h3>
-</div>
-
-<div id="outline-container-sec-1-4" class="outline-3">
-<h3 id="sec-1-4"><span class="section-number-3">1.4</span> Medir los radios R0 y R90 para los objetos LL</h3>
-</div>
-
-<div id="outline-container-sec-1-5" class="outline-3">
-<h3 id="sec-1-5"><span class="section-number-3">1.5</span> Comparar los LL que son proplyds con los que no son</h3>
-</div>
-
-<div id="outline-container-sec-1-6" class="outline-3">
-<h3 id="sec-1-6"><span class="section-number-3">1.6</span> Surface brightness measurements</h3>
-<div class="outline-text-3" id="text-1-6">
-</div><div id="outline-container-sec-1-6-1" class="outline-4">
-<h4 id="sec-1-6-1"><span class="section-number-4">1.6.1</span> Comparison of WFPC2 and ACS images</h4>
-<div class="outline-text-4" id="text-1-6-1">
-<ul class="org-ul">
-<li>WFPC2 has f656n (H alpha) and f658n ([N II]) which have small contaminations from the other line
-</li>
-<li>ACS has f658n (H alpha + [N II]) which passes both lines
-</li>
-</ul>
-</div>
-<ol class="org-ol"><li>Example measurements of object at 5:34:57.780 -5:22:51.21<br/><div class="outline-text-5" id="text-1-6-1-1">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
-<col class="left"/>
+<col  class="org-right" />
 
-<col class="left"/>
+<col  class="org-left" />
 
-<col class="left"/>
+<col  class="org-left" />
 
-<col class="left"/>
+<col  class="org-left" />
 
-<col class="left"/>
+<col  class="org-left" />
 </colgroup>
 <thead>
 <tr>
-<th scope="col" class="left">Filter</th>
-<th scope="col" class="left">Shell</th>
-<th scope="col" class="left">Neb</th>
-<th scope="col" class="left">(Shell - Neb)/Neb</th>
-<th scope="col" class="left">S(Ha) [Shell - Neb]</th>
+<th scope="col" class="org-right">Object</th>
+<th scope="col" class="org-left">Group</th>
+<th scope="col" class="org-left">Folder</th>
+<th scope="col" class="org-left">2020-08-11</th>
+<th scope="col" class="org-left">2020-08-18</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="left">ACS f658n</td>
-<td class="left">3.0956 +/- 0.0260</td>
-<td class="left">2.9091 +/- 0.0169</td>
-<td class="left">0.064 +/- 0.011</td>
-<td class="left">&#xa0;</td>
+<td class="org-right">022-635</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
 </tr>
 
 <tr>
-<td class="left">WFPC2 f656n</td>
-<td class="left">0.0377 +/- 0.0005</td>
-<td class="left">0.0356 +/- 0.0005</td>
-<td class="left">0.059 +/- 0.020</td>
-<td class="left">1.26e7 +/- 4.23e6</td>
+<td class="org-right">041-637</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">042-628</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">049-143</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc09010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">051-024</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc09010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">066-3251</td>
+<td class="org-left">S</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">072-134</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc09010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">074-229</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">101-233</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">102-157</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">106-245</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">109-246</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">116-3101</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc14010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">119-3155</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc14010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">124-131</td>
+<td class="org-left">NW</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">136-3057</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc14010_wcs</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">138-3024</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc14010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">142-301</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">154-225</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">154-240</td>
+<td class="org-left">N</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">158-323</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">159-221</td>
+<td class="org-left">N</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">161-324</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">163-222</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">163-317</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">165-235</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">166-316</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">167-317</td>
+<td class="org-left">LV</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">168-326</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">168-328</td>
+<td class="org-left">LV</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">169-338</td>
+<td class="org-left">SE</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">170-249</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">177-341</td>
+<td class="org-left">SE</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">178-258</td>
+<td class="org-left">N</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">180-331</td>
+<td class="org-left">SE</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">189-329</td>
+<td class="org-left">SE</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">203-3039</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc14010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">206-043</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc02010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">261-3018</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc07010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">305-811</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc07010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">308-3036</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc08010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">344-3020</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc08010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">362-3137</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc08010_wcs</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+<td class="org-left">⬜⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4285-458</td>
+<td class="org-left">W</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4417-653</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">4468-605</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4491-627</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4505-336</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4520-419</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4531-628</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4550-659</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4578-251</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc09010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">4582-635</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc16010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">LL1</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">LL2</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc18010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">LL3</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc17010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">LL4</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc24010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">LL5</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc07010_wcs</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">LL6</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc08010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">LL7</td>
+<td class="org-left">S</td>
+<td class="org-left">wfpc2_64_f656n</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬛⬛⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w000-400</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc09010_wcs</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+<td class="org-left">⬛⬛⬛⬛</td>
+</tr>
+
+<tr>
+<td class="org-right">w005-514</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w012-407</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w014-414</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w030-524</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬛⬜⬜</td>
+<td class="org-left">⬛⬛⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w044-527</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+<td class="org-left">⬜⬜⬜⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w069-601</td>
+<td class="org-left">W</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w073-227</td>
+<td class="org-left">NW</td>
+<td class="org-left">j8oc01010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬛⬜</td>
+</tr>
+
+<tr>
+<td class="org-right">w266-558</td>
+<td class="org-left">S</td>
+<td class="org-left">j8oc06010_wcs</td>
+<td class="org-left">⬛⬜⬜⬜</td>
+<td class="org-left">⬛⬜⬜⬜</td>
 </tr>
 </tbody>
 </table>
-
-<ul class="org-ul">
-<li>From O'Dell &amp; Doi (1999), leading order calibration of WFPC2 f656n is <code>S(Ha) = CPS/1.67e-10</code> where <code>S(Ha)</code> is surface brightness in units of photons/cm<sup>2</sup>/s/sr and <code>CPS</code> is counts per second in the filter image.
-</li>
-<li>=&gt; S(Ha) = 1.26e7 +/- 4.23e6
-</li>
-<li>Measurements of shell radius and thickness
-<ul class="org-ul">
-<li>Radius of curvature: R = 2 arcsec (very approximately)
-</li>
-<li>Thickness: h = 0.6 arcsec
-</li>
-<li>Path length: Delta l = 2 sqrt(R h) = (2.2 +/- 0.5) arcsec
-</li>
-</ul>
-</li>
-<li>Also we have n = sqrt(4 pi S / alpha Delta l)
-<ul class="org-ul">
-<li>where alpha = 1.27e-13 cm<sup>3</sup>/s
-</li>
-<li>n = sqrt((1.26e7 +/- 4.23e6) 4 pi / 1.27e-13 (2.2 +/- 0.5) 440 1.49597870691e13)
-</li>
-<li>=&gt; n = 300 +/- 60 cm<sup>-3</sup>
-</li>
-</ul>
-</li>
-</ul>
 </div>
-</li></ol>
-</div>
-</div>
-</div>
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
-
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
-Looks like a proplyd. Bowshock is less open, as expected.
-</p></div>
-
-<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
-Just behind LL Ori
-</p></div>
-
-<div class="footdef"><sup><a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
-Also looks like a proplyd. Position NW of Trapezium
-</p></div>
-
-<div class="footdef"><sup><a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara">
-A very large bow
-</p></div>
-
-
-</div>
-</div></div>
 <div id="postamble" class="status">
 <p class="author">Author: William Henney</p>
-<p class="date">Created: 2013-08-22 Thu 13:25</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.7)</p>
-<p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
+<p class="date">Created: 2020-08-19 Wed 00:22</p>
+<p class="creator">Emacs 24.3.1 (Org mode 8.0.7)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
 </html>

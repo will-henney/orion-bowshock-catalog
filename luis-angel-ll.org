@@ -4991,7 +4991,7 @@ w266-558 [PosixPath('j8oc06010_wcs/w266-558-inner-60.json'), PosixPath('j8oc0601
   + [[file:~/Work/Bowshocks/Jorge/bowshock-shape/LL-shapes-2017/][bowshock-shape/LL-shapes-2017/]] from Paper IV of the main bow shock project
     + I ended up using the ridge of the arc (brightness maximum), instead of inner or outer boundary
     + These are files like ~new-LL4-ridge.reg~, which have a lot of points
-  + Fits to infrared images of LV arcs in [[id:00D55CC8-DE20-4A18-8718-633BEA319A52][Second opinion on proplyd shapes]]
+  + Fits to infrared images of LV arcs in [[id:150F249D-1943-457D-AEC6-2A9189EF5160][Second opinion on proplyd shapes]]
     + We should maybe use some of these, since we manage to get alatude for LV1, LV3, and LV4
     + LV5, as traced, does not get to 90 deg, but looking at the image it seems that the arc can be traced further
     + These all use the ridge method, since the MIR resolution is not good enough to clearly see the inner and outer boundaries
