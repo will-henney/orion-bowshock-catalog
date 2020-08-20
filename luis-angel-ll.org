@@ -4823,7 +4823,9 @@ CLOSED: [2020-08-06 Thu 23:39]
     + [[file:all-sources-new-Pi_out-Lambda_out.pdf]]
     + [[file:all-sources-new-Pi_in-Lambda_in.pdf]]
   + These eliminate the big clump of points in the oblate spheroid region
-  + But they also have much fewer points 
+  + But they also have much fewer points
++ [2020-08-19 Wed] It turns out that the inner and outer arcs are indistinguishable statistically, so it makes sense to merge all the measurements:
+  + [[file:all-sources-merge-Pi-Lambda.pdf]]
 
 #+begin_src python :eval no :tangle apply-circle-fit/collate-results-circle-fit.py
   import sys
