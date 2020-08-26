@@ -16,7 +16,7 @@ point(5:34:57.889,-5:22:49.51) # point=x color=red width=2 tag={4578-251 outer}
 point(5:34:57.828,-5:22:48.78) # point=x color=red width=2 tag={4578-251 outer}
 circle(5:34:57.791,-5:22:51.06,0.961909") # color=white text={Diffraction Ring?} dash=1
 # projection(5:34:57.630,-5:22:47.58,5:34:57.630,-5:22:47.58,0")
-point(5:34:57.875,-5:22:50.49) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.842,-5:22:50.10) # point=cross color=red width=2 tag={4578-251 inner}
 point(5:34:57.793,-5:22:51.10) # point=circle
 point(5:34:57.852,-5:22:51.90) # point=cross color=red width=2 tag={4578-251 inner}
 point(5:34:57.870,-5:22:51.51) # point=cross color=red width=2 tag={4578-251 inner}
@@ -33,3 +33,24 @@ point(5:34:57.828,-5:22:48.78) # point=x color=red width=2 tag={4578-251 outer}
 circle(5:34:57.791,-5:22:51.06,0.961909") # color=white text={Diffraction Ring?} dash=1
 # projection(5:34:57.630,-5:22:47.58,5:34:57.630,-5:22:47.58,0")
 point(5:34:57.875,-5:22:50.49) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.865,-5:22:49.11) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.913,-5:22:50.07) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.918,-5:22:51.28) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.917,-5:22:51.67) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.907,-5:22:52.70) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.896,-5:22:53.14) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.843,-5:22:54.12) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.766,-5:22:55.06) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.697,-5:22:55.84) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.789,-5:22:48.54) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.755,-5:22:48.37) # point=x color=red width=2 tag={4578-251 outer}
+point(5:34:57.859,-5:22:50.28) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.824,-5:22:49.95) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.804,-5:22:49.86) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.788,-5:22:49.85) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.772,-5:22:49.84) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.756,-5:22:49.88) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.789,-5:22:52.98) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.763,-5:22:53.28) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.736,-5:22:53.56) # point=cross color=red width=2 tag={4578-251 inner}
+point(5:34:57.708,-5:22:53.79) # point=cross color=red width=2 tag={4578-251 inner}

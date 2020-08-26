@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.3.3
+#       jupytext_version: 1.5.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -19,7 +19,7 @@ import numpy as np
 
 datadir = Path("../luis-programas")
 
-tab = Table.read(datadir / "arcs-summary-merge.fits")
+tab = Table.read(datadir / "arcs-summary-merge.ecsv")
 
 tab.show_in_notebook()
 
@@ -35,7 +35,7 @@ t2[0]
 
 tab[0]
 
-# So it looks like `ascii.ecsv` is the best format for saving and loading tabular data. 
+# So it looks like `ascii.ecsv` is the best format for saving and loading tabular data.
 #
 # * The other ascii formats are too fragile, especially if there are missing values
 # * FITS Table would work, but has the disadvantage that files are not human-readable, and also the string columns end up being `bytes`, not real strings

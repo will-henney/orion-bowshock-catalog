@@ -3,9 +3,9 @@
     "region file": "j8oc02010_wcs/206-043-forma.reg",
     "FITS file": "j8oc02010_wcs/206-043-Bally_02-extract.fits",
     "d theta": 75,
-    "Pi": 1.3268650420590142,
+    "Pi": 1.354351285190644,
     "Lambda": NaN,
     "d Lambda": NaN,
-    "R0": 32.95032049685545,
-    "axis angle": -127.08625161895772
+    "R0": 33.598475529802705,
+    "axis angle": -131.96841324476208
 }

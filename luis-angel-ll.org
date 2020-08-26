@@ -4794,11 +4794,12 @@ CLOSED: [2020-08-06 Thu 23:39]
                   continue
 #+end_src
 
-#+begin_src sh :results verbatim
+#+begin_src sh :results verbatim :eval no
   PYTHONPATH=. python apply-circle-fit/all-sources-circle-fit.py
 #+end_src
 
-#+RESULTS:
+*This should be run in a terminal* 
+
 
 *** TODO Collate the results of circle_fit
 
