@@ -55,3 +55,4 @@
 /j8oc16010_wcs/*.pdf
 /j8oc17010_wcs/*.fits
 /j8oc17010_wcs/*.pdf
+!*.afdesign

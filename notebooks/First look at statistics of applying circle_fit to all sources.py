@@ -736,6 +736,6 @@ sn.despine()
 #
 # Conponent 0, which is the main diagonal ridge, is dominated by the W group.
 
-# Token change to test jupytext
+# Token change to test jupytext.
 
 
