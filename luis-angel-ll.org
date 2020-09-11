@@ -4887,6 +4887,9 @@ CLOSED: [2020-08-06 Thu 23:39]
   + But they also have much fewer points
 + [2020-08-19 Wed] It turns out that the inner and outer arcs are indistinguishable statistically, so it makes sense to merge all the measurements:
   + [[file:all-sources-merge-Pi-Lambda.pdf]]
++ [2020-09-11 Fri] Now added the mid-IR arcs for the LV knots
+  + There are only 5 of them - LV 1, 2, 3, 4, 5
+  + They all use the ridge method
 
 #+begin_src python :eval no :tangle apply-circle-fit/collate-results-circle-fit.py
   import sys

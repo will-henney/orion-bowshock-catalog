@@ -3,9 +3,9 @@
     "region file": "j8oc06010_wcs/w266-558-forma.reg",
     "FITS file": "j8oc06010_wcs/w266-558-Bally_06-extract.fits",
     "d theta": 75,
-    "Pi": 1.3247327924073296,
-    "Lambda": NaN,
+    "Pi": 1.4879221160853022,
+    "Lambda": 2.0263389108326697,
     "d Lambda": NaN,
-    "R0": 22.733958573821603,
-    "axis angle": 82.5366125103532
+    "R0": 22.442643752145727,
+    "axis angle": 79.83169625710782
 }
