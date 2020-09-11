@@ -1,6 +1,9 @@
 *
 !notebooks
 !notebooks/*.py
+# Now we ADD the ipynb files, so that pre-commit can manage them
+# Note that they never get commited
+!notebooks/*.ipynb
 !circle_fit
 !j8oc01010_wcs
 !j8oc02010_wcs
