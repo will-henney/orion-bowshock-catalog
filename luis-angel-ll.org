@@ -1095,7 +1095,7 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
 
 ** New images of each group
 :PROPERTIES:
-:dir:      /Users/will/Work/OrionTreasury/acs
+:header-args:      :dir /Users/will/Work/OrionTreasury/acs
 :ID:       171A91D5-C0D6-4411-9DB2-C1AB76D18E61
 :END:
 
@@ -1117,7 +1117,7 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
   def main(field: "Robberto field of view"="0l",
            band: "ACS filter"="f658n",
            width: "Width of Gaussian smoothing kernel in pixels"=20,
-           bbox: "Subimage to use: 'i1 j1 i2 j2'"='13000 5000 14000 6000',
+           bbox: "Subimage to use: 'i1 j1 i2 j2', or use 'full' for entire image"='full',
            suffix: "Extra id string to add to output filename"="",
            twopass: "Whether to do a second pass for eliminating negative halos"=False,
            threshold: "Mask out relative brightnesses higher than this in second pass"=1.5,
@@ -1126,17 +1126,21 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
       infile = template.format(field, band)
       hdu = fits.open(infile)['SCI']
 
-      i1, j1, i2, j2 = [int(s) for s in bbox.split()]
-      im = hdu.data[j1:j2, i1:i2]
+      if "full" in bbox.lower():
+          im = hdu.data
+      else:
+          i1, j1, i2, j2 = [int(s) for s in bbox.split()]
+          im = hdu.data[j1:j2, i1:i2]
+
       gauss_kernel = Gaussian2DKernel(width)
-      smoothim = convolve_fft(im, gauss_kernel)
+      smoothim = convolve_fft(im, gauss_kernel, allow_huge=True)
       sharpim = im/smoothim
 
       if twopass:
           mask = (sharpim > threshold) | (im == 0.0)
           im[mask] = np.nan
           print('Starting second pass: N(masked) =', mask.sum())
-          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, interpolate_nan=True)
+          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, allow_huge=True)
           sharpim = im/smoothim
 
       outhdu = fits.PrimaryHDU(data=smoothim, header=hdu.header)
@@ -1144,22 +1148,59 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
       outhdu.header['CRPIX2'] -= j1
 
       outfile = infile.replace("_v1_drz.fits", "_smooth_{}{}.fits".format(width, suffix))
-      outhdu.writeto(outfile, clobber=True)
+      outhdu.writeto(outfile, overwrite=True)
 
       outhdu.data = sharpim
       outfile = outfile.replace("_smooth_", "_sharp_")
-      outhdu.writeto(outfile, clobber=True)
+      outhdu.writeto(outfile, overwrite=True)
 
   if __name__ == "__main__":
       argh.dispatch_command(main)
 
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :results verbatim
 python smooth-image.py --help
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+usage: smooth-image.py [-h] [-f FIELD] [--band BAND] [-w WIDTH] [--bbox BBOX]
+                       [-s SUFFIX] [--twopass] [--threshold THRESHOLD]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FIELD, --field FIELD
+                        Robberto field of view (default: '0l')
+  --band BAND           ACS filter (default: 'f658n')
+  -w WIDTH, --width WIDTH
+                        Width of Gaussian smoothing kernel in pixels (default:
+                        20)
+  --bbox BBOX           Subimage to use: 'i1 j1 i2 j2', or use 'full' for
+                        entire image (default: 'full')
+  -s SUFFIX, --suffix SUFFIX
+                        Extra id string to add to output filename (default:
+                        '')
+  --twopass             Whether to do a second pass for eliminating negative
+                        halos (default: False)
+  --threshold THRESHOLD
+                        Mask out relative brightnesses higher than this in
+                        second pass (default: 1.5)
+#+end_example
+
+
+
+*** S group
+Try out with small section around LL 7
+
+#+BEGIN_SRC sh 
+BGTASK='parallel --files --id hipass -j 1'
+$BGTASK python smooth-image.py --width 100 --bbox \'1500 600 8500 3600\' --band f658n --field 7l --twopass --suffix full #> /dev/null
+#+END_SRC
+
+#+RESULTS:
+: /var/folders/sv/41w0vxds13d20rvl07t_1x2w0000gn/T/parsqfMT.par
+
 
 
 *** SW group
@@ -1212,6 +1253,7 @@ $BGTASK python smooth-image.py --width 100 --bbox \'9100 1800 14500 4600\' --ban
 #+END_SRC
 
 #+RESULTS:
+
 
 
 * Three dimensional structure
@@ -4753,42 +4795,60 @@ CLOSED: [2020-08-06 Thu 23:39]
   import pandas as pd
 
   df = Table.read(
-      "luis-programas/arcs-summary-classify.ecsv",
-      format="ascii.ecsv").to_pandas()
+      "luis-programas/arcs-summary-classify.ecsv", format="ascii.ecsv"
+  ).to_pandas()
   qstring = "~((Group == '*P') | (Group == '*I'))"
   arcdata_paths = sorted(Path().rglob("*-arcdata.json"))
 
   circle_fit.PT_STAR = "o"
 
+  lv_mir = {
+      "168-326": "lv1",
+      "167-317": "lv2",
+      "163-317": "lv3",
+      "161-324": "lv4",
+      "158-323": "lv5",
+  }
+
   for arcdata_path in arcdata_paths:
       arcdata_file = arcdata_path.name
       source_dir = arcdata_path.parent
       source_id = arcdata_file.replace("-arcdata.json", "")
-      region_path = source_dir / f"{source_id}-forma.reg"
       fits_paths = sorted(source_dir.glob(f"{source_id}-*-extract.fits"))
       # Filter the list of fits files to choose the one that corresponds to the Bally field
       # This is designed to fail if more than one file meets the filter
       if str(source_dir).startswith("j8oc"):
           bally_field = str(source_dir).replace("j8oc", "")[:2]
-          fits_path, = [_ for _ in fits_paths if f"-Bally_{bally_field}-" in str(_)]
+          (fits_path,) = [_ for _ in fits_paths if f"-Bally_{bally_field}-" in str(_)]
       else:
-          # Deal with the case of LL 7 that is only in WFPC2 
+          # Deal with the case of LL 7 that is only in WFPC2
           bally_field = str(source_dir).replace("wfpc2_", "")[:2]
-          fits_path, = [_ for _ in fits_paths if f"_WFPC2_{bally_field}_" in str(_)]
-      print('[][] '*10)
+          (fits_path,) = [_ for _ in fits_paths if f"_WFPC2_{bally_field}_" in str(_)]
+      print("[][] " * 10)
       print(source_dir, source_id, bally_field, fits_path)
 
-      for arc, circle_fit.PT_ARC in ["outer", "x"], ["inner", "+"]:
+      for arc, circle_fit.PT_ARC in ["outer", "x"], ["inner", "+"], ["ridge", "x"]:
+          region_file = f"{source_id}-forma.reg"
+          if arc == "ridge":
+              # Special case of MIR LV arcs
+              if source_id in lv_mir:
+                  region_file = f"{lv_mir[source_id]}-smith-2005-forma.reg"
+              else:
+                  # Skip the ridge method if not an LV arc
+                  continue
+
           for delta_theta in 60, 65, 70, 75:
               plot_path = source_dir / f"{source_id}-{arc}-{delta_theta:02d}.pdf"
-              print('#### '*10)
+              print("#### " * 10)
               print("Creating", plot_path)
               try:
                   circle_fit.plot_solution(
-                      source_dir / f"{source_id}-forma.reg",
+                      source_dir / region_file,
                       fits_path,
                       plot_path,
-                      delta_theta=delta_theta, maxiter=5)
+                      delta_theta=delta_theta,
+                      maxiter=5,
+                  )
               except AssertionError as e:
                   print(f".@.@.@.@. Failed assertion: {e.args}")
                   continue
@@ -4998,6 +5058,11 @@ w266-558 [PosixPath('j8oc06010_wcs/w266-558-inner-60.json'), PosixPath('j8oc0601
     + We should maybe use some of these, since we manage to get alatude for LV1, LV3, and LV4
     + LV5, as traced, does not get to 90 deg, but looking at the image it seems that the arc can be traced further
     + These all use the ridge method, since the MIR resolution is not good enough to clearly see the inner and outer boundaries
+    + *UPDATE* [2020-09-11 Fri] I have copied these from the ~bowshock-shape~ project to the [[file:j8oc01010_wcs/]] folder
+      + They are named lv1, lv2, etc, rather than 167-317, so in order to use them I will make a dictionary of name mappings
+        + Example: [[file:j8oc01010_wcs/lv1-smith-2005-forma.reg]]
+      + Also, the arc is by the ridge method and they use the "x" point type
+      + So, I will add "ridge" to the list of arc types
 
 |   Object | Group | Folder         | 2020-08-11 | 2020-08-18 | 2020-08-25 |
 |----------+-------+----------------+------------+------------+------------|
