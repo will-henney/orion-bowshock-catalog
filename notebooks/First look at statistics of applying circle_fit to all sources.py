@@ -409,7 +409,7 @@ print_stats("Pi_in", "old_Pi_in")
 
 print_stats("log_Pi_out", "log_Pi_in")
 
-# Next one is a but silly.  Of course, the difference tests will be significant between one value that is logged and one that isn't ...
+# Next one is a bit silly.  Of course, the difference tests will be significant between one value that is logged and one that isn't ...
 
 print_stats("log_Pi_out", "Lambda_out")
 print()
@@ -425,8 +425,8 @@ print_stats("log_Pi_in", "Lambda_in")
 #
 # Prinipal findings are:
 #
-# * Strong correlation between `Lambda_out` and `Lambda_in`: $r = 0.61$, $p = 0.0005$.  All difference tests non-significant.
-# * Weaker (but still significant) correlation between `log_Pi_out` and `log_Pi_in`: $r = 0.39$, $p = 0.002$.  Again, all difference tests non-significant.
+# * Strong correlation between `Lambda_out` and `Lambda_in`: $r = 0.55$, $p = 0.0004$.  All difference tests non-significant.
+# * Weaker (but still significant) correlation between `log_Pi_out` and `log_Pi_in`: $r = 0.41$, $p = 0.001$.  Again, all difference tests non-significant.
 # * `Lambda` versus `Pi` has strong correlation (both out and in).  The Brown–Forsyth test is the only one that shows a significant difference, presumably because `Lambda` does not have the fat tail towards high values that `Pi` has.
 #
 # Conclusions are that it is fine to merge the outer and inner arc values, since there is no significant difference between the two.
