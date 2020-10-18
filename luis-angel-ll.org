@@ -4836,6 +4836,10 @@ CLOSED: [2020-08-06 Thu 23:39]
               else:
                   # Skip the ridge method if not an LV arc
                   continue
+          else:
+              # Opposite logic for the outer/inner arcs: skip the LV knots
+              if source_id in lv_mir:
+                  continue
 
           for delta_theta in 60, 65, 70, 75:
               plot_path = source_dir / f"{source_id}-{arc}-{delta_theta:02d}.pdf"
@@ -4859,6 +4863,13 @@ CLOSED: [2020-08-06 Thu 23:39]
 #+end_src
 
 *This should be run in a terminal* 
+**** Sources that are still failing
+[2020-10-01 Thu]
++ 124-131 NW
+  + Missing JSON files
++ 154-240 N
++ 159-221 N
++ Todos los LV
 
 
 *** TODO Collate the results of circle_fit
