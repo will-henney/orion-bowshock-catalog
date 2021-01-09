@@ -67,18 +67,24 @@ def mad(x):
 def collate_circle_fit_one_source(source_id):
     rslt = {"Object": source_id}
 
-    for arc_long, arc in [["inner", "in"], ["outer", "out"]]:
+    for arc_long, arc in [["inner", "in"], ["outer", "out"], ["ridge", "out"]]:
         json_paths = sorted(ROOT_PATH.glob(f"*/{source_id}-{arc_long}-*.json"))
         try:
             rslt["Folder"] = str(json_paths[0].parent.name)
         except IndexError:
             rslt["Folder"] = ""
-
+        # print(arc_long)
+        # print(json_paths)
         # Initialize empty lists for each variable
         var_lists = {f"{vv}_{arc}": [] for vv in VVARS}
 
         # Now fill in those lists with data from JSON files
         # print(json_paths)
+        if not json_paths:
+            # But skip the rest if there is no data for this arc type
+            continue
+
+        rslt["Outer arc type"] = arc_long
         for json_path in json_paths:
             data = json.load(json_path.open())
             # print(data)
@@ -102,7 +108,12 @@ def collate_circle_fit_one_source(source_id):
 
 # -
 
+# In theory, the `out` arc should be overwritten with data from `ridge` if it is available.  Hopefully, this will sort out the LV knots.
+
 data = collate_circle_fit_one_source("LL7")
+data
+
+data = collate_circle_fit_one_source("167-317")
 data
 
 df3 = pd.DataFrame(
@@ -121,6 +132,7 @@ dff.groupby(by="Group").mean().sort_values(by="D")
 dff_log = pd.concat(
     [
         dff[["Object", "Group"]],
+        dff[["D"]].apply(np.log10),
         dff[["old_Pi_in", "old_Pi_out", "Pi_in", "Pi_out", "Lambda_in", "Lambda_out"]]
         .clip(lower=1.0, upper=15.0)
         .apply(np.log10),
@@ -129,12 +141,13 @@ dff_log = pd.concat(
 )
 
 
+pd.options.display.max_rows = 100
 dff_log
 
 fig = sn.pairplot(dff_log.dropna(), hue="Group", palette="magma")
 for i, row in enumerate(fig.axes):
     for j, ax in enumerate(row):
-        if i != j:
+        if i != j and i != 0 and j != 0:
             ax.set(xlim=[-0.2, 1.2], ylim=[-0.2, 1.2])
             ax.plot([-0.2, 1.2], [-0.2, 1.2], "--", c="k")
 

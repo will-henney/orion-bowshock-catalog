@@ -1255,6 +1255,129 @@ $BGTASK python smooth-image.py --width 100 --bbox \'9100 1800 14500 4600\' --ban
 #+RESULTS:
 
 
+Lower-left section of SW group
+
+#+BEGIN_SRC sh 
+BGTASK='parallel --semaphore --files --id hipass --bg'
+$BGTASK python smooth-image.py --width 100 --bbox \'9042 3308 12373 5846\' --band f658n --field 1l --twopass --threshold 3.0 --suffix sw-lower-left > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh 
+BGTASK='parallel --semaphore --files --id hipass --bg'
+$BGTASK python smooth-image.py --width 100 --bbox \'9042 3308 12373 5846\' --band f435w --field 1l --twopass --threshold 3.0 --suffix sw-lower-left > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh 
+BGTASK='parallel --semaphore --files --id hipass --bg  -j0'
+$BGTASK python smooth-image.py --width 100 --bbox \'9042 3308 12373 5846\' --band f555w --field 1l --twopass --threshold 3.0 --suffix sw-lower-left > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+RGB file is written with limits of 0.75 1.4 in each channel
+
+
+
+
+*** NW group
++ Luckily, all of these fall in the 5r images
++ Use ~--threshold 3.0~ because there are some bright bits
+
+#+BEGIN_SRC sh 
+BGTASK='parallel --semaphore --files --id hipass --bg'
+$BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band f658n --field 5r --twopass --threshold 3.0 --suffix nw > /dev/null
+#+END_SRC
+
+
+#+BEGIN_SRC sh
+BGTASK='parallel --semaphore --files --id hipass --bg'
+$BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band f435w --field 5r --twopass --threshold 3.0 --suffix nw > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh
+BGTASK='parallel --semaphore --files --id hipass --bg'
+$BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band f555w --field 5r --twopass --threshold 3.0 --suffix nw > /dev/null
+#+END_SRC
+
+#+RESULTS:
+
++ Displaying them in ds9
++ Note that limits are a bit lower than in SW group because the contrast is generally smaller here
+#+begin_src sh
+  xpaset -p ACS file $PWD/hlsp_orion_hst_acs_strip5r_f658n_sharp_100nw.fits
+  xpaset -p ACS scale limits 0.8 1.25
+  xpaset -p ACS rgb green            
+  xpaset -p ACS file $PWD/hlsp_orion_hst_acs_strip5r_f555w_sharp_100nw.fits 
+  xpaset -p ACS scale limits 0.8 1.25
+  xpaset -p ACS rgb blue                                                   
+  xpaset -p ACS file $PWD/hlsp_orion_hst_acs_strip5r_f435w_sharp_100nw.fits
+  xpaset -p ACS scale limits 0.8 1.25
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh
+  # Save an image
+  xpaset -p ACS export $PWD/ds9.jpeg 95  
+  mv ds9.jpeg NW-group-hipass-rgb-5r.jpg
+#+end_src
+
+
+
+*** LV plus SE group plus N group
++ We can get all these together from 5l
+  + bounding box: 9940 2100 12445 4286
++ First a version with threshold ~1.5~ to avoid the negative halo
+#+BEGIN_SRC sh :results verbatim
+  parallel --jobs 0 --tag \
+           python smooth-image.py --width 100 --bbox \'9940 2100 12445 4286\' \
+           --band {} --field 5l --twopass --threshold 1.5 --suffix lv-se-n \
+           ::: f658n f555w f435w
+#+END_SRC
+
+#+RESULTS:
+: f658n	Starting second pass: N(masked) = 580230
+: f435w	Starting second pass: N(masked) = 668934
+: f555w	Starting second pass: N(masked) = 675575
++ Second a version with threshold ~10~ to get the bright bits
+#+BEGIN_SRC sh :results verbatim
+  parallel --jobs 0 --tag \
+           python smooth-image.py --width 100 --bbox \'9940 2100 12445 4286\' \
+           --band {} --field 5l --twopass --threshold 10.0 --suffix lv-se-n-HI \
+           ::: f658n f555w f435w
+#+END_SRC
+
+#+RESULTS:
+: f658n	Starting second pass: N(masked) = 147425
+: f555w	Starting second pass: N(masked) = 147798
+: f435w	Starting second pass: N(masked) = 148962
++ Combine the two versions
+  + Mostly use the ~--threshold 1.5~ version
+  + But wherever that is NaN, use the ~--threshold 10.0~ version
+#+begin_src python
+  import numpy as np
+  from astropy.io import fits
+
+  for f in "f658n", "f555w", "f435w":
+      fname = f"hlsp_orion_hst_acs_strip5l_{f}_sharp_100lv-se-n.fits"
+      hdu = fits.open(fname)["SCI"]
+      hdu2 = fits.open(fname.replace(".fits", "-HI.fits"))["SCI"]
+
+      m = ~np.isfinite(hdu.data)
+      hdu.data[m] = hdu2.data[m]
+      hdu.writeto(fname.replace(".fits", "-COMBO.fits"), overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+*** What about the new Bally images for the LV knots?
 
 * Three dimensional structure
 
@@ -4867,6 +4990,7 @@ CLOSED: [2020-08-06 Thu 23:39]
 [2020-10-01 Thu]
 + 124-131 NW
   + Missing JSON files
+  + [2021-01-07 Thu] I think this is because it is best seen in [O III]
 + 154-240 N
 + 159-221 N
 + Todos los LV
