@@ -983,7 +983,7 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
   from astropy.table import Table
 
   # This is the sample list with the group information (in astropy.table format)
-  arctab = Table.read("luis-programas/arcs-summary-classify.tab", format = "ascii")
+  arctab = Table.read("luis-programas/arcs-summary-classify.ecsv", format = "ascii")
   arctab.sort('RA')
 
   # and this is the list from ll-data.json -> db, keys
@@ -1022,7 +1022,6 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
       "SE": ("02-southeast", "Southeast group"),
       "N": ("03-north", "North group"),
       "NW": ("04-northwest", "Northwest group"),
-      "SW": ("05-southwest", "Southwest group"),
       "W": ("06-west", "West group"),
       "S": ("07-south", "South group"),
       "*P": ("XX-problematic", "Problematic objects"),
