@@ -1,4 +1,5 @@
 *
+!*.ecsv
 !Simbad
 !notebooks
 !notebooks/*.py

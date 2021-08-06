@@ -1,0 +1,331 @@
+# %ECSV 0.9
+# ---
+# datatype:
+# - name: MAIN_ID
+#   datatype: object
+#   description: Main identifier for an object
+#   meta: !!omap
+#   - {ucd: meta.id;meta.main}
+#   - {width: 22}
+#   - links:
+#     - {href: 'http://simbad.u-strasbg.fr/simbad/sim-id?Ident=${MAIN_ID}&NbIdent=1', value: '${MAIN_ID}'}
+# - name: RA
+#   unit: '"h:m:s"'
+#   datatype: string
+#   description: Right ascension
+#   meta: !!omap
+#   - {ucd: pos.eq.ra;meta.main}
+#   - {width: 13}
+#   - {precision: '8'}
+# - name: DEC
+#   unit: '"d:m:s"'
+#   datatype: string
+#   description: Declination
+#   meta: !!omap
+#   - {ucd: pos.eq.dec;meta.main}
+#   - {width: 13}
+#   - {precision: '8'}
+# - name: RA_PREC
+#   datatype: int16
+#   description: Right ascension precision
+#   meta: !!omap
+#   - {width: 2}
+# - name: DEC_PREC
+#   datatype: int16
+#   description: Declination precision
+#   meta: !!omap
+#   - {width: 2}
+# - name: COO_ERR_MAJA
+#   unit: mas
+#   datatype: float32
+#   format: '{:6.3f}'
+#   description: Coordinate error major axis
+#   meta: !!omap
+#   - {ucd: phys.angSize.smajAxis;pos.errorEllipse;pos.eq}
+#   - {width: 6}
+#   - {precision: '3'}
+# - name: COO_ERR_MINA
+#   unit: mas
+#   datatype: float32
+#   format: '{:6.3f}'
+#   description: Coordinate error minor axis
+#   meta: !!omap
+#   - {ucd: phys.angSize.sminAxis;pos.errorEllipse;pos.eq}
+#   - {width: 6}
+#   - {precision: '3'}
+# - name: COO_ERR_ANGLE
+#   unit: deg
+#   datatype: int16
+#   description: Coordinate error angle
+#   meta: !!omap
+#   - {ucd: pos.posAng;pos.errorEllipse;pos.eq}
+#   - {width: 3}
+# - name: COO_QUAL
+#   datatype: string
+#   description: Coordinate quality
+#   meta: !!omap
+#   - {ucd: meta.code.qual;pos.eq}
+#   - {width: 1}
+# - name: COO_WAVELENGTH
+#   datatype: string
+#   description: Wavelength class for the origin of the coordinates (R,I,V,U,X,G)
+#   meta: !!omap
+#   - {ucd: instr.bandpass;pos.eq}
+#   - {width: 1}
+# - name: COO_BIBCODE
+#   datatype: object
+#   description: Coordinate reference
+#   meta: !!omap
+#   - {ucd: meta.bib.bibcode;pos.eq}
+#   - {width: 19}
+# - name: SP_TYPE
+#   datatype: object
+#   description: MK spectral type
+#   meta: !!omap
+#   - {ucd: src.spType}
+#   - {width: 6}
+# - name: SP_QUAL
+#   datatype: string
+#   description: Spectral type quality
+#   meta: !!omap
+#   - {ucd: meta.code.qual;src.spType}
+#   - {width: 1}
+# - name: SP_BIBCODE
+#   datatype: object
+#   description: spectral type reference
+#   meta: !!omap
+#   - {ucd: meta.bib.bibcode;src.spType}
+#   - {width: 19}
+# - name: OTYPE
+#   datatype: object
+#   description: Object type
+#   meta: !!omap
+#   - {ucd: src.class}
+#   - {width: 8}
+#   - links:
+#     - {href: 'http://simbad.u-strasbg.fr/simbad/sim-display?data=otypes'}
+# - name: Distance_distance
+#   datatype: float64
+#   format: '{:10.4f}'
+#   description: Distance value
+#   meta: !!omap
+#   - {ucd: POS.DISTANCE}
+#   - {width: 10}
+#   - {precision: '4'}
+# - name: Distance_Q
+#   datatype: string
+#   description: Quality
+#   meta: !!omap
+#   - {ucd: META.CODE.QUAL}
+#   - {width: 1}
+# - name: Distance_unit
+#   datatype: string
+#   description: Unit (pc,kpc or Mpc)
+#   meta: !!omap
+#   - {ucd: META.UNIT}
+#   - {width: 4}
+# - name: Distance_merr
+#   datatype: float64
+#   format: '{:9.4f}'
+#   description: minus error
+#   meta: !!omap
+#   - {ucd: STAT.ERROR}
+#   - {width: 9}
+#   - {precision: '4'}
+# - name: Distance_perr
+#   datatype: float64
+#   format: '{:9.4f}'
+#   description: plus error
+#   meta: !!omap
+#   - {ucd: STAT.ERROR}
+#   - {width: 9}
+#   - {precision: '4'}
+# - name: Distance_method
+#   datatype: string
+#   description: distance calculation method
+#   meta: !!omap
+#   - {ucd: INSTR.SETUP}
+#   - {width: 8}
+# - name: Distance_bibcode
+#   datatype: string
+#   description: Bibcode
+#   meta: !!omap
+#   - {ucd: META.BIB.BIBCODE}
+#   - {width: 19}
+# - name: RVZ_TYPE
+#   datatype: string
+#   description: Radial velocity / redshift type
+#   meta: !!omap
+#   - {width: 1}
+# - name: RVZ_RADVEL
+#   unit: km / s
+#   datatype: float64
+#   format: '{:.3f}'
+#   description: Radial Velocity
+#   meta: !!omap
+#   - {ucd: spect.dopplerVeloc.opt}
+#   - {precision: '3'}
+# - name: RVZ_ERROR
+#   unit: km / s
+#   datatype: float32
+#   format: '{:.3f}'
+#   description: Radial velocity / redshift error
+#   meta: !!omap
+#   - {ucd: stat.error;spect.dopplerVeloc}
+#   - {precision: '3'}
+# - name: RVZ_QUAL
+#   datatype: string
+#   description: Radial velocity / redshift quality
+#   meta: !!omap
+#   - {ucd: meta.code.qual;spect.dopplerVeloc}
+#   - {width: 1}
+# - name: RVZ_WAVELENGTH
+#   datatype: string
+#   description: Radial velocity / redshift wavelength class of the observ. (RIVUXG)
+#   meta: !!omap
+#   - {ucd: em.wl.central;spect.dopplerVeloc}
+#   - {width: 1}
+# - name: RVZ_BIBCODE
+#   datatype: object
+#   description: Radial velocity / redshift reference
+#   meta: !!omap
+#   - {ucd: meta.bib.bibcode;spect.dopplerVeloc}
+#   - {width: 19}
+# - name: OTYPES
+#   datatype: object
+#   description: List of all object types concatenated with pipe
+#   meta: !!omap
+#   - {ucd: src.class}
+# - name: RA_d
+#   unit: deg
+#   datatype: float64
+#   format: '{:11.8f}'
+#   description: Right ascension
+#   meta: !!omap
+#   - {ucd: pos.eq.ra;meta.main}
+#   - {width: 11}
+#   - {precision: '8'}
+# - name: DEC_d
+#   unit: deg
+#   datatype: float64
+#   format: '{:12.8f}'
+#   description: Declination
+#   meta: !!omap
+#   - {ucd: pos.eq.dec;meta.main}
+#   - {width: 12}
+#   - {precision: '8'}
+# - name: BIBLIST_1990_2020
+#   datatype: int32
+#   description: List of Bibcodes
+#   meta: !!omap
+#   - {ucd: meta.bib}
+#   - links:
+#     - {href: 'http://simbad.u-strasbg.fr/simbad/sim-id?bibdisplay=refsum&Ident=${MAIN_ID}#lab_bib', value: 'ref (${BIBLIST})'}
+# meta: {ID: SimbadScript, description: 'Simbad script executed on 2020.08.11CEST02:56:58', name: default}
+# schema: astropy-2.0
+MAIN_ID RA DEC RA_PREC DEC_PREC COO_ERR_MAJA COO_ERR_MINA COO_ERR_ANGLE COO_QUAL COO_WAVELENGTH COO_BIBCODE SP_TYPE SP_QUAL SP_BIBCODE OTYPE Distance_distance Distance_Q Distance_unit Distance_merr Distance_perr Distance_method Distance_bibcode RVZ_TYPE RVZ_RADVEL RVZ_ERROR RVZ_QUAL RVZ_WAVELENGTH RVZ_BIBCODE OTYPES RA_d DEC_d BIBLIST_1990_2020
+"[H97b] 10351" "05 35 02.2022" "-05 26 35.433" 14 14 0.545 0.495 90 C O 2018yCat.1345....0G "" "" "" Irregular_V* "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*|Ir* 83.75917587 -5.44317610 3
+"V* V1482 Ori" "05 35 04.0666" "-05 26 37.196" 14 14 0.099 0.095 90 A O 2018yCat.1345....0G M2 D 2009MNRAS.400..603P Orion_V* "" "" "" "" "" "" "" v 24.700 0.600 A O 2009ApJ...697.1103T Y*?|*|*|*|*|*iC|Y*O|Em*|pr*|V*|Or*|Rad|IR|X 83.76694437 -5.44366564 42
+"V* V1322 Ori" "05 35 04.1934" "-05 26 27.860" 14 14 0.066 0.060 90 A O 2018yCat.1345....0G M2e D 2009MNRAS.400..603P BYDra 398.4540 "" pc -15.9877 15.9877 paral 2018yCat.1345....0G v 27.168 0.276 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|Y*O|Em*|Em*|pr*|V*|BY*|Rad|IR|X 83.76747288 -5.44107242 37
+"[RRS2008] 049-143" "05 35 04.940" "-05 21 42.99" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" Y*O|Rad 83.77058300 -5.36194200 2
+"[RRL2007] 050-143" "05 35 04.95" "-05 21 42.8" 6 6 150.000 150.000 90 C O 2009A&A...502..883R M "" 2007MNRAS.381.1077R Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|* 83.77062000 -5.36189000 3
+"V* V479 Ori" "05 35 05.1354" "-05 20 24.413" 14 14 0.051 0.052 90 A O 2018yCat.1345....0G M2.4e D 2009ApJS..183..261D Orion_V* 390.0460 "" pc -10.6343 10.6343 paral 2018yCat.1345....0G v 25.700 0.200 A O 2009ApJ...697.1103T X|Y*?|*|*|*|*|*|*|*|Y*O|Em*|V*|Or*|IR 83.77139789 -5.34011475 24
+"V* V2167 Ori" "05 35 06.5439" "-05 25 01.566" 14 14 0.303 0.307 90 A O 2018yCat.1345....0G M4 D 1997AJ....113.1733H Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|Y*O|Em*|V*|V*|Or*|Rad|IR|X 83.77726650 -5.41710168 27
+"V* V2168 Ori" "05 35 06.5678" "-05 32 51.573" 14 14 0.269 0.265 90 A O 2018yCat.1345....0G M3:,M6-M9 E 2013AJ....146...85H Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" G?|*|*|Y*O|Y*O|Em*|V*|Ir*|Or*|IR|X 83.77736621 -5.54765931 22
+"[DRH2012] 347" "05 35 06.58" "-05 26 52.0" 6 6 "" "" 0 C O 2012ApJ...748...14D "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Rad 83.77742000 -5.44778000 3
+"2MASS J05350722-0521345" "05 35 07.228" "-05 21 34.59" 7 7 110.000 110.000 90 C I 2003yCat.2246....0C "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Rad|Rad|IR|NIR 83.78011700 -5.35960800 13
+"COUP   286" "05 35 07.390" "-05 22 29.00" 7 7 "" "" 0 C R 2016ApJ...831..155S M4.75 D 2014ApJ...782....8I V* "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|V*|Rad|IR|X 83.78079200 -5.37472200 24
+"V* V2181 Ori" "05 35 08.2990" "-05 24 34.890" 14 14 0.192 0.182 90 A O 2018yCat.1345....0G M4.6e D 2009ApJS..183..261D Orion_V* "" "" "" "" "" "" "" v 23.419 1.103 C O 2015ApJ...807...27C *|*|*|*|*|*iC|Y*O|Em*|V*|V*|Or*|Rad|IR|X 83.78457918 -5.40969193 36
+"2MASS J05351014-0522326" "05 35 10.1419" "-05 22 32.652" 14 14 0.127 0.140 90 A O 2018yCat.1345....0G M1.9e D 2009ApJS..183..261D YSO 391.1290 "" pc -30.2140 30.2140 paral 2018yCat.1345....0G v 23.000 2.300 C O 2009ApJ...697.1103T *|*|*|*|*|*iC|Y*O|Y*O|Em*|Rad|Rad|IR|NIR|X 83.79225812 -5.37573678 29
+"2MASS J05351026-0521571" "05 35 10.2622" "-05 21 57.119" 14 14 0.653 0.611 90 C O 2018yCat.1345....0G M5.5 D 2013AJ....146...85H YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|Y*O|Ir*|Rad|Rad|IR|NIR|X 83.79275920 -5.36586666 23
+"V* V1487 Ori B" "05 35 10.5861" "-05 22 44.750" 14 14 0.562 0.598 90 C O 2018yCat.1345....0G M2 D 2013AJ....146...85H Star "" "" "" "" "" "" "" "" "" "" "" "" "" X|X|X|X|X|X|**|**|*|*|*|*|*|*|*iC|*iC|Em*|V*|Rad|IR|IR 83.79410915 -5.37909743 15
+"JW  355" "05 35 10.9049" "-05 22 46.356" 14 14 24.144 5.458 90 C O 2018yCat.1345....0G M2.7e D 2009ApJS..183..261D YSO "" "" "" "" "" "" "" "" "" "" "" "" "" **|**|*|*|*iC|Y*O|Em*|Ir*|Rad|Rad|IR|NIR|X 83.79543744 -5.37954357 34
+"2MASS J05351165-0531011" "05 35 11.6595" "-05 31 01.182" 14 14 0.085 0.085 90 A O 2018yCat.1345....0G M4.4e D 2009ApJS..183..261D YSO 413.9240 "" pc -20.9541 20.9541 paral 2018yCat.1345....0G v 26.327 0.266 A N 2018AJ....156...84K X|Y*?|SB*|*|*|*|*|*|*|*|*iC|Y*O|Y*O|Y*O|Em*|IR 83.79858151 -5.51699520 24
+"2MASS J05351165-0524213" "05 35 11.6559" "-05 24 21.456" 14 14 0.625 0.587 90 C O 2018yCat.1345....0G M4.7e D 2009MNRAS.400..603P YSO "" "" "" "" "" "" "" v 22.635 1.916 C O 2015ApJ...807...27C *|*|*|*|*iC|Y*O|Y*O|V*|Rad|Rad|IR|NIR|X 83.79856655 -5.40596020 35
+"[DRS2009] 852" "05 35 11.9319" "-05 31 53.409" 14 14 0.192 0.160 90 A O 2018yCat.1345....0G "" "" "" YSO 286.8290 "" pc -25.5862 25.5862 paral 2018yCat.1345....0G "" "" "" "" "" "" *|Y*O|Y*O 83.79971661 -5.53150264 2
+"V* V2224 Ori" "05 35 12.1261" "-05 24 33.776" 14 14 19.051 12.592 90 C O 2018yCat.1345....0G M8.25 D 2014ApJ...782....8I Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" *iC|Y*O|V*|Ir*|Or*|Rad|Rad|IR|NIR|X 83.80052565 -5.40938241 28
+"[HC2000] 616" "05 35 12.39" "-05 21 31.6" 6 6 "" "" 0 D "" 2000ApJ...540..236H "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC 83.80162000 -5.35878000 2
+"COUP   476" "05 35 12.4010" "-05 21 31.648" 9 9 "" "" 0 C R 2016ApJ...822...93F "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Rad|Rad|IR|NIR|X 83.80167096 -5.35879133 16
+"[H97b] 9016" "05 35 12.36" "-05 21 31.6" 6 6 150.000 150.000 90 C O 2009A&A...502..883R "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|IR 83.80150000 -5.35878000 8
+"[FRM2016] 105" "05 35 13.0686" "-05 20 45.921" 9 9 "" "" 0 C R 2016ApJ...822...93F "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Rad|Rad 83.80445254 -5.34608928 7
+"V* V2236 Ori" "05 35 13.2151" "-05 20 52.746" 14 14 0.325 0.338 90 A O 2018yCat.1345....0G K8-M0 E 1997AJ....113.1733H Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|Y*O|V*|Ir*|Or*|Rad|IR|NIR|X 83.80506310 -5.34798504 28
+"V* V488 Ori" "05 35 13.6039" "-05 30 57.667" 14 14 0.036 0.037 90 A O 2018yCat.1345....0G G7:e D 2009MNRAS.400..603P Orion_V* 386.7570 "" pc -7.8829 7.8829 paral 2018yCat.1345....0G v 26.887 0.297 A N 2018AJ....156...84K Y*?|TT?|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|V*|Or*|Or*|Or*|Rad|IR|X 83.80668331 -5.51601878 53
+"[KPM2006]  86" "05 35 13.8062" "-05 30 24.472" 14 14 0.051 0.049 90 A O 2018yCat.1345....0G M2.5 D 2009MNRAS.400..603P Star 414.8690 "" pc -12.8571 12.8571 paral 2018yCat.1345....0G v 25.433 0.761 A N 2018AJ....156...84K X|Y*?|*|*|*|*|*|*|*|Y*O|Em*|IR 83.80752622 -5.50679805 25
+"GBS-VLA J053514.17-052301.0" "05 35 14.160" "-05 23 01.29" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Rad|Rad|IR|NIR 83.80900000 -5.38369200 30
+"JW  472" "05 35 15.3786" "-05 22 25.382" 14 14 0.739 0.876 90 C O 2018yCat.1345....0G M1.5 D 2005ApJS..160..511K YSO 376.5770 "" pc -26.3200 26.3200 paral 2018yCat.1345....0G "" "" "" "" "" "" *|*|*iC|Ir*|Rad|Rad|IR|IR|NIR|X 83.81407787 -5.37371728 29
+"MLLA  566" "05 35 15.400" "-05 22 40.06" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|Y*O|Rad|Rad|IR|NIR 83.81416700 -5.37779400 12
+"Parenago  1867" "05 35 15.8337" "-05 23 22.420" 9 9 "" "" 0 B N 2012ApJ...749..180C Ke E 1997AJ....113.1733H YSO "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|ISM|*|*iC|*iN|Y*O|Y*O|Em*|Rad|Rad|IR|NIR|X 83.81597375 -5.38956131 72
+"2MASS J05351594-0522211" "05 35 15.9413" "-05 22 21.075" 14 14 0.203 0.222 90 A O 2018yCat.1345....0G K7e D 1997AJ....113.1733H YSO 264.0125 "" pc -25.0441 25.0441 paral 2018yCat.1345....0G "" "" "" "" "" "" *|*|*iC|Y*O|Ir*|Rad|Rad|IR|NIR|X 83.81642238 -5.37252103 29
+"V* V2279 Ori" "05 35 15.9483" "-05 23 49.949" 14 14 0.362 0.349 90 A O 2018yCat.1345....0G M0.5+M2 D 2012A&A...540A..46D Orion_V* "" "" "" "" "" "" "" v 22.730 1.350 B O 2016ApJ...821....8K **|HII|*|*|*|*|*|*iC|*iC|*iC|*iN|Y*O|Y*O|Em*|Em*|V*|Or*|Rad|Rad|IR|IR|NIR|X|X|X|X 83.81645148 -5.39720824 79
+"TCC  54" "05 35 16.0692" "-05 23 24.348" 9 9 "" "" 0 C R 2016ApJ...822...93F "" "" "" Radio "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|ISM|*|*iC|Y*O|Rad|Rad|IR|NIR 83.81695508 -5.39009675 55
+"GBS-VLA J053516.07-052324.3" "05 35 16.07" "-05 23 24.3" 6 6 "" "" 0 C R 2014ApJ...790...49K "" "" "" Radio "" "" "" "" "" "" "" "" "" "" "" "" "" Rad 83.81696000 -5.39008000 1
+"[BSD98]  2" "05 35 16.076" "-05 23 24.73" 7 7 "" "" 0 D "" "" "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O 83.81698300 -5.39020300 4
+"V* V2285 Ori" "05 35 16.1912" "-05 24 56.465" 14 14 1.024 1.065 90 C O 2018yCat.1345....0G "" "" "" Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" **|*iC|Y*O|V*|Ir*|Or*|Rad|IR|NIR|X 83.81746358 -5.41568490 26
+"COUP   799" "05 35 16.310" "-05 22 21.55" 7 7 "" "" 0 C R 2016ApJ...831..155S M3e D 2013AJ....146...85H YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Rad|Rad|IR|NIR|X 83.81795800 -5.37265300 21
+"LV 3" "05 35 16.2830" "-05 23 16.512" 8 8 "" "" 0 B N 2012ApJ...749..180C K3 D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|ISM|*|*iC|Y*O|Y*O|Rad|Rad|IR|NIR|X 83.81784580 -5.38792000 63
+"MLLA  588B" "05 35 16.4800" "-05 22 35.160" 8 8 "" "" 0 C m 2016ApJ...826...16E "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|*iC|*iC|*iC|Y*O|Y*O|Y*O|Rad|Rad|IR|X 83.81866670 -5.37643330 18
+"[FRM2016] 306" "05 35 16.4933" "-05 22 35.154" 14 14 5.712 4.976 90 C O 2018yCat.1345....0G M4 D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Y*O|Ir*|Rad|IR|NIR|X 83.81872220 -5.37643177 30
+"HH 513" "05 35 16.47" "-05 22 35.6" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" HH "" "" "" "" "" "" "" "" "" "" "" "" "" HH 83.81862000 -5.37656000 10
+"TCC  70" "05 35 16.6148" "-05 23 16.083" 9 9 "" "" 0 B N 2012ApJ...749..180C "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Y*O|Rad|Rad|IR|NIR|X 83.81922833 -5.38780100 44
+"* tet01 Ori G" "05 35 16.723" "-05 23 16.56" 7 7 100.000 100.000 90 C I 2003yCat.2246....0C K0.7 D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" v -116.000 "" D "" 2004AJ....127.3456D **|ISM|ISM|*|*iC|*iN|Y*O|Y*O|Em*|Rad|Rad|IR|NIR|X 83.81967900 -5.38793300 93
+"[OW94] 168-326" "05 35 16.85" "-05 23 26.2" 6 6 "" "" 0 C R 2014ApJ...790...49K "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *iC|Y*O|Rad|IR 83.82021000 -5.39061000 37
+"TCC  77" "05 35 16.851" "-05 23 26.71" 7 7 "" "" 0 C O 1998AJ....116..293B "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" **|*|*iC|Y*O|Rad|Rad|NIR 83.82021200 -5.39075300 27
+"TCC  75" "05 35 16.8258" "-05 23 25.903" 9 9 "" "" 0 B N 2012ApJ...749..180C "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" **|*|*iC|Y*O|Rad|IR 83.82010750 -5.39052867 23
+"TCC  75" "05 35 16.8258" "-05 23 25.903" 9 9 "" "" 0 B N 2012ApJ...749..180C "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" **|*|*iC|Y*O|Rad|IR 83.82010750 -5.39052867 23
+"[OW94] 168-326" "05 35 16.85" "-05 23 26.2" 6 6 "" "" 0 C R 2014ApJ...790...49K "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *iC|Y*O|Rad|IR 83.82021000 -5.39061000 37
+"LV 1" "05 35 16.8" "-05 23 26" 5 5 "" "" 0 E "" "" "" "" "" ISM "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|ISM|* 83.82000000 -5.39060000 25
+"TCC  74" "05 35 16.7621" "-05 23 28.020" 9 9 "" "" 0 B N 2012ApJ...749..180C "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Y*O|Rad|Rad|IR|NIR|X 83.81984208 -5.39111692 38
+"[BSD98] 17" "05 35 16.8902" "-05 23 38.065" 9 9 "" "" 0 C R 2016ApJ...822...93F "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" HII|*|Y*O|Rad|Rad 83.82037583 -5.39390703 20
+"[SCB99] 150" "05 35 16.858" "-05 23 38.23" 7 7 "" "" 0 D "" 1999AJ....117.1375S "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC 83.82024200 -5.39395300 1
+"COUP   844" "05 35 16.970" "-05 22 48.72" 7 7 "" "" 0 C R 2016ApJ...831..155S M0 D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Y*O|Em*|Rad|Rad|IR|NIR|X 83.82070800 -5.38020000 45
+"HD  37024" "05 35 17.3543" "-05 22 35.810" 14 14 0.298 0.256 90 A O 2018yCat.1345....0G K0.7 D 2005ApJS..160..511K Orion_V* "" "" "" "" "" "" "" v 24.140 2.040 C O 2016ApJ...821....8K *|*|*|*|*|*|*iC|*iN|Y*O|Em*|V*|Or*|Rad|Rad|IR|NIR|X 83.82230960 -5.37661408 43
+"COUP   886" "05 35 17.330" "-05 23 41.42" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" HII|*|*iC|Y*O|Rad|Rad|IR|X 83.82220800 -5.39483900 28
+"[FRM2016] 346" "05 35 17.3321" "-05 23 41.392" 9 9 "" "" 0 C R 2016ApJ...822...93F "" "" "" Radio "" "" "" "" "" "" "" "" "" "" "" "" "" Rad|NIR 83.82221737 -5.39483114 1
+"COUP   885" "05 35 17.45" "-05 23 21.0" 6 6 "" "" 0 C O 2009ApJS..183..261D K7-K8e E 1997AJ....113.1733H Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Rad|Rad|IR|NIR|X 83.82271000 -5.38917000 28
+"[BOM2000] j177-341" "05 35 17.67" "-05 23 40.9" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" Unknown "" "" "" "" "" "" "" "" "" "" "" "" "" "" 83.82362000 -5.39469000 2
+"JW  558" "05 35 17.680" "-05 23 40.89" 7 7 "" "" 0 C R 2016ApJ...831..155S M5.9e D 2009ApJS..183..261D YSO "" "" "" "" "" "" "" "" "" "" "" "" "" HII|*|*iC|Y*O|Y*O|Y*O|Em*|Ir*|Rad|Rad|mm|IR|NIR 83.82366700 -5.39469200 67
+"MLLA  495" "05 35 17.8317" "-05 22 58.007" 9 9 "" "" 0 C R 2016ApJ...822...93F M4 D 2004ApJ...610.1045S Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Rad|Rad|IR|NIR 83.82429887 -5.38277997 14
+"GBS-VLA J053518.05-052330.7" "05 35 18.05" "-05 23 30.7" 6 6 "" "" 0 C R 2014ApJ...790...49K "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|Rad|Rad|IR|NIR 83.82521000 -5.39186000 39
+"HH 1144" "05 35 18.0" "-05 23 31" 5 5 "" "" 0 E "" 2015AJ....150..108O "" "" "" HH "" "" "" "" "" "" "" "" "" "" "" "" "" HH 83.82500000 -5.39190000 1
+"COUP  1000" "05 35 18.8758" "-05 23 28.866" 14 14 0.931 0.917 90 C O 2018yCat.1345....0G M0e D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|*iC|Y*O|Rad|Rad|IR|NIR|X 83.82864951 -5.39135167 32
+"V* MY Ori" "05 35 20.2977" "-05 30 39.564" 14 14 0.029 0.028 90 A O 2018yCat.1345....0G M5e D 2009MNRAS.400..603P Orion_V* 412.1670 "" pc -7.1520 7.1520 paral 2018yCat.1345....0G v 27.158 0.354 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*|*|*|*iC|*iN|Y*O|Em*|Em*|Em*|V*|Or*|G|IR|X 83.83457376 -5.51099019 39
+"** PRS   22B" "05 35 20.430" "-05 23 29.70" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" **|**|*|*|*|*|*iC|*iC|V*|Rad|Rad|IR|IR|X 83.83512500 -5.39158300 11
+"V* V1521 Ori" "05 35 20.5720" "-05 20 43.222" 14 14 0.149 0.161 90 A O 2018yCat.1345....0G M2.1e D 2009ApJS..183..261D Orion_V* 388.9230 "" pc -33.6254 33.6254 paral 2018yCat.1345....0G v 29.273 0.584 A N 2018AJ....156...84K *|*|*|*iC|Y*O|Em*|pr*|V*|Or*|Rad|Rad|IR|NIR|X 83.83571680 -5.34533946 28
+"MLLA  262" "05 35 21.2021" "-05 24 00.162" 9 9 "" "" 0 C R 2016ApJ...822...93F M3:: E 2013AJ....146...85H YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*iC|Y*O|V*|Rad|Rad|Rad|IR|NIR|NIR 83.83834213 -5.40004522 14
+"JW  796" "05 35 26.1786" "-05 30 18.182" 14 14 0.061 0.062 90 A O 2018yCat.1345....0G M2.5e D 1997AJ....113.1733H YSO 411.7938 "" pc -15.5330 15.5330 paral 2018yCat.1345....0G "" "" "" "" "" "" Y*?|TT?|*|*|Y*O|Em*|Em*|Em*|Ir*|G|IR|X 83.85907767 -5.50505079 18
+"V* V2488 Ori" "05 35 30.4533" "-05 28 11.373" 14 14 0.149 0.149 90 A O 2018yCat.1345....0G M3.5 D 1997AJ....113.1733H Orion_V* 424.9533 "" pc -40.7581 40.7581 paral 2018yCat.1345....0G v 24.960 2.720 D "" 2008ApJ...676.1109F *|*|*iC|Y*O|Em*|V*|V*|Or*|IR 83.87688902 -5.46982590 20
+"V* V1555 Ori" "05 35 30.8022" "-05 30 36.256" 14 14 0.048 0.047 90 A O 2018yCat.1345....0G M3.5 D 1997AJ....113.1733H Orion_V* 437.3880 "" pc -13.5255 13.5255 paral 2018yCat.1345....0G v 25.965 0.198 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*|*|*|*|*iC|Y*O|Y*O|Em*|Em*|Em*|V*|Or*|G|IR|NIR|X 83.87834253 -5.51007124 39
+"[H97b] 20602" "05 35 34.36" "-05 30 20.4" 6 6 150.000 150.000 90 C O 2009A&A...502..883R "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|* 83.89317000 -5.50567000 2
+"V* V2551 Ori" "05 35 36.3551" "-05 31 37.877" 14 14 0.052 0.051 90 A O 2018yCat.1345....0G M4.3e D 2009ApJS..183..261D Orion_V* 401.1390 "" pc -12.1489 12.1489 paral 2018yCat.1345....0G v 26.466 0.250 A N 2018AJ....156...84K TT?|*|*|*|*|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|Em*|Em*|Em*|V*|Ir*|Or*|IR|X 83.90147958 -5.52718827 23
+"V* V976 Ori" "05 34 28.5259" "-05 24 57.897" 14 14 0.020 0.020 90 A O 2018yCat.1345....0G K5Ve D "" Orion_V* 400.2080 "" pc -3.7318 3.7318 paral 2018yCat.1345....0G v 24.000 0.100 A O 2009ApJ...697.1103T TT?|*|*|*|*|*|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|Em*|V*|Or*|Fl*|Fl*|G|Rad|IR|X 83.61885815 -5.41608252 33
+"V* V399 Ori" "05 34 41.7070" "-05 26 52.929" 14 14 0.076 0.076 90 A O 2018yCat.1345....0G M3 D 1997AJ....113.1733H Orion_V* 396.1650 "" pc -16.5422 16.5422 paral 2018yCat.1345....0G v 22.010 0.207 A N 2018AJ....156...84K X|TT?|*|*|*|*|*|*|*|*|*|*iC|Y*O|Y*O|Em*|Em*|V*|Or*|IR 83.67377951 -5.44803594 27
+"V* V2026 Ori" "05 34 46.7718" "-05 26 04.798" 14 14 0.085 0.079 90 A O 2018yCat.1345....0G M3,M2-M3 E 2013AJ....146...85H Orion_V* 382.0590 "" pc -15.7938 15.7938 paral 2018yCat.1345....0G v 25.605 0.577 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*|*|*|*|*|*|*|*iC|Y*O|Y*O|Em*|Em*|V*|Ir*|Or*|IR 83.69488252 -5.43466634 26
+"V* V2044 Ori" "05 34 49.0731" "-05 26 26.567" 14 14 0.076 0.073 90 A O 2018yCat.1345....0G M3e D 2009MNRAS.400..603P Orion_V* 394.3220 "" pc -15.8599 15.8599 paral 2018yCat.1345....0G v 26.175 0.935 B N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*|*|*iC|Y*O|Em*|Em*|Em*|V*|V*|Or*|G|IR|X 83.70447136 -5.44071333 31
+"V* V475 Ori" "05 34 50.5049" "-05 23 35.308" 14 14 0.049 0.048 90 A O 2018yCat.1345....0G M1e D 1997AJ....113.1733H Orion_V* 424.5200 "" pc -10.7950 10.7950 paral 2018yCat.1345....0G v 23.300 0.200 A O 2009ApJ...697.1103T Y*?|TT?|*|*|*|*|*|*|*iC|Y*O|Em*|Em*|Em*|V*|Or*|G|IR|X 83.71043712 -5.39314117 35
+"V* V2064 Ori" "05 34 52.0176" "-05 24 18.763" 14 14 0.064 0.062 90 A O 2018yCat.1345....0G M3.5 D 2009MNRAS.400..603P Orion_V* 415.1270 "" pc -14.1828 14.1828 paral 2018yCat.1345....0G v 23.376 0.226 A N 2018AJ....156...84K X|TT?|*|*|*|*|*|*|*|*|*|*|*|*iC|*iN|Y*O|Em*|Em*|Em*|V*|Ir*|Or*|G|Rad|IR|NIR 83.71674019 -5.40521217 34
+"2MASS J05345307-0526276" "05 34 53.0732" "-05 26 27.637" 14 14 0.477 0.447 90 C O 2018yCat.1345....0G M4.6e D 2009ApJS..183..261D YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|*|Y*O|Em*|Ir*|IR|X 83.72113835 -5.44101052 16
+"V* V2074 Ori" "05 34 55.0145" "-05 26 58.908" 14 14 0.155 0.148 90 A O 2018yCat.1345....0G M5.5e D 2009MNRAS.400..603P Orion_V* 447.1272 "" pc -44.3629 44.3629 paral 2018yCat.1345....0G "" "" "" "" "" "" Y*O|Em*|V*|Ir*|Or*|IR|NIR|X 83.72922719 -5.44969688 20
+"V* V402 Ori" "05 34 57.7867" "-05 22 51.195" 14 14 0.046 0.045 90 A O 2018yCat.1345....0G M3 D 1997AJ....113.1733H Orion_V* 412.2180 "" pc -10.2974 10.2974 paral 2018yCat.1345....0G v 25.319 0.195 A N 2018AJ....156...84K X|TT?|*|*|*|*|*|*|*|*|*|*|*|*iC|Y*O|Em*|Em*|Em*|V*|Or*|G|IR 83.74077800 -5.38088768 38
+"2MASS J05345816-0526350" "05 34 58.1680" "-05 26 35.168" 14 14 0.698 0.616 90 C O 2018yCat.1345....0G "" "" "" YSO "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Em*|Ir*|Rad|IR 83.74236682 -5.44310228 8
+"V* LL Ori" "05 35 05.6361" "-05 25 19.517" 14 14 0.037 0.034 90 A O 2018yCat.1345....0G K0-K3e E 1997AJ....113.1733H Orion_V* 391.9420 "" pc -7.0818 7.0818 paral 2018yCat.1345....0G v 29.024 0.526 A N 2018AJ....156...84K Y*?|*|*|*|*|*iC|*iN|Y*O|Em*|Em*|V*|Or*|Or*|Or*|Rad|IR|X 83.77348399 -5.42208815 68
+"V* IX Ori" "05 34 40.8649" "-05 22 42.307" 14 14 0.078 0.072 90 A O 2018yCat.1345....0G K1e D 1997AJ....113.1733H Orion_V* 304.3310 "" pc -9.4284 9.4284 paral 2018yCat.1345....0G v 23.478 0.310 A N 2018AJ....156...84K TT?|*|*|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|V*|Or*|Or*|Or*|Rad|IR|X 83.67027063 -5.37841868 55
+"V* V2005 Ori" "05 34 40.8137" "-05 26 38.650" 14 14 0.050 0.051 90 A O 2018yCat.1345....0G M1.5 D 1997AJ....113.1733H Orion_V* 418.6900 "" pc -12.7620 12.7620 paral 2018yCat.1345....0G v 24.335 0.182 A N 2018AJ....156...84K X|Y*?|TT?|*|*|*|*|*|*|*|*|*|*|*|*|*iC|Y*O|Y*O|Em*|Em*|Em*|V*|Ir*|Or*|G|IR|NIR 83.67005742 -5.44406970 31
+"V* V2012 Ori" "05 34 42.7216" "-05 28 37.454" 14 14 0.245 0.235 90 A O 2018yCat.1345....0G M2.6e D 2009ApJS..183..261D Orion_V* "" "" "" "" "" "" "" v 23.930 0.234 A N 2018AJ....156...84K TT?|*|*|*|*|*|*|*|*iC|Y*O|Em*|Em*|V*|Or*|Or*|IR|X 83.67800671 -5.47707058 25
+"V* V1559 Ori" "05 35 31.4098" "-05 28 16.498" 14 14 0.135 0.133 90 A O 2018yCat.1345....0G M5 D 1997AJ....113.1733H Orion_V* 378.9460 "" pc -28.1312 28.1312 paral 2018yCat.1345....0G v 27.763 0.618 A N 2018AJ....156...84K *|*|*|*|*|*|*iC|Y*O|Em*|V*|Or*|Rad|IR|NIR|X 83.88087446 -5.47124948 34
+"V* NX Ori" "05 35 32.8735" "-05 30 21.463" 14 14 0.030 0.028 90 A O 2018yCat.1345....0G K6 D 2013AJ....146...85H Orion_V* 408.6970 "" pc -6.9318 6.9318 paral 2018yCat.1345....0G v 28.782 0.300 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|V*|Or*|Rad|IR|NIR|X 83.88697327 -5.50596214 25
+"V* V2542 Ori" "05 35 35.1350" "-05 33 49.189" 14 14 0.213 0.205 90 A O 2018yCat.1345....0G K1-K5e E 1997AJ....113.1733H Orion_V* "" "" "" "" "" "" "" "" "" "" "" "" "" TT?|Y*O|Em*|Em*|Em*|V*|Ir*|Or*|G|IR 83.89639596 -5.56366374 19
+"V* V1318 Ori" "05 34 59.5597" "-05 24 00.233" 14 14 0.045 0.045 90 A O 2018yCat.1345....0G M3.2 D 2005ApJS..160..511K BYDra 420.3270 "" pc -10.7065 10.7065 paral 2018yCat.1345....0G v 25.793 0.161 A N 2018AJ....156...84K X|*|*|*|*|*|*|*|*|*|*|*|Y*O|Em*|pr*|V*|BY*|IR|NIR 83.74816555 -5.40006476 41
+"[BOM2000] w000-400" "05 34 59.57" "-05 24 00.4" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" Unknown "" "" "" "" "" "" "" "" "" "" "" "" "" ? 83.74821000 -5.40011000 2
+"V* V2102 Ori" "05 35 00.4720" "-05 25 14.284" 14 14 0.038 0.034 90 A O 2018yCat.1345....0G K6e D 2005ApJS..160..511K Orion_V* 402.6250 "" pc -8.5592 8.5592 paral 2018yCat.1345....0G v 23.615 0.278 A N 2018AJ....156...84K X|Y*?|*|*|*|*|*|*|*|*|Y*O|Em*|V*|Or*|Rad|IR 83.75196678 -5.42063454 38
+"[BOM2000] w005-514" "05 35 00.5" "-05 25 14" 5 5 "" "" 0 D "" 2000RMxAC...9..194O "" "" "" Unknown "" "" "" "" "" "" "" "" "" "" "" "" "" ? 83.75210000 -5.42060000 3
+"Brun 471" "05 35 01.1784" "-05 24 06.807" 14 14 0.369 0.363 90 A O 2018yCat.1345....0G M1 D 2013AJ....146...85H YSO "" "" "" "" "" "" "" v 25.443 0.150 A N 2018AJ....156...84K Y*?|TT?|*|*|*|*|*|*|*|*iC|*iN|Y*O|Y*O|Em*|Em*|Em*|G|Rad|IR|X 83.75491041 -5.40189087 31
+"[BOM2000] w012-407" "05 35 01.20" "-05 24 07.0" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" ISM "" "" "" "" "" "" "" "" "" "" "" "" "" ISM 83.75500000 -5.40194000 2
+"[OW94] 014-413" "05 35 01.3635" "-05 24 13.324" 14 14 2.949 1.929 90 C O 2018yCat.1345....0G M6.5 D 2007MNRAS.381.1077R Irregular_V* "" "" "" "" "" "" "" "" "" "" "" "" "" *|Ir*|IR 83.75568128 -5.40370125 15
+"[LRT2005] 030-524" "05 35 02.996" "-05 25 24.26" 7 7 "" "" 0 D "" 2005MNRAS.361..211L M7.5 D 2007MNRAS.381.1077R Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|IR 83.76248300 -5.42340600 5
+"[BOM2000] w030-524" "05 35 03.0" "-05 25 24" 5 5 "" "" 0 D "" 2000RMxAC...9..194O "" "" "" ISM "" "" "" "" "" "" "" "" "" "" "" "" "" ISM 83.76250000 -5.42330000 3
+"[BOM2000] w069-601" "05 35 06.91" "-05 26 00.6" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" ISM "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|? 83.77879000 -5.43350000 2
+"V* V2170 Ori" "05 35 06.9118" "-05 26 00.637" 14 14 0.206 0.197 90 A O 2018yCat.1345....0G M4.7e D 2009ApJS..183..261D Orion_V* 352.0879 "" pc -33.1485 33.1485 paral 2018yCat.1345....0G "" "" "" "" "" "" *|*|*iC|Y*O|Em*|V*|Ir*|Or*|Rad|IR|X 83.77879934 -5.43351036 33
+"[BOM2000] w073-227" "05 35 07.27" "-05 22 26.6" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" ISM "" "" "" "" "" "" "" "" "" "" "" "" "" ISM|? 83.78029000 -5.37406000 2
+"2MASS J05350727-0522266" "05 35 07.277" "-05 22 26.64" 7 7 60.000 60.000 0 C N 2003yCat.2246....0C M3: D 2005ApJS..160..511K YSO "" "" "" "" "" "" "" v 26.475 0.727 A N 2018AJ....156...84K X|*|*|*|*|*|*|*iC|Y*O|Y*O|Em*|Rad|Rad|IR|NIR 83.78032100 -5.37406700 38
+"[BOM2000] w266-558" "05 35 26.62" "-05 25 58.4" 6 6 "" "" 0 D "" 2000AJ....119.2919B "" "" "" Unknown "" "" "" "" "" "" "" "" "" "" "" "" "" "" 83.86092000 -5.43289000 1
+"[RRS2008] 266-558" "05 35 26.620" "-05 25 57.84" 7 7 "" "" 0 C R 2016ApJ...831..155S "" "" "" Star "" "" "" "" "" "" "" "" "" "" "" "" "" *|Y*O|Rad 83.86091700 -5.43273300 2
