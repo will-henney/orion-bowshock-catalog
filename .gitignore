@@ -1,4 +1,5 @@
 *
+!Simbad
 !notebooks
 !notebooks/*.py
 # Now we ADD the ipynb files, so that pre-commit can manage them

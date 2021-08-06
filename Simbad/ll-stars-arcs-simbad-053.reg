@@ -1,0 +1,108 @@
+# Region file format: DS9 version 4.1
+global color=yellow dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+fk5
+box(83.75917587,-5.4431761,2",2",0.0) # text={b'[H97b] 10351'} color=red
+box(83.76694437,-5.44366564,2",2",0.0) # text={b'V* V1482 Ori'} color=red
+box(83.76747288,-5.44107242,2",2",0.0) # text={b'V* V1322 Ori'} color=red
+box(83.770583,-5.361942,2",2",0.0) # text={b'[RRS2008] 049-143'} color=red
+box(83.77062,-5.36189,2",2",0.0) # text={b'[RRL2007] 050-143'} color=red
+box(83.77139789,-5.34011475,2",2",0.0) # text={b'V* V479 Ori'} color=red
+box(83.7772665,-5.41710168,2",2",0.0) # text={b'V* V2167 Ori'} color=red
+box(83.77736621,-5.54765931,2",2",0.0) # text={b'V* V2168 Ori'} color=red
+box(83.77742,-5.44778,2",2",0.0) # text={b'[DRH2012] 347'} color=red
+box(83.780117,-5.359608,2",2",0.0) # text={b'2MASS J05350722-0521345'} color=red
+box(83.780792,-5.374722,2",2",0.0) # text={b'COUP   286'} color=red
+box(83.78457918,-5.40969193,2",2",0.0) # text={b'V* V2181 Ori'} color=red
+box(83.79225812,-5.37573678,2",2",0.0) # text={b'2MASS J05351014-0522326'} color=red
+box(83.7927592,-5.36586666,2",2",0.0) # text={b'2MASS J05351026-0521571'} color=red
+box(83.79410915,-5.37909743,2",2",0.0) # text={b'V* V1487 Ori B'} color=red
+box(83.79543744,-5.37954357,2",2",0.0) # text={b'JW  355'} color=red
+box(83.79858151,-5.5169952,2",2",0.0) # text={b'2MASS J05351165-0531011'} color=red
+box(83.79856655,-5.4059602,2",2",0.0) # text={b'2MASS J05351165-0524213'} color=red
+box(83.79971661,-5.53150264,2",2",0.0) # text={b'[DRS2009] 852'} color=red
+box(83.80052565,-5.40938241,2",2",0.0) # text={b'V* V2224 Ori'} color=red
+box(83.80162,-5.35878,2",2",0.0) # text={b'[HC2000] 616'} color=red
+box(83.80167096,-5.35879133,2",2",0.0) # text={b'COUP   476'} color=red
+box(83.8015,-5.35878,2",2",0.0) # text={b'[H97b] 9016'} color=red
+box(83.80445254,-5.34608928,2",2",0.0) # text={b'[FRM2016] 105'} color=red
+box(83.8050631,-5.34798504,2",2",0.0) # text={b'V* V2236 Ori'} color=red
+box(83.80668331,-5.51601878,2",2",0.0) # text={b'V* V488 Ori'} color=red
+box(83.80752622,-5.50679805,2",2",0.0) # text={b'[KPM2006]  86'} color=red
+box(83.809,-5.383692,2",2",0.0) # text={b'GBS-VLA J053514.17-052301.0'} color=red
+box(83.81407787,-5.37371728,2",2",0.0) # text={b'JW  472'} color=red
+box(83.814167,-5.377794,2",2",0.0) # text={b'MLLA  566'} color=red
+box(83.81597375,-5.38956131,2",2",0.0) # text={b'Parenago  1867'} color=red
+box(83.81642238,-5.37252103,2",2",0.0) # text={b'2MASS J05351594-0522211'} color=red
+box(83.81645148,-5.39720824,2",2",0.0) # text={b'V* V2279 Ori'} color=red
+box(83.81695508,-5.39009675,2",2",0.0) # text={b'TCC  54'} color=red
+box(83.81696,-5.39008,2",2",0.0) # text={b'GBS-VLA J053516.07-052324.3'} color=red
+box(83.816983,-5.390203,2",2",0.0) # text={b'[BSD98]  2'} color=red
+box(83.81746358,-5.4156849,2",2",0.0) # text={b'V* V2285 Ori'} color=red
+box(83.817958,-5.372653,2",2",0.0) # text={b'COUP   799'} color=red
+box(83.8178458,-5.38792,2",2",0.0) # text={b'LV 3'} color=red
+box(83.8186667,-5.3764333,2",2",0.0) # text={b'MLLA  588B'} color=red
+box(83.8187222,-5.37643177,2",2",0.0) # text={b'[FRM2016] 306'} color=red
+box(83.81862,-5.37656,2",2",0.0) # text={b'HH 513'} color=red
+box(83.81922833,-5.387801,2",2",0.0) # text={b'TCC  70'} color=red
+box(83.819679,-5.387933,2",2",0.0) # text={b'* tet01 Ori G'} color=red
+box(83.82021,-5.39061,2",2",0.0) # text={b'[OW94] 168-326'} color=red
+box(83.820212,-5.390753,2",2",0.0) # text={b'TCC  77'} color=red
+box(83.8201075,-5.39052867,2",2",0.0) # text={b'TCC  75'} color=red
+box(83.8201075,-5.39052867,2",2",0.0) # text={b'TCC  75'} color=red
+box(83.82021,-5.39061,2",2",0.0) # text={b'[OW94] 168-326'} color=red
+box(83.82,-5.3906,2",2",0.0) # text={b'LV 1'} color=red
+box(83.81984208,-5.39111692,2",2",0.0) # text={b'TCC  74'} color=red
+box(83.82037583,-5.39390703,2",2",0.0) # text={b'[BSD98] 17'} color=red
+box(83.820242,-5.393953,2",2",0.0) # text={b'[SCB99] 150'} color=red
+box(83.820708,-5.3802,2",2",0.0) # text={b'COUP   844'} color=red
+box(83.8223096,-5.37661408,2",2",0.0) # text={b'HD  37024'} color=red
+box(83.822208,-5.394839,2",2",0.0) # text={b'COUP   886'} color=red
+box(83.82221737,-5.39483114,2",2",0.0) # text={b'[FRM2016] 346'} color=red
+box(83.82271,-5.38917,2",2",0.0) # text={b'COUP   885'} color=red
+box(83.82362,-5.39469,2",2",0.0) # text={b'[BOM2000] j177-341'} color=red
+box(83.823667,-5.394692,2",2",0.0) # text={b'JW  558'} color=red
+box(83.82429887,-5.38277997,2",2",0.0) # text={b'MLLA  495'} color=red
+box(83.82521,-5.39186,2",2",0.0) # text={b'GBS-VLA J053518.05-052330.7'} color=red
+box(83.825,-5.3919,2",2",0.0) # text={b'HH 1144'} color=red
+box(83.82864951,-5.39135167,2",2",0.0) # text={b'COUP  1000'} color=red
+box(83.83457376,-5.51099019,2",2",0.0) # text={b'V* MY Ori'} color=red
+box(83.835125,-5.391583,2",2",0.0) # text={b'** PRS   22B'} color=red
+box(83.8357168,-5.34533946,2",2",0.0) # text={b'V* V1521 Ori'} color=red
+box(83.83834213,-5.40004522,2",2",0.0) # text={b'MLLA  262'} color=red
+box(83.85907767,-5.50505079,2",2",0.0) # text={b'JW  796'} color=red
+box(83.87688902,-5.4698259,2",2",0.0) # text={b'V* V2488 Ori'} color=red
+box(83.87834253,-5.51007124,2",2",0.0) # text={b'V* V1555 Ori'} color=red
+box(83.89317,-5.50567,2",2",0.0) # text={b'[H97b] 20602'} color=red
+box(83.90147958,-5.52718827,2",2",0.0) # text={b'V* V2551 Ori'} color=red
+box(83.61885815,-5.41608252,2",2",0.0) # text={b'V* V976 Ori'} color=red
+box(83.67377951,-5.44803594,2",2",0.0) # text={b'V* V399 Ori'} color=red
+box(83.69488252,-5.43466634,2",2",0.0) # text={b'V* V2026 Ori'} color=red
+box(83.70447136,-5.44071333,2",2",0.0) # text={b'V* V2044 Ori'} color=red
+box(83.71043712,-5.39314117,2",2",0.0) # text={b'V* V475 Ori'} color=red
+box(83.71674019,-5.40521217,2",2",0.0) # text={b'V* V2064 Ori'} color=red
+box(83.72113835,-5.44101052,2",2",0.0) # text={b'2MASS J05345307-0526276'} color=red
+box(83.72922719,-5.44969688,2",2",0.0) # text={b'V* V2074 Ori'} color=red
+box(83.740778,-5.38088768,2",2",0.0) # text={b'V* V402 Ori'} color=red
+box(83.74236682,-5.44310228,2",2",0.0) # text={b'2MASS J05345816-0526350'} color=red
+box(83.77348399,-5.42208815,2",2",0.0) # text={b'V* LL Ori'} color=red
+box(83.67027063,-5.37841868,2",2",0.0) # text={b'V* IX Ori'} color=red
+box(83.67005742,-5.4440697,2",2",0.0) # text={b'V* V2005 Ori'} color=red
+box(83.67800671,-5.47707058,2",2",0.0) # text={b'V* V2012 Ori'} color=red
+box(83.88087446,-5.47124948,2",2",0.0) # text={b'V* V1559 Ori'} color=red
+box(83.88697327,-5.50596214,2",2",0.0) # text={b'V* NX Ori'} color=red
+box(83.89639596,-5.56366374,2",2",0.0) # text={b'V* V2542 Ori'} color=red
+box(83.74816555,-5.40006476,2",2",0.0) # text={b'V* V1318 Ori'} color=red
+box(83.74821,-5.40011,2",2",0.0) # text={b'[BOM2000] w000-400'} color=red
+box(83.75196678,-5.42063454,2",2",0.0) # text={b'V* V2102 Ori'} color=red
+box(83.7521,-5.4206,2",2",0.0) # text={b'[BOM2000] w005-514'} color=red
+box(83.75491041,-5.40189087,2",2",0.0) # text={b'Brun 471'} color=red
+box(83.755,-5.40194,2",2",0.0) # text={b'[BOM2000] w012-407'} color=red
+box(83.75568128,-5.40370125,2",2",0.0) # text={b'[OW94] 014-413'} color=red
+box(83.762483,-5.423406,2",2",0.0) # text={b'[LRT2005] 030-524'} color=red
+box(83.7625,-5.4233,2",2",0.0) # text={b'[BOM2000] w030-524'} color=red
+box(83.77879,-5.4335,2",2",0.0) # text={b'[BOM2000] w069-601'} color=red
+box(83.77879934,-5.43351036,2",2",0.0) # text={b'V* V2170 Ori'} color=red
+box(83.78029,-5.37406,2",2",0.0) # text={b'[BOM2000] w073-227'} color=red
+box(83.780321,-5.374067,2",2",0.0) # text={b'2MASS J05350727-0522266'} color=red
+box(83.86092,-5.43289,2",2",0.0) # text={b'[BOM2000] w266-558'} color=red
+box(83.860917,-5.432733,2",2",0.0) # text={b'[RRS2008] 266-558'} color=red
