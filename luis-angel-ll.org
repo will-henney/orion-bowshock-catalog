@@ -825,53 +825,66 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
 - Main change is to make the output precision be uniform for each column
 #+name: table-write-setup
 #+BEGIN_SRC python
-    from  astropy.table import Table
-    import astropy.coordinates as coord
-    import astropy.units as u
-    
-    def format_RA(ra):
-	return coord.Angle(ra, unit=u.hour).to_string(sep=':', precision=2, pad=True)
-    
-    def format_DEC(dec):
-	s = coord.Angle(dec, unit=u.deg).to_string(sep=':', precision=1, pad=True)
-	if s.startswith('-'):
-	    return r'$-$' + s[1:]
-	else:
-	    return s
-    
-    arctab = Table.read("luis-programas/arcs-summary-classify.ecsv", format = "ascii")
-    selected_columns = ['Object', 'Group', 'RA', 'Dec',
-			'D', 'PA_star', 'R_out','R_in','Rc_out','Rc_in','h', 'PA_out', 'PA_in',
-			'MAIN_ID']
-    latex_columns = ['Object', 'Group', 'RA', 'Dec',
-		     r'\(D\)', 'PA',
-		     r'\(R_\mathrm{out}\)',
-		     r'\(R_\mathrm{in}\)',
-		     r'\(R_\mathrm{c,out}\)',
-		     r'\(R_\mathrm{c,in}\)',
-		     r'\(h\)',
-		     r'PA\(\mathrm{_{out}}\)',
-		     r'PA\(\mathrm{_{in}}\)',
-		     'Star id'
-    ]
-    column_formats = {}
-    for c, cc in zip(selected_columns, latex_columns):
-	if c[0] in 'DRh':
-	    column_formats[cc] = '%.2f'
-	elif c.startswith('PA'):
-	    column_formats[cc] = '%.1f'
-	else:
-	    column_formats[cc] = '%s'
-    
-    column_formats['RA'] = format_RA
-    column_formats['Dec'] = format_DEC
-    arctab.sort('RA')
-    
-    #Simbad coincidences 
-    simbad_sources = Table.read("Simbad/ll-stars-arcs-simbad-clean.ecsv", format = "ascii")
-    simbad_sources.sort('RA')
-    arctab['MAIN_ID'] = simbad_sources['MAIN_ID']
-    arctab['SP_TYPE'] = simbad_sources['SP_TYPE']
+  from  astropy.table import Table
+  import astropy.coordinates as coord
+  import astropy.units as u
+  
+  def format_RA(ra):
+      return coord.Angle(ra, unit=u.hour).to_string(sep=':', precision=2, pad=True)
+  
+  def format_DEC(dec):
+      s = coord.Angle(dec, unit=u.deg).to_string(sep=':', precision=1, pad=True)
+      if s.startswith('-'):
+	  return r'$-$' + s[1:]
+      else:
+	  return s
+  
+  arctab = Table.read("luis-programas/arcs-summary-classify.ecsv", format = "ascii")
+  selected_columns = ['Object', 'Group', 'RA', 'Dec',
+		      'D', 'PA_star', 'R_out','R_in','Rc_out','Rc_in','h', 'PA_out', 'PA_in',
+		      'Star']
+  latex_columns = ['Object', 'Group', 'RA', 'Dec',
+		   r'\(D\)', 'PA',
+		   r'\(R_\mathrm{out}\)',
+		   r'\(R_\mathrm{in}\)',
+		   r'\(R_\mathrm{c,out}\)',
+		   r'\(R_\mathrm{c,in}\)',
+		   r'\(h\)',
+		   r'PA\(\mathrm{_{out}}\)',
+		   r'PA\(\mathrm{_{in}}\)',
+		   'Star ID'
+  ]
+  
+  #Stellar sources
+  star = []
+  stellar_sources = Table.read("arc-stellar-sources.ecsv", format = "ascii.ecsv")
+  for i, j in zip(stellar_sources["ACS"], stellar_sources["RSS"]):
+    if i:
+	star.append(i)
+    else:
+	star.append(j)
+  
+  arctab['Star'] = star
+  
+  column_formats = {}
+  for c, cc in zip(selected_columns, latex_columns):
+      if c[0] in 'DRh':
+	  column_formats[cc] = '%.2f'
+      elif c.startswith('PA'):
+	  column_formats[cc] = '%.1f'
+      else:
+	  column_formats[cc] = '%s'
+  
+  column_formats['RA'] = format_RA
+  column_formats['Dec'] = format_DEC
+  arctab.sort('RA')
+  
+  #Simbad coincidences 
+  simbad_sources = Table.read("Simbad/ll-stars-arcs-simbad-clean.ecsv", format = "ascii")
+  simbad_sources.sort('RA')
+  arctab['MAIN_ID'] = simbad_sources['MAIN_ID']
+  arctab['SP_TYPE'] = simbad_sources['SP_TYPE']
+  
 #+END_SRC
 
 #+RESULTS: table-write-setup
