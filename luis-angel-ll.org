@@ -609,12 +609,14 @@ This diagnostic, Aout vs Ain, is actually not very useful.  A better way of look
                   alpha=0.8)
   label_sources(source_labels, q, A, allmask=m, 
                 extramask=(A > 5.0) | (A < 1.3) | (q > 0.2) | (q < 4e-3))
-  plt.xlabel('Bowshock fractional size, q = r0/D')
-  plt.ylabel('Bowshock bluntness, A = Rc/r0')
+  plt.xlabel(r'Bowshock fractional size, $q = r_0/D$')
+  plt.ylabel(r'Bowshock planitude, $\Pi = R_c/r_0$')
   ax.text(0.05, 0.05, 'Symbol size indicates outer shell radius, R0',
            transform=ax.transAxes, fontsize='x-small')
   ax.set_xscale('log')
   ax.set_xlim(0.001, 1.0)
+  ax.set_yscale('log')
+  ax.set_ylim(0.8, 11.0)
   ax.legend(**lgd_kws)
   fig.savefig(pltfile)
 #+END_SRC
@@ -707,7 +709,8 @@ For the flaring, we take the geometric mean of the values calculated from the ce
   ax.set_xscale('log')
   ax.set_yscale('log')
   ax.minorticks_on()
-  ax.grid(which='minor', lw=0.3)
+  ax.grid(which='major', lw=0.4)
+  ax.grid(which='minor', lw=0.2)
   ax.legend(loc='upper left', ncol=2, fontsize='x-small',
             ,**lgd_kws)
   fig.savefig(pltfile)
@@ -722,7 +725,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 
   pltfile = 'will-PA-vs-PA-class.pdf'
   sns.set_style('ticks')
-  fig = plt.figure(figsize=(7,6))
+  fig = plt.figure(figsize=(7,4))
   ax = fig.add_subplot(111)
   plt.fill_betweenx([-90.0, 90.0], [0.0, 0.0], [90.0, 90.0], zorder=-10, alpha=0.08)
   plt.fill_betweenx([-90.0, 90.0], [180.0, 180.0], [270.0, 270.0], zorder=-10, alpha=0.08)
@@ -759,8 +762,12 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 #+name: angle-stats
 #+BEGIN_SRC python
   def anglestats(PA, dth, th1, th2):
-      mask = (PA >= th1) & (PA <= th2) & (np.abs(dth) < 90.0)
+      mask = (PA >= th1) & (PA <= th2) & (np.abs(dth) < 65.0)
       return '({:+.0f} +/- {:.0f})'.format(dth[mask].mean(), dth[mask].std())
+
+  # def anglestats(PA, dth, th1, th2):
+  #     mask = (PA >= th1) & (PA <= th2) & (np.abs(dth) < 90.0)
+  #     return '({:+.0f} +/- {:.0f})'.format(dth[mask].mean(), dth[mask].std())
 
 #+END_SRC
 
@@ -771,7 +778,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 
   pltfile = 'will-PA-out-vs-in-class.pdf'
   sns.set_style('ticks')
-  fig = plt.figure(figsize=(7,6))
+  fig = plt.figure(figsize=(7,4))
   ax = fig.add_subplot(111)
   plt.fill_betweenx([-90.0, 90.0], [0.0, 0.0], [90.0, 90.0], zorder=-10, alpha=0.08)
   plt.fill_betweenx([-90.0, 90.0], [180.0, 180.0], [270.0, 270.0], zorder=-10, alpha=0.08)
