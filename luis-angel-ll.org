@@ -686,7 +686,7 @@ For the flaring, we take the geometric mean of the values calculated from the ce
   <<classify-plots-setup>>
 
   pltfile = 'will-r0-vs-D-class.pdf'
-  fig = plt.figure(figsize=(7,6))
+  fig = plt.figure(figsize=(7,4))
   ax = fig.add_subplot(111)
   for group, color in groups_and_colors:
       for thismask, marker, label in [
@@ -718,6 +718,44 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 
 #+RESULTS:
 [[file:luis-programas/will-r0-vs-D-class.pdf]]
+
+#+BEGIN_SRC python :return pltfile :results file 
+  <<classify-plots-setup>>
+
+  pltfile = 'will-H-vs-D-class.pdf'
+  fig = plt.figure(figsize=(7,4))
+  ax = fig.add_subplot(111)
+  for group, color in groups_and_colors:
+      for thismask, marker, label in [
+              (proplyd_mask | maybe_proplyd_mask, 's', group+' group'),
+              (not_proplyd_mask, 'D', group+' group (non-proplyd)'),
+      ]:
+          mm = m & (tab['Group'] == group) & thismask
+          n = len(D60[mm])
+          if n > 0:
+              plt.scatter(D60[mm], H[mm], s=20*tab['R_out'][mm], c=[color]*n,
+                          label=label, marker=marker, alpha=0.8, zorder=100)
+  label_sources(source_labels, D60, H, (H > 0.6) | (H < 0.2), allmask=m)
+  plt.xlabel('Projected distance from Trapezium, D / arcmin')
+  plt.ylabel('Shell relative thickness, H = h/r0')
+  plt.text(0.02, 0.02, 'Symbol size indicates outer shell radius, R0',
+           transform=ax.transAxes, fontsize='x-small')
+  ax.set_xlim(0.05, 20.0)
+  ax.set_ylim(0.09, 1.05)
+  ax.set_xscale('log')
+  ax.set_yscale('log')
+  ax.minorticks_on()
+  ax.set_yticks(0.1*np.arange(1, 11))
+  ax.set_yticklabels([f"{_:.1f}" for _ in 0.1*np.arange(1, 11)])
+  ax.grid(which='major', lw=0.4)
+  ax.grid(which='minor', lw=0.2)
+  # ax.legend(ncol=2, fontsize='x-small',
+  #           **lgd_kws)
+  fig.savefig(pltfile)
+#+END_SRC
+
+#+RESULTS:
+[[file:luis-programas/will-H-vs-D-class.pdf]]
 
 #+BEGIN_SRC python :return pltfile :results file 
   <<classify-plots-setup>>
