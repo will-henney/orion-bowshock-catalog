@@ -870,6 +870,14 @@ For the flaring, we take the geometric mean of the values calculated from the ce
 
 *** Plot the spiral distribution back into real space
 This is done in [[file:programas/plot-ll-spiral.py]]
+
+#+begin_src sh
+python programas/plot-ll-spiral.py
+#+end_src
+
+#+RESULTS:
+: INFO: Auto-setting resolution to 300 dpi [aplpy.core]
+
 *** Output a latex table for the catalog paper, which includes the groups
 :LOGBOOK:  
 CLOCK: [2014-12-05 Fri 12:46]--[2014-12-05 Fri 12:47] =>  0:01
