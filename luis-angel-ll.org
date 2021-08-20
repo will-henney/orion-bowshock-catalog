@@ -543,16 +543,18 @@ Note that these run in the [[file:luis-programas]] folder
       mm = m & (tab['Group'] == group)
       x = np.concatenate((D60[mm], D60[mm], D60[mm]))
       y = np.concatenate((PA_star[mm]-360, PA_star[mm], PA_star[mm]+360))
-      ax.scatter(x, y, s=100, color=color, alpha=0.7)
+      ax.scatter(x, y, s=50, color=color, alpha=0.7, label=group+' group')
   ax.fill_between([xmin, xmax], [0.0, 0.0], [360.0, 360.0], alpha=0.05, color='k')
   ax.set(
       xlim=[xmin, xmax],
       xscale="log",
       # ylim=[-180.0, 360.0 + 180.0],
-      ylim=[-240.0, 200.0],
+      ylim=[-178.0, 360 + 180],
       xlabel="Projected distance, arcmin",
       ylabel="Position angle, degrees",
   )
+  ax.legend(loc="lower left", ncol=2, **lgd_kws)
+  ax.set_yticks([-180, -90, 0, 90, 180, 270, 360, 450, 540])
   fig.tight_layout()
   fig.savefig(pltfile)
 #+END_SRC
