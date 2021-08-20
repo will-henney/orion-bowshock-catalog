@@ -539,11 +539,23 @@ Note that these run in the [[file:luis-programas]] folder
   for dpa in -360, 0, 360, 720:
       ax.plot(rgrid, pagrid + dpa, color="k", ls=":", alpha=0.5, zorder=-100)
 
+  lab_pos = {
+      "LV": (0.07, 180),
+      "SE": (0.55, 125),
+      "N": (0.4, 330),
+      "NW": (2.5, 340),
+      "W": (1.2, 210),
+      "S": (2.8, 160),
+  }
   for group, color in groups_and_colors:
       mm = m & (tab['Group'] == group)
       x = np.concatenate((D60[mm], D60[mm], D60[mm]))
       y = np.concatenate((PA_star[mm]-360, PA_star[mm], PA_star[mm]+360))
       ax.scatter(x, y, s=50, color=color, alpha=0.7, label=group+' group')
+      xx, yy = lab_pos[group]
+      for dy in -360, 0, 360:
+          ax.text(xx, yy + dy, group+' group', color=color).set_clip_on(True)
+
   ax.fill_between([xmin, xmax], [0.0, 0.0], [360.0, 360.0], alpha=0.05, color='k')
   ax.set(
       xlim=[xmin, xmax],
@@ -553,7 +565,7 @@ Note that these run in the [[file:luis-programas]] folder
       xlabel="Projected distance, arcmin",
       ylabel="Position angle, degrees",
   )
-  ax.legend(loc="lower left", ncol=2, **lgd_kws)
+  #ax.legend(loc="lower left", ncol=2, **lgd_kws)
   ax.set_yticks([-180, -90, 0, 90, 180, 270, 360, 450, 540])
   fig.tight_layout()
   fig.savefig(pltfile)
