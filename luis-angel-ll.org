@@ -50,7 +50,24 @@
 #+END_SRC
 
 #+RESULTS:
-[[file:coup-sources.reg]]
+#+begin_example
+[['Robb-13', '5r'], ['Robb-13', '0l'], ['Bally-06', 1], ['Bally-06', 9], ['Bally-06', 17]]
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip5r_f658n_v1_drz.fits
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip5r_f555w_v1_drz.fits
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip5r_f435w_v1_drz.fits
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip0l_f555w_v1_drz.fits
+/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip0l_f435w_v1_drz.fits
+/Users/will/Work/OrionTreasury/Bally-ACS/j8oc1010_wcs.fits
+NOT FOUND: Bally-06 1 f555w
+NOT FOUND: Bally-06 1 f435w
+/Users/will/Work/OrionTreasury/Bally-ACS/j8oc9010_wcs.fits
+NOT FOUND: Bally-06 9 f555w
+NOT FOUND: Bally-06 9 f435w
+/Users/will/Work/OrionTreasury/Bally-ACS/j8oc17010_wcs.fits
+NOT FOUND: Bally-06 17 f555w
+NOT FOUND: Bally-06 17 f435w
+#+end_example
 
 *** And on the NICMOS data
 #+BEGIN_SRC python :results file :return regionfile
@@ -1218,6 +1235,7 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
 
       if "full" in bbox.lower():
           im = hdu.data
+          i1, j1 = 0, 0
       else:
           i1, j1, i2, j2 = [int(s) for s in bbox.split()]
           im = hdu.data[j1:j2, i1:i2]
@@ -1279,6 +1297,116 @@ optional arguments:
 #+end_example
 
 
+
+
+*** Stitch together bespoke fields for each group figure
++ Many of the groups fall on awkward boundaries of the Robberto strips
++ So it would be better to stitch together images using ~reproject~ that have exactly the coverage we want
+  + This has the disadvantage that we will lose a little resolution in the reprojection
+  + But on the other hand it will allow us to use for example the Bally fields in places where they make sense
+**** Proof of concept: NW group
++ It would be good to extend the FOV beyond what we have from ~strip5r~
+  + We could get the frothy shocks region better
++ Probably ~0l~ will cover it
++ Also Bally fields 1, 9, 10
+  + But 10 has no ~_wcs~ version
+
+#+name: nw-reproject-files
+| Robb-13  | 5r |
+| Robb-13  | 0l |
+| Bally-06 | 01 |
+| Bally-06 | 09 |
+
+
+#+name: nw-subset
+| Bally-06 | 01 |
+| Bally-06 | 09 |
+
+#+header: :var INFILES=nw-reproject-files NEWFIELD="NW-Field"
+#+begin_src python :results output :tangle reproject-images/test-reproject.py
+  from pathlib import Path
+  import numpy as np
+  from astropy.io import fits
+  from reproject import reproject_interp
+
+  base_path = Path("/Users/will/Work/OrionTreasury/")
+
+  def get_filename(dataset, field, filter):
+      if dataset == "Robb-13":
+          return base_path / "acs" / f"hlsp_orion_hst_acs_strip{field}_{filter}_v1_drz.fits"
+      elif dataset == "Bally-06":
+          if filter == "f658n":
+              return base_path / "Bally-ACS" / f"j8oc{field:02d}010_wcs.fits"
+          else:
+              return None
+      else:
+          return None
+
+  hdu0 = fits.open(f"blank-{NEWFIELD}.fits")[0]
+  FILTERS = "f658n", "f555w", "f435w"
+  for dataset, field in INFILES:
+      for filter in FILTERS:
+          fn = get_filename(dataset, field, filter)
+          if fn is not None:
+              hdulist = fits.open(fn)
+              hdu = hdulist["SCI"]
+              # Remove any unwanted SIP keywords
+              del hdu.header["A_*"]
+              del hdu.header["B_*"]
+              # switch zeros for NaN
+              hdu.data = np.where(
+                  hdu.data > 0.0,
+                  hdu.data,
+                  np.nan,
+              )
+              newdata, _ = reproject_interp(hdu, hdu0.header, order="nearest-neighbor")
+              newhdu = fits.PrimaryHDU(header=hdu0.header, data=newdata)
+              try:
+                  field = f"{field:02d}"
+              except:
+                  pass
+              newfn = f"{NEWFIELD}-{dataset}-{field}-{filter}.fits"
+              newhdu.writeto(newfn, overwrite=True)
+          else:
+              pass
+
+#+end_src
+
+#+begin_src sh :dir reproject-images :results verbatim
+python test-reproject.py
+#+end_src
+
+#+RESULTS:
+
+
+#+begin_src python :tangle reproject-images/make-best-image.py
+  from pathlib import Path
+  import sys
+  from astropy.io import fits
+  import numpy as np
+
+  field = sys.argv[1]
+  filter = sys.argv[2]
+
+  files = Path(".").glob(f"{field}-*-{filter}.fits")
+
+  imlist = []
+  for file in files:
+      if "-best-" in str(file): continue
+      if "-Bally-" in str(file): continue
+      hdu = fits.open(file)[0]
+      imlist.append(hdu.data)
+  imstack = np.stack(imlist)
+  imbest = np.nanmedian(imstack, axis=0)
+  fits.PrimaryHDU(
+      header=hdu.header,
+      data=imbest,
+  ).writeto(f"{field}-best-{filter}.fits", overwrite=True)
+
+#+end_src
+
+
+Working OK, but I need the ability to exclude some bits of the Bally images - but not all!
 
 *** S group
 Try out with small section around LL 7

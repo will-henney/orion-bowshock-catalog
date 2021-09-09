@@ -1,4 +1,8 @@
 *
+!reproject-images
+reproject-images/*.fits
+!reproject-images/*.py
+!reproject-images/*.reg
 !*.ecsv
 !Simbad
 !notebooks
@@ -61,3 +65,4 @@
 /j8oc17010_wcs/*.fits
 /j8oc17010_wcs/*.pdf
 !*.afdesign
+/reproject-images/*.fits
