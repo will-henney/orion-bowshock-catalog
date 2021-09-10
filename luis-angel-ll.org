@@ -1304,25 +1304,41 @@ optional arguments:
 + So it would be better to stitch together images using ~reproject~ that have exactly the coverage we want
   + This has the disadvantage that we will lose a little resolution in the reprojection
   + But on the other hand it will allow us to use for example the Bally fields in places where they make sense
++ I had to get some Robberto fields that were missing
+  + https://archive.stsci.edu/pub/hlsp/orion/images/acs/
 **** Proof of concept: NW group
 + It would be good to extend the FOV beyond what we have from ~strip5r~
   + We could get the frothy shocks region better
 + Probably ~0l~ will cover it
 + Also Bally fields 1, 9, 10
   + But 10 has no ~_wcs~ version
-
+***** DONE Make a template HDU to reproject onto
+CLOSED: [2021-09-09 Thu 18:16]
+This is done in [[file:reproject-images/fits-image-from-ds9-box.py]]
+***** DONE Mask out problematic areas of individual images
+CLOSED: [2021-09-09 Thu 18:16]
++ Some of the Bally fields in particular have artefacts close to the sharp edges
++ We could deal with this by some sore of dilation of the NaN areas
+  + But the boundary area is many pixels in some cases
++ A more general solution would be to define areas with DS9 regions
++ This could also be used on areas where the Bally field has geometric distortions that lead to double stars when combining
++ These are now used in the combination phase below: [[id:833C0C2E-A06A-4EDD-A063-5495D01C40BE][Combine the individual images to make a "best" mosaic]]
+  
+***** Reproject all the images
 #+name: nw-reproject-files
 | Robb-13  | 5r |
 | Robb-13  | 0l |
+| Robb-13  | 0r |
+| Robb-13  | 3l |
 | Bally-06 | 01 |
+| Bally-06 | 02 |
 | Bally-06 | 09 |
 
 
 #+name: nw-subset
-| Bally-06 | 01 |
-| Bally-06 | 09 |
+| Robb-13  | 0r |
 
-#+header: :var INFILES=nw-reproject-files NEWFIELD="NW-Field"
+#+header: :var INFILES=nw-subset NEWFIELD="NW-Field"
 #+begin_src python :results output :tangle reproject-images/test-reproject.py
   from pathlib import Path
   import numpy as np
@@ -1377,13 +1393,19 @@ python test-reproject.py
 #+end_src
 
 #+RESULTS:
-
+***** Combine the individual images to make a "best" mosaic
+:PROPERTIES:
+:ID:       833C0C2E-A06A-4EDD-A063-5495D01C40BE
+:END:
 
 #+begin_src python :tangle reproject-images/make-best-image.py
   from pathlib import Path
   import sys
   from astropy.io import fits
+  from astropy.wcs import WCS
   import numpy as np
+  import regions
+
 
   field = sys.argv[1]
   filter = sys.argv[2]
@@ -1393,11 +1415,21 @@ python test-reproject.py
   imlist = []
   for file in files:
       if "-best-" in str(file): continue
-      if "-Bally-" in str(file): continue
       hdu = fits.open(file)[0]
+      regfile = str(file).replace(".fits", "-exclude.reg")
+      try:
+          regs = regions.read_ds9(regfile)
+          print("Masking:", regs)
+          w = WCS(hdu.header)
+          shape = hdu.data.shape
+          for reg in regs:
+              m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+              hdu.data[m] = np.nan
+      except:
+          pass
       imlist.append(hdu.data)
   imstack = np.stack(imlist)
-  imbest = np.nanmedian(imstack, axis=0)
+  imbest = np.nanmin(imstack, axis=0)
   fits.PrimaryHDU(
       header=hdu.header,
       data=imbest,
@@ -1407,6 +1439,87 @@ python test-reproject.py
 
 
 Working OK, but I need the ability to exclude some bits of the Bally images - but not all!
+
+***** New program for the spatial filtering
++ The previous version was specialized to the Robberto files
++ Here is something more general
++ But we also remove the ability to work on sub-images, since we assume that we already made a sub-image
+
+#+name: smooth-image
+#+BEGIN_SRC python :tangle reproject-images/smooth-sharp.py
+  import click
+  import numpy as np
+  from astropy.io import fits
+  from astropy.convolution import convolve_fft, Gaussian2DKernel
+
+  @click.command()
+  @click.argument("infile")
+  @click.option("--width", default=20, show_default=True,
+                help="Width of Gaussian smoothing kernel in pixels")
+  @click.option("--suffix", default="",
+                help="Extra id string to add to output filename")
+  @click.option("--twopass/--no-twopass", default=False, show_default=True,
+                help="Whether to do a second pass for eliminating negative halos")
+  @click.option("--threshold", default=1.5, show_default=True,
+                help="Mask out relative brightnesses higher than this in second pass")
+  def main(infile, width, suffix, twopass, threshold):
+      """
+      Do high-pass filtering of Fits file INFILE
+      """
+      hdu = fits.open(infile)[0]
+
+      im = hdu.data
+
+      gauss_kernel = Gaussian2DKernel(width)
+      smoothim = convolve_fft(im, gauss_kernel, allow_huge=True)
+      sharpim = im/smoothim
+
+      if twopass:
+          mask = (sharpim > threshold) | (im == 0.0)
+          im[mask] = np.nan
+          print('Starting second pass: N(masked) =', mask.sum())
+          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, allow_huge=True)
+          sharpim = im/smoothim
+
+      outhdu = fits.PrimaryHDU(data=smoothim, header=hdu.header)
+
+      outfile = infile.replace(".fits", f"_smooth_{width}{suffix}.fits")
+      outhdu.writeto(outfile, overwrite=True)
+
+      outhdu.data = sharpim
+      outfile = outfile.replace("_smooth_", "_sharp_")
+      outhdu.writeto(outfile, overwrite=True)
+
+  if __name__ == "__main__":
+      main()
+
+#+END_SRC
+
+#+begin_src shell :dir reproject-images :results verbatim
+python smooth-sharp.py --help
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Usage: smooth-sharp.py [OPTIONS] INFILE
+
+  Do high-pass filtering of Fits file INFILE
+
+Options:
+  --width INTEGER           Width of Gaussian smoothing kernel in pixels
+                            [default: 20]
+  --suffix TEXT             Extra id string to add to output filename
+  --twopass / --no-twopass  Whether to do a second pass for eliminating
+                            negative halos  [default: no-twopass]
+  --threshold FLOAT         Mask out relative brightnesses higher than this in
+                            second pass  [default: 1.5]
+  --help                    Show this message and exit.
+#+end_example
+
+***** Example of the spatial filtering
+#+begin_src shell :eval no
+time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --threshold 3.0
+#+end_src
 
 *** S group
 Try out with small section around LL 7

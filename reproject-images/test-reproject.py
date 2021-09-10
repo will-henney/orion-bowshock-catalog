@@ -1,4 +1,4 @@
-INFILES=[["Robb-13", "5r"], ["Robb-13", "0l"], ["Bally-06", 1], ["Bally-06", 9]]
+INFILES=[["Robb-13", "0r"]]
 NEWFIELD="NW-Field"
 from pathlib import Path
 import numpy as np
