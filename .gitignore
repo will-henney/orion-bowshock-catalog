@@ -66,3 +66,4 @@ reproject-images/*.fits
 /j8oc17010_wcs/*.pdf
 !*.afdesign
 /reproject-images/*.fits
+/reproject-images/*.png

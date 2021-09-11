@@ -1521,6 +1521,52 @@ Options:
 time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --threshold 3.0
 #+end_src
 
+
+***** Convert to color image to include in figure
++ Looks like ~plt.imsave()~ from matplotlib is the way to go
+#+begin_src python :tangle reproject-images/fits2image.py
+  from matplotlib import pyplot as plt
+  from astropy.io import fits
+  import click
+
+  @click.command()
+  @click.argument("fitsname")
+  @click.option("--vmin", default=0.5)
+  @click.option("--vmax", default=1.5)
+  @click.option("--format", default="png")
+  @click.option("--verbose/--no-verbose", default=False)
+  def fits2image(fitsname, vmin, vmax, format, verbose):
+      """
+      Convert FITSNAME.fits to an image
+      """
+      hdu = fits.open(fitsname)[0]
+      imname = fitsname.replace(".fits", f".{format}")
+      plt.imsave(imname, hdu.data, vmin=vmin, vmax=vmax, cmap="gray", origin="lower")
+      if verbose:
+          print("Saved", imname)
+
+  if __name__ == "__main__":
+      fits2image()
+
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py NW-Field-best-f658n_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py NW-Field-best-f555w_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py NW-Field-best-f435w_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  convert -verbose NW-Field-best-f{658n,555w,435w}_sharp_100.png -channel RGB -combine NW-Field-best-RGB_sharp_100.png
+#+end_src
+
+#+RESULTS:
+: Saved NW-Field-best-f658n_sharp_100.png
+: Saved NW-Field-best-f555w_sharp_100.png
+: Saved NW-Field-best-f435w_sharp_100.png
+: NW-Field-best-f658n_sharp_100.png=>NW-Field-best-RGB_sharp_100.png PNG 5896x4300 5896x4300+0+0 8-bit sRGB 25.8441MiB 12.950u 0:09.030
+
+
 *** S group
 Try out with small section around LL 7
 
