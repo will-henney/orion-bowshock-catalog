@@ -1230,97 +1230,6 @@ CLOCK: [2014-12-05 Fri 10:05]--[2014-12-05 Fri 13:25] =>  3:20
 :ID:       171A91D5-C0D6-4411-9DB2-C1AB76D18E61
 :END:
 
-+ Plan is to use the Robberto images:
-  + Red :: F658N
-  + Green :: F555W
-  + Blue :: F435W
-+ Remove large-scale brightness structure by dividing by smoothed version
-
-#+name: smooth-image
-#+BEGIN_SRC python :tangle /Users/will/Work/OrionTreasury/acs/smooth-image.py
-  import argh
-  import numpy as np
-  from astropy.io import fits
-  from astropy.convolution import convolve_fft, Gaussian2DKernel
-
-  template = "hlsp_orion_hst_acs_strip{}_{}_v1_drz.fits"
-
-  def main(field: "Robberto field of view"="0l",
-           band: "ACS filter"="f658n",
-           width: "Width of Gaussian smoothing kernel in pixels"=20,
-           bbox: "Subimage to use: 'i1 j1 i2 j2', or use 'full' for entire image"='full',
-           suffix: "Extra id string to add to output filename"="",
-           twopass: "Whether to do a second pass for eliminating negative halos"=False,
-           threshold: "Mask out relative brightnesses higher than this in second pass"=1.5,
-       ):
-
-      infile = template.format(field, band)
-      hdu = fits.open(infile)['SCI']
-
-      if "full" in bbox.lower():
-          im = hdu.data
-          i1, j1 = 0, 0
-      else:
-          i1, j1, i2, j2 = [int(s) for s in bbox.split()]
-          im = hdu.data[j1:j2, i1:i2]
-
-      gauss_kernel = Gaussian2DKernel(width)
-      smoothim = convolve_fft(im, gauss_kernel, allow_huge=True)
-      sharpim = im/smoothim
-
-      if twopass:
-          mask = (sharpim > threshold) | (im == 0.0)
-          im[mask] = np.nan
-          print('Starting second pass: N(masked) =', mask.sum())
-          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, allow_huge=True)
-          sharpim = im/smoothim
-
-      outhdu = fits.PrimaryHDU(data=smoothim, header=hdu.header)
-      outhdu.header['CRPIX1'] -= i1
-      outhdu.header['CRPIX2'] -= j1
-
-      outfile = infile.replace("_v1_drz.fits", "_smooth_{}{}.fits".format(width, suffix))
-      outhdu.writeto(outfile, overwrite=True)
-
-      outhdu.data = sharpim
-      outfile = outfile.replace("_smooth_", "_sharp_")
-      outhdu.writeto(outfile, overwrite=True)
-
-  if __name__ == "__main__":
-      argh.dispatch_command(main)
-
-#+END_SRC
-
-#+BEGIN_SRC sh :results verbatim
-python smooth-image.py --help
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-usage: smooth-image.py [-h] [-f FIELD] [--band BAND] [-w WIDTH] [--bbox BBOX]
-                       [-s SUFFIX] [--twopass] [--threshold THRESHOLD]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -f FIELD, --field FIELD
-                        Robberto field of view (default: '0l')
-  --band BAND           ACS filter (default: 'f658n')
-  -w WIDTH, --width WIDTH
-                        Width of Gaussian smoothing kernel in pixels (default:
-                        20)
-  --bbox BBOX           Subimage to use: 'i1 j1 i2 j2', or use 'full' for
-                        entire image (default: 'full')
-  -s SUFFIX, --suffix SUFFIX
-                        Extra id string to add to output filename (default:
-                        '')
-  --twopass             Whether to do a second pass for eliminating negative
-                        halos (default: False)
-  --threshold THRESHOLD
-                        Mask out relative brightnesses higher than this in
-                        second pass (default: 1.5)
-#+end_example
-
-
 
 
 *** Stitch together bespoke fields for each group figure
@@ -1591,7 +1500,252 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 : NW-Field-best-f658n_sharp_100.png=>NW-Field-best-RGB_sharp_100.png PNG 5896x4300 5896x4300+0+0 8-bit sRGB 25.8441MiB 12.950u 0:09.030
 
 
-*** S group
+
+
+
+**** The trapezium group
++ We have lots of images to choose from here
+  + The original PC mosaic in many filters
+    + But unfortunately, the only one that is well aligned to Robberto frame is [O III]
+    + It would be a lot of work to repeat this for the other filters
+  + The Bally 2015 H alpha and NUV  images
+  + The ACS Ramp 2004-01 images (includes a wider [O III] filter)
+  + The Robberto H alpha images
+
+
+
+***** Copy relevant images and reproject to a common frame
++ Put them in [[file:reproject-images/Trap/]]
++ I got the ones from the [[file:~/Dropbox/OrionHST-2012/Combine/]] project
+***** Reproject to a common frame
++ Might as well use the same method as above
+#+begin_src shell :dir reproject-images/Trap :eval no
+python ../fits-image-from-ds9-box.py trap-reproject-field.reg
+#+end_src
+
+#+begin_src shell :dir reproject-images/Trap :eval no
+python ../fits-image-from-ds9-box.py trap-reproject-field.reg
+#+end_src
+
+#+begin_src python :results output :tangle reproject-images/Trap/trap-reproject.py
+  from pathlib import Path
+  import numpy as np
+  from astropy.io import fits
+  from reproject import reproject_interp
+
+  base_path = Path(".")
+
+  hdu0 = fits.open("blank-Trap-Field.fits")[0]
+
+  infiles = base_path.glob("*-align-rob_drz_sci.fits")
+  for fn in infiles:
+      hdulist = fits.open(fn)
+      hdu = hdulist[0]
+      # Remove any unwanted SIP keywords
+      del hdu.header["A_*"]
+      del hdu.header["B_*"]
+      # switch zeros for NaN
+      hdu.data = np.where(
+          hdu.data > 0.0,
+          hdu.data,
+          np.nan,
+      )
+      newdata, _ = reproject_interp(hdu, hdu0.header, order="nearest-neighbor")
+      newhdu = fits.PrimaryHDU(header=hdu0.header, data=newdata)
+    
+      newfn = "Trap-field-" + str(fn).replace("-align-rob_drz_sci.fits", ".fits")
+      newhdu.writeto(newfn, overwrite=True)
+
+#+end_src
+
+#+begin_src sh :dir reproject-images/Trap :results verbatim
+python trap-reproject.py
+#+end_src
+
+#+RESULTS:
+
+***** Divide the sharp [O III] images
+
+#+begin_src python :dir reproject-images/Trap
+  from astropy.io import fits
+
+  hdu1 = fits.open("Trap-field-best-ramp-oiii_sharp_20.fits")[0]
+  hdu2 = fits.open("Trap-field-f502n-allpc_sharp_20.fits")[0]
+
+  hdu1.data /= hdu2.data
+  hdu1.writeto("Trap-field-ratio-f502n-ramp_sharp_20.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+
+***** Manipulate the ramp filters
+
+Median to eliminate cosmic rays
+#+begin_src python :dir reproject-images/Trap
+  import numpy as np
+  from astropy.io import fits
+
+  # Trap-field-fr505n-5007.fits
+  hdu1 = fits.open("Trap-field-fr505n-5007_sharp_20.fits")[0]
+  hdu2 = fits.open("Trap-field-fr505n-4959_sharp_20.fits")[0]
+  hdu3 = fits.open("Trap-field-fr459m-5007_sharp_20.fits")[0]
+
+  # hdu1.data = np.min(np.stack((hdu1.data, hdu2.data, hdu3.data)), axis=0)
+  hdu1.data = np.min(np.stack((hdu1.data, hdu2.data)), axis=0)
+  hdu1.writeto("Trap-field-best-ramp-oiii_sharp_20.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+
+#+begin_src python :dir reproject-images/Trap
+  from astropy.io import fits
+
+  hdu1 = fits.open("fr505n-5007-align-rob_drz_sci.fits")[0]
+  hdu2 = fits.open("fr505n-4959-align-rob_drz_sci.fits")[0]
+
+  hdu1.data /= hdu2.data
+  hdu1.writeto("fr505n-ratio-5007-4959.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+
+Have to shift one of the images to align better
+
+#+begin_src python :dir reproject-images/Trap
+  import numpy as np
+  from astropy.io import fits
+
+  hdu1 = fits.open("fr505n-5007-align-rob_drz_sci.fits")[0]
+  hdu2 = fits.open("fr459m-5007-align-rob_drz_sci.fits")[0]
+  hdu1.data = np.roll(hdu1.data, shift=(-1, 1), axis=(0, 1)) / hdu2.data
+  hdu1.writeto("fr505n-ratio-fr459m.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+But the alignment is not perfect and these are no use
+
+
+
+***** Make an RGB image of Trapezium proper motion
+
+#+begin_src shell :dir reproject-images/Trap :results verbatim
+  python ../fits2image.py Trap-field-best-ramp-oiii_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-f502n-allpc_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-ratio-f502n-ramp_sharp_20.fits --vmin 0.5 --vmax 1.5 --verbose
+  convert -verbose Trap-field-f502n-allpc_sharp_20.png Trap-field-best-ramp-oiii_sharp_20.png Trap-field-ratio-f502n-ramp_sharp_20.fits -channel RGB -combine Trap-field-oiii-motion-RGB_sharp_20.png
+#+end_src
+
+#+RESULTS:
+: Saved Trap-field-best-ramp-oiii_sharp_20.png
+: Saved Trap-field-f502n-allpc_sharp_20.png
+: Saved Trap-field-ratio-f502n-ramp_sharp_20.png
+: Trap-field-f502n-allpc_sharp_20.png=>Trap-field-oiii-motion-RGB_sharp_20.png PNG 1171x1224 1171x1224+0+0 8-bit sRGB 1.41994MiB 4.390u 0:01.493
+
+
+*** Earlier version from 2016 \to 2020
++ Plan is to use the Robberto images:
+  + Red :: F658N
+  + Green :: F555W
+  + Blue :: F435W
++ Remove large-scale brightness structure by dividing by smoothed version
+
+
+**** The original ~smooth-image.py~ program to do spatial filtering
+#+name: smooth-image
+#+BEGIN_SRC python :tangle /Users/will/Work/OrionTreasury/acs/smooth-image.py
+  import argh
+  import numpy as np
+  from astropy.io import fits
+  from astropy.convolution import convolve_fft, Gaussian2DKernel
+
+  template = "hlsp_orion_hst_acs_strip{}_{}_v1_drz.fits"
+
+  def main(field: "Robberto field of view"="0l",
+           band: "ACS filter"="f658n",
+           width: "Width of Gaussian smoothing kernel in pixels"=20,
+           bbox: "Subimage to use: 'i1 j1 i2 j2', or use 'full' for entire image"='full',
+           suffix: "Extra id string to add to output filename"="",
+           twopass: "Whether to do a second pass for eliminating negative halos"=False,
+           threshold: "Mask out relative brightnesses higher than this in second pass"=1.5,
+       ):
+
+      infile = template.format(field, band)
+      hdu = fits.open(infile)['SCI']
+
+      if "full" in bbox.lower():
+          im = hdu.data
+          i1, j1 = 0, 0
+      else:
+          i1, j1, i2, j2 = [int(s) for s in bbox.split()]
+          im = hdu.data[j1:j2, i1:i2]
+
+      gauss_kernel = Gaussian2DKernel(width)
+      smoothim = convolve_fft(im, gauss_kernel, allow_huge=True)
+      sharpim = im/smoothim
+
+      if twopass:
+          mask = (sharpim > threshold) | (im == 0.0)
+          im[mask] = np.nan
+          print('Starting second pass: N(masked) =', mask.sum())
+          smoothim = convolve_fft(im, gauss_kernel, normalize_kernel=True, allow_huge=True)
+          sharpim = im/smoothim
+
+      outhdu = fits.PrimaryHDU(data=smoothim, header=hdu.header)
+      outhdu.header['CRPIX1'] -= i1
+      outhdu.header['CRPIX2'] -= j1
+
+      outfile = infile.replace("_v1_drz.fits", "_smooth_{}{}.fits".format(width, suffix))
+      outhdu.writeto(outfile, overwrite=True)
+
+      outhdu.data = sharpim
+      outfile = outfile.replace("_smooth_", "_sharp_")
+      outhdu.writeto(outfile, overwrite=True)
+
+  if __name__ == "__main__":
+      argh.dispatch_command(main)
+
+#+END_SRC
+
+#+BEGIN_SRC sh :results verbatim
+python smooth-image.py --help
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+usage: smooth-image.py [-h] [-f FIELD] [--band BAND] [-w WIDTH] [--bbox BBOX]
+                       [-s SUFFIX] [--twopass] [--threshold THRESHOLD]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FIELD, --field FIELD
+                        Robberto field of view (default: '0l')
+  --band BAND           ACS filter (default: 'f658n')
+  -w WIDTH, --width WIDTH
+                        Width of Gaussian smoothing kernel in pixels (default:
+                        20)
+  --bbox BBOX           Subimage to use: 'i1 j1 i2 j2', or use 'full' for
+                        entire image (default: 'full')
+  -s SUFFIX, --suffix SUFFIX
+                        Extra id string to add to output filename (default:
+                        '')
+  --twopass             Whether to do a second pass for eliminating negative
+                        halos (default: False)
+  --threshold THRESHOLD
+                        Mask out relative brightnesses higher than this in
+                        second pass (default: 1.5)
+#+end_example
+
+
+
+**** S group
 Try out with small section around LL 7
 
 #+BEGIN_SRC sh 
@@ -1604,7 +1758,7 @@ $BGTASK python smooth-image.py --width 100 --bbox \'1500 600 8500 3600\' --band 
 
 
 
-*** SW group
+**** SW group
 Lower section of SW group: [[file:highpass-rgb-sw-lower.jpg]]
 #+BEGIN_SRC sh 
 BGTASK='sem --files --id hipass -j 1'
@@ -1684,7 +1838,7 @@ RGB file is written with limits of 0.75 1.4 in each channel
 
 
 
-*** NW group
+**** NW group
 + Luckily, all of these fall in the 5r images
 + Use ~--threshold 3.0~ because there are some bright bits
 
@@ -1731,7 +1885,7 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 
 
 
-*** LV plus SE group plus N group
+**** LV plus SE group plus N group
 + We can get all these together from 5l
   + bounding box: 9940 2100 12445 4286
 + First a version with threshold ~1.5~ to avoid the negative halo
@@ -1778,7 +1932,7 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 #+RESULTS:
 : None
 
-*** What about the new Bally images for the LV knots?
+**** What about the new Bally images for the LV knots?
 
 * Three dimensional structure
 
