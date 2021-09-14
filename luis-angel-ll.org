@@ -925,14 +925,18 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
   
   arctab = Table.read("luis-programas/arcs-summary-classify.ecsv", format = "ascii")
   selected_columns = ['Object', 'Group', 'RA', 'Dec',
-		      'D', 'PA_star', 'R_out','R_in','Rc_out','Rc_in','h', 'PA_out', 'PA_in',
+		      'D', 'PA_star', 'R_out','R_in', 'Pi_out', 'Pi_in', 'Lambda_out',
+		      'Lambda_in', 'h', 'PA_out', 'PA_in',
 		      'Star']
+  
   latex_columns = ['Object', 'Group', 'RA', 'Dec',
 		   r'\(D\)', 'PA',
 		   r'\(R_\mathrm{out}\)',
 		   r'\(R_\mathrm{in}\)',
-		   r'\(R_\mathrm{c,out}\)',
-		   r'\(R_\mathrm{c,in}\)',
+		   r'\(\Pi_\mathrm{out}\)',
+		   r'\(\Pi_\mathrm{in}\)',
+		   r'\(\Lambda_\mathrm{out}\)',
+		   r'\(\Lambda_\mathrm{in}\)',
 		   r'\(h\)',
 		   r'PA\(\mathrm{_{out}}\)',
 		   r'PA\(\mathrm{_{in}}\)',
@@ -950,12 +954,32 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
   
   arctab['Star'] = star
   
+  #Adding planitude and alatude
+  
+  pi_out, pi_in, lambda_out, lambda_in = [], [], [], []
+  pi_lambda = Table.read("luis-programas/arcs-sources-Pi-Lambda.ecsv", format = "ascii.ecsv")
+  for pi_lambda_ in pi_lambda:
+      pi_out.append(pi_lambda_["Pi_out"])
+      pi_in.append(pi_lambda_["Pi_in"])
+      lambda_out.append(pi_lambda_["Lambda_out"])
+      lambda_in.append(pi_lambda_["Lambda_in"])
+  
+  
+  arctab['Pi_out'] = pi_out
+  arctab['Pi_in'] = pi_in
+  arctab['Lambda_out'] = lambda_out
+  arctab['Lambda_in'] = lambda_in
+  
   column_formats = {}
   for c, cc in zip(selected_columns, latex_columns):
       if c[0] in 'DRh':
 	  column_formats[cc] = '%.2f'
       elif c.startswith('PA'):
 	  column_formats[cc] = '%.1f'
+      elif c.startswith('Pi'):
+	  column_formats[cc] = '%.2f'
+      elif c.startswith('Lambda'):
+	  column_formats[cc] = '%.2f'
       else:
 	  column_formats[cc] = '%s'
   
@@ -983,7 +1007,7 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
       names=latex_columns,
       formats=column_formats,
       col_align='r'*len(latex_columns),
-      fill_values=[('nan', r'\nodata'), ('0.00', r'\nodata')]) 
+      fill_values=[('nan', r''), ('0.00', r'')]) 
 #+END_SRC 
 
 #+RESULTS:
@@ -1015,7 +1039,7 @@ But what we really want is a separate table for each spatial group.  This is wha
           formats=column_formats,
           col_align='r'*len(latex_columns),
           caption='Shell geometric parameters of {}'.format(cap.lower()),
-          fill_values=[('nan', r'\nodata'), ('0.00', r'\nodata')])
+          fill_values=[('nan', r''), ('0.00', r'')])
       
 #+END_SRC
 
