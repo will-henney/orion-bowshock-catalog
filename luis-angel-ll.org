@@ -1269,7 +1269,7 @@ CLOSED: [2021-09-09 Thu 18:16]
 
 
 #+name: nw-subset
-| Robb-13  | 0r |
+| Robb-13 | 0r |
 
 #+header: :var INFILES=nw-subset NEWFIELD="NW-Field"
 #+begin_src python :results output :tangle reproject-images/test-reproject.py
@@ -1503,7 +1503,7 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 
 
 
-**** The trapezium group
+**** [9/10] The trapezium group
 + We have lots of images to choose from here
   + The original PC mosaic in many filters
     + But unfortunately, the only one that is well aligned to Robberto frame is [O III]
@@ -1514,10 +1514,12 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 
 
 
-***** Copy relevant images and reproject to a common frame
+***** DONE Copy relevant images and reproject to a common frame
+CLOSED: [2021-09-14 Tue 13:45]
 + Put them in [[file:reproject-images/Trap/]]
 + I got the ones from the [[file:~/Dropbox/OrionHST-2012/Combine/]] project
-***** Reproject to a common frame
+***** DONE Reproject to a common frame
+CLOSED: [2021-09-14 Tue 13:48]
 + Might as well use the same method as above
 #+begin_src shell :dir reproject-images/Trap :eval no
 python ../fits-image-from-ds9-box.py trap-reproject-field.reg
@@ -1564,7 +1566,145 @@ python trap-reproject.py
 
 #+RESULTS:
 
-***** Divide the sharp [O III] images
+Repeat for Ha fields
+
+#+begin_src python :results output :tangle reproject-images/Trap/trap-reproject-ha.py
+  from pathlib import Path
+  import numpy as np
+  from astropy.io import fits
+  from reproject import reproject_interp
+  import sys
+  sys.path.append("../../../wcsfile")
+  import wcsfile
+
+
+  base_path = Path(".")
+
+  hdu0 = fits.open("blank-Trap-Field.fits")[0]
+
+  hdu1 = fits.open(
+      "/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits"
+  )["SCI"]
+
+  hdu2 = fits.open(
+      "/Users/will/Dropbox/OrionBally-2016/data-2016-01-11/icaz01040_drz.fits"
+  )["SCI"]
+  hdu2.header.update(
+      ,**wcsfile.read(
+          "/Users/will/Dropbox/OrionBally-2016/data-2016-01-11/trap-south-align-robberto.wcs"
+      )
+  )
+
+
+
+  for hdu, suffix in [
+          [hdu1, "ACS-2005"],
+          [hdu2, "WFC3-2016"],
+  ]:
+      # Remove any unwanted SIP keywords
+      del hdu.header["A_*"]
+      del hdu.header["B_*"]
+      # switch zeros for NaN
+      hdu.data = np.where(
+          hdu.data > 0.0,
+          hdu.data,
+          np.nan,
+      )
+      newdata, _ = reproject_interp(hdu, hdu0.header, order="nearest-neighbor")
+      newhdu = fits.PrimaryHDU(header=hdu0.header, data=newdata)
+
+      newfn = f"Trap-field-ha-{suffix}.fits"
+      newhdu.writeto(newfn, overwrite=True)
+
+#+end_src
+
+#+begin_src sh :dir reproject-images/Trap :results verbatim
+python trap-reproject-ha.py
+#+end_src
+
+#+RESULTS:
+
+
+***** DONE Pre-process the ramp images before sharpening
+CLOSED: [2021-09-14 Tue 13:47]
++ We want to avoid the effect of the diffraction spike as much as we can
++ So we make a mask that hopefully 
+
+#+begin_src python :dir reproject-images/Trap
+  import numpy as np
+  from astropy.wcs import WCS
+  from astropy.io import fits
+  import regions
+
+  # Trap-field-fr505n-5007.fits
+  hdu1 = fits.open("Trap-field-fr505n-5007.fits")[0]
+  hdu2 = fits.open("Trap-field-fr505n-4959.fits")[0]
+
+  w = WCS(hdu1.header)
+  shape = hdu1.data.shape
+  regs = regions.read_ds9("trap-fr505n-saturation.reg")
+
+  # Start with empty mask
+  boxmask = np.zeros(shape, dtype=bool)
+  for reg in regs:
+      # Add in each of the box regions from the file
+      m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+      boxmask = boxmask | m
+
+  ratio = hdu1.data / hdu2.data
+  mean = 0.5 * (hdu1.data + hdu2.data)
+
+  # Use a criterion on the ratio and mean to try and get all of the saturation spike within the boxes
+  mask = boxmask & (np.abs(ratio - 1.0) <= 0.15) & (mean > 100.0)
+  # And then a tighter criterion to get any other fully saturated parts
+  mask = mask | ((np.abs(ratio - 1.0) <= 1e-5) & (mean > 100.0))
+  hdu1.data[mask] = np.nan
+  hdu2.data[mask] = np.nan
+
+  hdu1.writeto("Trap-field-fr505n-5007-mask.fits", overwrite=True)
+  hdu2.writeto("Trap-field-fr505n-4959-mask.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+***** DONE Do the sharpening of the ramp and PC mosaic images
+CLOSED: [2021-09-14 Tue 13:47]
++ Threshold of 5 is compromise between:
+  + not losing too much of the bright proplyd peaks
+  + but avoiding a big halo dip around the bright stars and saturation spikes
+#+begin_src shell :eval no :dir reproject-images/Trap
+    time python ../smooth-sharp.py Trap-field-f502n-allpc.fits --width 20 --twopass --threshold 5.0
+    time python ../smooth-sharp.py Trap-field-fr505n-5007-mask.fits --width 20 --twopass --threshold 5.0
+    time python ../smooth-sharp.py Trap-field-fr505n-4959-mask.fits --width 20 --twopass --threshold 5.0
+#+end_src
++ Repeat for the Ha images
+#+begin_src shell :eval no :dir reproject-images/Trap
+  time python ../smooth-sharp.py Trap-field-ha-ACS-2005.fits --width 20 --twopass --threshold 5.0
+  time python ../smooth-sharp.py Trap-field-ha-WFC3-2016.fits --width 20 --twopass --threshold 5.0
+#+end_src  
+
+***** DONE Combine two of the ACS ramp images to eliminate cosmic rays
+CLOSED: [2021-09-14 Tue 13:47]
++ Taking the minimum of the 5007 and 4959 images seems to work
+#+begin_src python :dir reproject-images/Trap
+  import numpy as np
+  from astropy.io import fits
+
+  # Trap-field-fr505n-5007.fits
+  hdu1 = fits.open("Trap-field-fr505n-5007-mask_sharp_20.fits")[0]
+  hdu2 = fits.open("Trap-field-fr505n-4959-mask_sharp_20.fits")[0]
+
+  # hdu1.data = np.min(np.stack((hdu1.data, hdu2.data, hdu3.data)), axis=0)
+  hdu1.data = np.min(np.stack((hdu1.data, hdu2.data)), axis=0)
+  hdu1.writeto("Trap-field-best-ramp-oiii_sharp_20.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+
+***** DONE Divide the sharp [O III] images
+CLOSED: [2021-09-14 Tue 13:47]
 
 #+begin_src python :dir reproject-images/Trap
   from astropy.io import fits
@@ -1579,26 +1719,160 @@ python trap-reproject.py
 #+RESULTS:
 : None
 
-
-***** Manipulate the ramp filters
-
-Median to eliminate cosmic rays
 #+begin_src python :dir reproject-images/Trap
-  import numpy as np
   from astropy.io import fits
 
-  # Trap-field-fr505n-5007.fits
-  hdu1 = fits.open("Trap-field-fr505n-5007_sharp_20.fits")[0]
-  hdu2 = fits.open("Trap-field-fr505n-4959_sharp_20.fits")[0]
-  hdu3 = fits.open("Trap-field-fr459m-5007_sharp_20.fits")[0]
+  hdu1 = fits.open("Trap-field-ha-WFC3-2016_sharp_20.fits")[0]
+  hdu2 = fits.open("Trap-field-ha-ACS-2005_sharp_20.fits")[0]
 
-  # hdu1.data = np.min(np.stack((hdu1.data, hdu2.data, hdu3.data)), axis=0)
-  hdu1.data = np.min(np.stack((hdu1.data, hdu2.data)), axis=0)
-  hdu1.writeto("Trap-field-best-ramp-oiii_sharp_20.fits", overwrite=True)
+  hdu1.data /= hdu2.data
+  hdu1.writeto("Trap-field-ratio-ha-2016-2005_sharp_20.fits", overwrite=True)
 #+end_src
 
 #+RESULTS:
 : None
+
+
+***** DONE Make an RGB image of Trapezium proper motion
+CLOSED: [2021-09-14 Tue 13:47]
+
+#+begin_src shell :dir reproject-images/Trap :results verbatim
+  python ../fits2image.py Trap-field-best-ramp-oiii_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-f502n-allpc_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-ratio-f502n-ramp_sharp_20.fits --vmin 0.5 --vmax 1.5 --verbose
+  convert -verbose Trap-field-f502n-allpc_sharp_20.png Trap-field-best-ramp-oiii_sharp_20.png Trap-field-ratio-f502n-ramp_sharp_20.png -channel RGB -combine Trap-field-oiii-motion-RGB_sharp_20.png
+#+end_src
+
+#+RESULTS:
+: Saved Trap-field-best-ramp-oiii_sharp_20.png
+: Saved Trap-field-f502n-allpc_sharp_20.png
+: Saved Trap-field-ratio-f502n-ramp_sharp_20.png
+: Trap-field-f502n-allpc_sharp_20.png=>Trap-field-oiii-motion-RGB_sharp_20.png PNG 1171x1224 1171x1224+0+0 8-bit sRGB 1.41371MiB 3.730u 0:00.898
+
+
+***** DONE Calculate the proper motions with FLCT
+CLOSED: [2021-09-14 Tue 19:45]
+#+begin_src python :dir . :results output silent
+  import sys
+  sys.path.append("../../Source/pyflct")
+  import os
+  from pathlib import Path
+  import numpy as np
+  import pyflct
+  from astropy.io import fits
+  from astropy.wcs import WCS
+
+  os.environ["PATH"] = ":".join((os.environ["PATH"], "/Users/will/.local/bin"))
+  datadir = Path("reproject-images/Trap")
+
+  # h1, = fits.open(datadir / "Trap-field-f502n-allpc_sharp_20.fits")
+  # h2, = fits.open(datadir / "Trap-field-best-ramp-oiii_sharp_20.fits")
+  h1, = fits.open(datadir / "Trap-field-f502n-allpc.fits")
+  h2, = fits.open(datadir / "Trap-field-fr505n-5007-mask.fits")
+
+  data_scale = h1.data.max()
+  m = ~np.isfinite(h2.data)
+  h2.data = np.where(m, h1.data, h2.data)
+  m = ~np.isfinite(h1.data)
+  h1.data = np.where(m, h2.data, h1.data)
+
+  sigma = 5.0
+  vx, vy, vm = pyflct.flct(h1.data.T, h2.data.T,
+                           deltat=1.0, deltas=1.0, sigma=sigma,
+                           thresh=0.1/data_scale,
+                           )
+  vx[vm==0] = np.nan
+  vy[vm==0] = np.nan
+
+  fits.PrimaryHDU(
+      header=h1.header,
+      data=vx.T,
+  ).writeto(datadir / f"Trap_field_oiii_1994_2004_vx_sig{int(sigma):02d}.fits", overwrite=True)
+
+  fits.PrimaryHDU(
+      header=h1.header,
+      data=vy.T,
+  ).writeto(datadir / f"Trap_field_oiii_1994_2004_vy_sig{int(sigma):02d}.fits", overwrite=True)
+#+end_src
+
+****** Make a figure of the proper motions
+#+begin_src python :results file :return figfile :dir .
+  from pathlib import Path
+  import numpy as np
+  from matplotlib import pyplot as plt
+  import matplotlib.patheffects as path_effects
+  import seaborn as sns
+  from astropy.io import fits
+  from astropy.wcs import WCS
+
+  figdir = Path("reproject-images/Trap")
+  datadir = figdir
+  sigma = 10.0
+  prefix = "Trap_field_oiii_1994_2004"
+  s0 = f"sig{int(sigma):02d}"
+
+
+  figfile = figdir / f"{prefix}_{s0}_proper_motions.jpg"
+
+  hdu, = fits.open(datadir / "Trap-field-f502n-allpc_sharp_20.fits")
+  w = WCS(hdu)
+  im = hdu.data
+  vx = fits.open(datadir / f"{prefix}_vx_{s0}.fits")[0].data
+  vy = fits.open(datadir / f"{prefix}_vy_{s0}.fits")[0].data
+  vv = np.hypot(vx, vy)
+  pa = np.rad2deg(np.arctan2(-vx, vy)) % 360
+
+
+  vx[vv > 7.0] = np.nan
+  vx[vv < 0.1] = np.nan
+  vx[(im < 1.02)] = np.nan 
+  vx[(im > 3.0)] = np.nan 
+
+
+  ny, nx = im.shape
+  X, Y = np.meshgrid(np.arange(nx), np.arange(ny))
+
+
+  fig, ax = plt.subplots(figsize=(4.5, 4), subplot_kw=dict(projection=w))
+  ax.imshow(im, vmin=0.5, vmax=1.5, origin="lower", cmap="gray_r")
+  step = slice(3, None, 5), slice(4, None, 5)
+
+  Q = ax.quiver(X[step], Y[step], vx[step], vy[step], pivot="middle",
+                headwidth=4, headlength=6, minlength=0.01,
+                units="xy", scale=0.3, width=1.5, minshaft=2.0, color="r", alpha=1.0)
+  Q.set_path_effects(
+      [
+          path_effects.PathPatchEffect(
+              edgecolor='white', linewidth=0.1, facecolor='red', capstyle="projecting",
+          ),
+      ]
+  )
+  QK = ax.quiverkey(Q, 0.1, 0.2, 7.0,
+               "70 km/s", labelcolor="red",
+               fontproperties=dict(size=6))
+  QK.set_path_effects(
+      [
+          path_effects.PathPatchEffect(
+              edgecolor='red', linewidth=0.1, facecolor='red', capstyle="projecting",
+          ),
+      ]
+  )
+  ax.set(
+      xlabel="RA",
+      ylabel="Dec",
+  )
+  fig.tight_layout(rect=(0.2, 0.1, 1.0, 1.0))
+  fig.savefig(figfile, dpi=1200)
+#+end_src
+
+#+RESULTS:
+[[file:reproject-images/Trap/Trap_field_oiii_1994_2004_sig10_proper_motions.jpg]]
+
+
+***** TODO Make an annotated figure for the paper
+
+***** DONE [#C] Ratios between the ramp filters
+CLOSED: [2021-09-14 Tue 13:45]
 
 
 #+begin_src python :dir reproject-images/Trap
@@ -1632,22 +1906,6 @@ Have to shift one of the images to align better
 
 But the alignment is not perfect and these are no use
 
-
-
-***** Make an RGB image of Trapezium proper motion
-
-#+begin_src shell :dir reproject-images/Trap :results verbatim
-  python ../fits2image.py Trap-field-best-ramp-oiii_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
-  python ../fits2image.py Trap-field-f502n-allpc_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
-  python ../fits2image.py Trap-field-ratio-f502n-ramp_sharp_20.fits --vmin 0.5 --vmax 1.5 --verbose
-  convert -verbose Trap-field-f502n-allpc_sharp_20.png Trap-field-best-ramp-oiii_sharp_20.png Trap-field-ratio-f502n-ramp_sharp_20.fits -channel RGB -combine Trap-field-oiii-motion-RGB_sharp_20.png
-#+end_src
-
-#+RESULTS:
-: Saved Trap-field-best-ramp-oiii_sharp_20.png
-: Saved Trap-field-f502n-allpc_sharp_20.png
-: Saved Trap-field-ratio-f502n-ramp_sharp_20.png
-: Trap-field-f502n-allpc_sharp_20.png=>Trap-field-oiii-motion-RGB_sharp_20.png PNG 1171x1224 1171x1224+0+0 8-bit sRGB 1.41994MiB 4.390u 0:01.493
 
 
 *** Earlier version from 2016 \to 2020
