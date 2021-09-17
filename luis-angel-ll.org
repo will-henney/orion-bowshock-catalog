@@ -2242,6 +2242,143 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 
 **** What about the new Bally images for the LV knots?
 
+
+* Kinematic structures
++ For the Trapezium region, it would be useful to relate the LL arcs to high-velocity features seen in the spectra
+
+
+** The MM shell
++ This was postulated by Massey & Meaburn (Massey:1993w)
+  + Earlier indications from 
++ It is a roughly 1 arcmin radius shell around the Trapezium
++ It as a coherent structure in the blueshifted spikes and knots
++ I am not 100% convinced it is real
+** Broad isovelocity images from the KPNO cubes
+*** Subtract continuum from [O III] cube
++ We make two estimates of continuum:
+  1. The minimum of the first 6 and last 6 velocity channels
+  2. The median of channels 4, 5, 6
++ We use the first unless it is negative, where we use the 2nd
+#+begin_src python :dir kinematics
+  import sys
+  from pathlib import Path
+  import numpy as np
+  from astropy.io import fits
+  sys.path.append("../../wcsfile")
+  import wcsfile
+
+  datadir = Path("/Users/will/Work/BobKPNO")
+
+  ##
+  ## [O III]
+  ##
+
+  hdu, = fits.open(datadir / "2004/vcube.oiii.fits")
+
+  # subtract off the continuum
+  cont = np.concatenate((hdu.data[:6, ...], hdu.data[-6:, ...])).min(axis=0)
+  cont2 = np.median(hdu.data[4:7, ...], axis=0)
+  cont = np.where(cont > 0.0, cont, cont2)
+  hdu.data -= cont
+
+
+  # Add the WCS
+  hdu.header.update(**wcsfile.read(datadir / "DOH-radec-vel-oiii.wcs"))
+
+  # Write the files
+  hdu.writeto("vcube.oiii-wcs-csub.fits", overwrite=True)
+  fits.PrimaryHDU(
+      data=cont,
+      header=hdu.header
+  ).writeto("vcube.oiii-wcs-cont.fits", overwrite=True)
+
+  ##
+  ## H alpha
+  ##
+
+  hdu, = fits.open(datadir / "2004/vcube.ha.fits")
+
+  # subtract off the continuum
+  cont = np.concatenate((hdu.data[:1, ...], hdu.data[-2:, ...])).min(axis=0)
+  hdu.data -= cont
+
+
+  # Add the WCS
+  hdu.header.update(**wcsfile.read(datadir / "DOH-radec-vel-oiii.wcs"))
+
+  # Write the files
+  hdu.writeto("vcube.ha-wcs-csub.fits", overwrite=True)
+  fits.PrimaryHDU(
+      data=cont,
+      header=hdu.header
+  ).writeto("vcube.ha-wcs-cont.fits", overwrite=True)
+
+  ##
+  ## [N II]
+  ##
+
+  hdu, = fits.open(datadir / "2004/vcube.nii.fits")
+
+  # subtract off the continuum - fit a linear function of V pixel
+  nv, ny, nx = hdu.data.shape
+  v = np.arange(nv)
+  y0 = hdu.data[0, ...]
+  slope = (hdu.data[-1, ...] - y0) / nv
+  cont = y0 + v[:, None, None] * slope
+  hdu.data -= cont
+
+
+  # Add the WCS
+  hdu.header.update(**wcsfile.read(datadir / "DOH-radec-vel-oiii.wcs"))
+
+  # Adjust for the offset between [N II] and the other lines
+  hdu.header["CRVAL3"] += 4.0
+
+  # Write the files
+  hdu.writeto("vcube.nii-wcs-csub.fits", overwrite=True)
+  fits.PrimaryHDU(
+      data=cont,
+      header=hdu.header
+  ).writeto("vcube.nii-wcs-cont.fits", overwrite=True)
+
+#+end_src
+
+#+RESULTS:
+: None
+*** Sum some channels to get blue velocity images
+#+begin_src python :dir kinematics
+  from astropy.io import fits
+  import numpy as np
+
+  chandata = [
+      [50, 57, "+110-fff-red"],
+      [45, 52, "+090-far-red"],
+      [40, 47, "+070-mid-red"],
+      [35, 42, "+050-near-red"],
+      [30, 37, "+030-core-red"],
+      [25, 32, "+010-big-arc"],
+      [20, 27, "-010-big-arc"],
+      [15, 22, "-030-near-blue"],
+      [10, 17, "-050-mid-blue"],
+      [5, 12,  "-070-far-blue"],
+  ]
+
+  for lineid in "oiii", "ha", "nii":
+      cube_hdu, = fits.open(f"vcube.{lineid}-wcs-csub.fits")
+      for k1, k2, label in chandata:
+          if lineid == "nii":
+              # Correction for nii peak shift
+              k1 -= 1
+              k2 -= 1
+          fits.PrimaryHDU(
+              header=cube_hdu.header,
+              data=cube_hdu.data[k1:k2, ...].sum(axis=0),
+          ).writeto(f"vmap-{lineid}_{label}.fits", overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
 * Three dimensional structure
 
 ** 3D Modeling Workflow
