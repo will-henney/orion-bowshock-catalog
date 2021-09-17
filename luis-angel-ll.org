@@ -1503,7 +1503,7 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 
 
 
-**** [9/10] The trapezium group
+**** [10/11] The trapezium group
 + We have lots of images to choose from here
   + The original PC mosaic in many filters
     + But unfortunately, the only one that is well aligned to Robberto frame is [O III]
@@ -1514,10 +1514,50 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 
 
 
-***** DONE Copy relevant images and reproject to a common frame
+***** DONE Copy relevant images 
 CLOSED: [2021-09-14 Tue 13:45]
 + Put them in [[file:reproject-images/Trap/]]
 + I got the ones from the [[file:~/Dropbox/OrionHST-2012/Combine/]] project
+
+***** DONE Preprocess WFC3 image before sharpening
+CLOSED: [2021-09-15 Wed 12:18]
++ This has a gap between two halves of the detector, which has garbage pixels at its boundaries
++ We can also mask out values of zero and >= 80 (saturated)
+
+#+begin_src python :dir reproject-images/Trap 
+  from pathlib import Path
+  import numpy as np
+  from astropy.wcs import WCS
+  from astropy.io import fits
+  import regions
+
+  infile = "icaz01040_drz.fits"
+  datapath = Path("/Users/will/Dropbox/OrionBally-2016/data-2016-01-11")
+  hdu = fits.open(datapath / infile)["SCI"]
+
+  w = WCS(hdu.header)
+  shape = hdu.data.shape
+  regs = regions.read_ds9("trap-wfc3-ha-gap.reg")
+
+  # Start with empty mask
+  boxmask = np.zeros(shape, dtype=bool)
+  for reg in regs:
+      # Add in each of the box regions from the file
+      m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+      boxmask = boxmask | m
+
+  mask = boxmask | (hdu.data == 0.0) | (hdu.data >= 75.0)
+  hdu.data[mask] = np.nan
+
+
+  outfile = infile.replace("_drz.fits", "_fix.fits")
+  hdu.writeto(outfile, overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+
 ***** DONE Reproject to a common frame
 CLOSED: [2021-09-14 Tue 13:48]
 + Might as well use the same method as above
@@ -1586,16 +1626,8 @@ Repeat for Ha fields
       "/Users/will/Work/OrionTreasury/acs/hlsp_orion_hst_acs_strip0l_f658n_v1_drz.fits"
   )["SCI"]
 
-  hdu2 = fits.open(
-      "/Users/will/Dropbox/OrionBally-2016/data-2016-01-11/icaz01040_drz.fits"
-  )["SCI"]
-  hdu2.header.update(
-      ,**wcsfile.read(
-          "/Users/will/Dropbox/OrionBally-2016/data-2016-01-11/trap-south-align-robberto.wcs"
-      )
-  )
-
-
+  hdu2 = fits.open("icaz01040_fix.fits")["SCI"]
+  hdu2.header.update(**wcsfile.read("trap-south-align-robberto.wcs"))
 
   for hdu, suffix in [
           [hdu1, "ACS-2005"],
@@ -1667,6 +1699,9 @@ CLOSED: [2021-09-14 Tue 13:47]
 
 #+RESULTS:
 : None
+
+
+
 ***** DONE Do the sharpening of the ramp and PC mosaic images
 CLOSED: [2021-09-14 Tue 13:47]
 + Threshold of 5 is compromise between:
@@ -1748,6 +1783,21 @@ CLOSED: [2021-09-14 Tue 13:47]
 : Saved Trap-field-f502n-allpc_sharp_20.png
 : Saved Trap-field-ratio-f502n-ramp_sharp_20.png
 : Trap-field-f502n-allpc_sharp_20.png=>Trap-field-oiii-motion-RGB_sharp_20.png PNG 1171x1224 1171x1224+0+0 8-bit sRGB 1.41371MiB 3.730u 0:00.898
+
+Repeat for  H alpha
+
+#+begin_src shell :dir reproject-images/Trap :results verbatim
+  python ../fits2image.py Trap-field-ha-ACS-2005_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-ha-WFC3-2016_sharp_20.fits --vmin 0.7 --vmax 1.5 --verbose
+  python ../fits2image.py Trap-field-ratio-ha-2016-2005_sharp_20.fits --vmin 0.5 --vmax 1.5 --verbose
+  convert -verbose Trap-field-ha-ACS-2005_sharp_20.png Trap-field-ha-WFC3-2016_sharp_20.png Trap-field-ratio-ha-2016-2005_sharp_20.png -channel RGB -combine Trap-field-ha-motion-RGB_sharp_20.png
+#+end_src
+
+#+RESULTS:
+: Saved Trap-field-ha-ACS-2005_sharp_20.png
+: Saved Trap-field-ha-WFC3-2016_sharp_20.png
+: Saved Trap-field-ratio-ha-2016-2005_sharp_20.png
+: Trap-field-ha-ACS-2005_sharp_20.png=>Trap-field-ha-motion-RGB_sharp_20.png PNG 1171x1224 1171x1224+0+0 8-bit sRGB 1076810B 4.270u 0:01.341
 
 
 ***** DONE Calculate the proper motions with FLCT
