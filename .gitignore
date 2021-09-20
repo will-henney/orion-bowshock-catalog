@@ -1,4 +1,6 @@
 *
+!kinematics
+!kinematics/vmap*.fits
 !reproject-images
 reproject-images/*.fits
 !reproject-images/*.py
@@ -67,3 +69,4 @@ reproject-images/*.fits
 !*.afdesign
 /reproject-images/*.fits
 /reproject-images/*.png
+/kinematics/vcube*.fits
