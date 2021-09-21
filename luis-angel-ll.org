@@ -2378,6 +2378,70 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 
 #+RESULTS:
 : None
+** Making velocity maps from the MUSE cubes
+*** Average maps
+#+begin_src python :dir kinematics
+  import numpy as np
+  from astropy.io import fits
+  from pathlib import Path
+
+  datapath = Path("/Users/will/Dropbox/OrionMuse/Linemaps")
+
+  combos = {
+      "low": ["S_II-6731", "S_II-6716", "N_II-6583", "N_II-6548"],
+      "mid": ["H_I-6563", "H_I-4861", "S_III-6312", "S_III-9069"],
+      "high": ["O_III-5007", "O_III-4959", "He_I-5876", "He_I-6678"],
+  }
+
+  for label, linelist in combos.items():
+      mom0, mom1 = None, None
+      for linelabel in linelist:
+          fhdu = fits.open(datapath / f"linesum-{linelabel}.fits")[0]
+          vhdu = fits.open(datapath / f"mean-{linelabel}-patfixx.fits")[0]
+          if mom0 is None:
+              mom0 = np.zeros_like(fhdu.data)
+              mom1 = np.zeros_like(fhdu.data)
+          m = np.isfinite(fhdu.data * vhdu.data)
+          m = m & (vhdu.data > -30) &  (vhdu.data < 50) 
+          mom0[m] += fhdu.data[m]
+          mom1[m] += fhdu.data[m] * vhdu.data[m]
+      fits.PrimaryHDU(
+          header=fhdu.header,
+          data=mom1 / mom0,
+      ).writeto(f"muse-vmean-{label}.fits", overwrite=True)
+
+#+end_src
+
+#+RESULTS:
+: None
+**** Make some images
+
+*** Difference maps
+#+name: deltaV
+#+header: :var A="H_I-6563" B="O_III-5007"
+#+begin_src python :dir kinematics
+  from astropy.io import fits
+  from pathlib import Path
+
+  datapath = Path("/Users/will/Dropbox/OrionMuse/Linemaps")
+  fn_a = datapath / f"mean-{A}-patfixx.fits"
+  fn_b = datapath / f"mean-{B}-patfixx.fits"
+  hdu_a, = fits.open(fn_a)
+  hdu_b, = fits.open(fn_b)
+
+  hdu_a.data -= hdu_b.data
+  _, _, Awav = A.partition("-")
+  _, _, Bwav = B.partition("-")
+  fn_out = f"delta-V-{Awav}-{Bwav}.fits"
+
+  hdu_a.writeto(fn_out, overwrite=True)
+#+end_src
+
+#+RESULTS:
+: None
+
+#+call: deltaV[:results silent]("H_I-6563", "H_I-9229")
+
 
 * Three dimensional structure
 
