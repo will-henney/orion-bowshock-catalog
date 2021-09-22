@@ -7120,15 +7120,23 @@ CLOCK: [2013-09-05 Thu 12:34]--[2013-09-06 Fri 08:53] => 20:19
 | Original           |      x |      y |        RA |        Dec | Fix |
 | j8oc01010_drz.fits | 2074.0 | 2010.0 | 83.777118 | -5.4114893 |   1 |
 
+#+name: fix-bally-wcs
 #+BEGIN_SRC python :var table=bally-corrections :dir ~/Work/OrionTreasury/Bally-ACS :results output
 import astropy.io.fits as pyfits
 for infile, x, y, ra, dec, dofix in table[1:]:
     if int(dofix) == 1:
         hdu = pyfits.open(infile)["SCI"]
         hdu.header.update(crpix1=float(x), crpix2=float(y), crval1=float(ra), crval2=float(dec))
-        outfile = infile.replace("_drz", "_robwcs")
+        outfile = infile.replace("_drz", "_wcs")
         hdu.writeto(outfile, clobber=True)
 #+END_SRC
+
+#+name: bally-corrections-2021
+| Original           |         x |        y |         RA |        Dec | Fix |
+| j8oc03010_drz.fits | 885.68776 | 602.6489 | 83.7924446 | -5.3391411 |   1 |
+
+
+#+call: fix-bally-wcs(table=bally-corrections-2021)
 
 #+RESULTS:
 
