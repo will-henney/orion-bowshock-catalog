@@ -146,11 +146,13 @@ plt.clf()
 f = plt.figure(figsize=(18,9))
 
 ax1 = aplpy.FITSFigure(hdu, figure=f, subplot=(1, 1, 1), north=True)
+ax1.axis_labels.set_xtext("RA (J2000)")
+ax1.axis_labels.set_ytext("Dec (J2000)")
 ax1.recenter(ra0, dec0, 4*R0/cmd_args.zoom)
 ax1.show_grayscale(invert=True, vmin=vmin, vmax=vmax)
-# ax1.add_colorbar()
-# ax1.colorbar.set_location("top")
-# ax1.colorbar.hide()             # necessary to get panels to be same size
+ax1.add_colorbar()
+ax1.colorbar.set_location("top")
+ax1.colorbar.hide()             # necessary to get panels to be same size
 
 # ax2 = aplpy.FITSFigure(hdu, figure=f, subplot=(1, 2, 2), north=True)
 # ax2.recenter(ra0, dec0, 4*R0/cmd_args.zoom)
@@ -190,11 +192,11 @@ ax1.add_label(0.1+dx, 0.9+dy, instrument, color="black", alpha=0.6,
               bbox={"facecolor": "black", "edgecolor": "none",# "pad": 20,
                     "alpha": 0.3, "boxstyle": "round,pad=0.5"},
               weight='bold', size='x-large', relative=True, zorder=999)
-ax1.axis_labels.hide_y()
-ax1.tick_labels.hide_y()
-ax1.add_colorbar()
-ax1.colorbar.set_axis_label_text("counts")
-ax1.colorbar.set_location("top")
+#ax1.axis_labels.hide_y()
+#ax1.tick_labels.hide_y()
+# ax1.add_colorbar()
+# ax1.colorbar.set_axis_label_text("counts")
+# ax1.colorbar.set_location("top")
 #ax2.colorbar.set_box([0.95, 0.1, 0.015, 0.8])
 
 #f.tight_layout()
