@@ -16,6 +16,7 @@ reproject-images/*.fits
 !circle_fit
 !j8oc01010_wcs
 !j8oc02010_wcs
+!j8oc03010_wcs
 !j8oc06010_wcs
 !j8oc07010_wcs
 !j8oc08010_wcs
