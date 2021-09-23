@@ -2246,6 +2246,10 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 + For the Trapezium region, it would be useful to relate the LL arcs to high-velocity features seen in the spectra
 
 
+** Comments on individual flows
++ ODell:2015a argue that HH 523 can be subsumed into HH 726
+  + But this cannot be true because HH 523 is blue-shifted, whereas 726 is highly redshifted.
+
 ** The MM shell
 + This was postulated by Massey & Meaburn (Massey:1993w)
   + Earlier indications from 
@@ -2377,6 +2381,9 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
 
 #+RESULTS:
 : None
+** Identifying KPNO features in the vstack cube
++ Equivalence between vstack and vcube
+  + vstack has 
 ** Making velocity maps from the MUSE cubes
 *** Average maps
 #+begin_src python :dir kinematics
