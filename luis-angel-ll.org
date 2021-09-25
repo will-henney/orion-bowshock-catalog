@@ -988,15 +988,14 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
   arctab.sort('RA')
   
   #Simbad coincidences 
-  simbad_sources = Table.read("Simbad/ll-stars-arcs-simbad-clean.ecsv", format = "ascii")
-  simbad_sources.sort('RA')
-  arctab['MAIN_ID'] = simbad_sources['MAIN_ID']
-  arctab['SP_TYPE'] = simbad_sources['SP_TYPE']
+  # simbad_sources = Table.read("Simbad/ll-stars-arcs-simbad-clean.ecsv", format = "ascii")
+  # simbad_sources.sort('RA')
+  # arctab['MAIN_ID'] = simbad_sources['MAIN_ID']
+  # arctab['SP_TYPE'] = simbad_sources['SP_TYPE']
   
 #+END_SRC
 
 #+RESULTS: table-write-setup
-: None
 
 #+BEGIN_SRC python :return table_filename :results file
   <<table-write-setup>>
@@ -5208,6 +5207,7 @@ Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]]
 |            |     4520-419 |          | 05:34:52.008 |  -5:24:18.73 |              |          17 |                        | x   |       |
 |            |     4505-336 |          | 05:34:50.492 |  -5:23:35.28 |              |          17 |                        | x   |       |
 |            |      364-411 |          | 05:35:36.441 |  -5:34:11.08 |              |           - |                        | x   |       |
+|            |      102-021 |          |  05:35:10.19 | -05:20:20.99 |              |          03 |                        | x   |       |
 |------------+--------------+----------+--------------+--------------+--------------+-------------+------------------------+-----+-------|
 |            |              |          |              |              |              |             |                        |     |    40 |
 #+TBLFM: @87$10=vsum(@I..@II)
