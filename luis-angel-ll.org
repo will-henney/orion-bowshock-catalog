@@ -2414,6 +2414,10 @@ $BGTASK python smooth-image.py --width 100 --bbox \'2532 1100 6744 4740\' --band
           header=fhdu.header,
           data=mom1 / mom0,
       ).writeto(f"muse-vmean-{label}.fits", overwrite=True)
+      fits.PrimaryHDU(
+          header=fhdu.header,
+          data=mom0,
+      ).writeto(f"muse-linesum-{label}.fits", overwrite=True)
 
 #+end_src
 
