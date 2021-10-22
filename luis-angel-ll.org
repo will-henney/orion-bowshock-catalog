@@ -1249,7 +1249,7 @@ This is done in [[file:reproject-images/fits-image-from-ds9-box.py]]
 ***** DONE Mask out problematic areas of individual images
 CLOSED: [2021-09-09 Thu 18:16]
 + Some of the Bally fields in particular have artefacts close to the sharp edges
-+ We could deal with this by some sore of dilation of the NaN areas
++ We could deal with this by some sort of dilation of the NaN areas
   + But the boundary area is many pixels in some cases
 + A more general solution would be to define areas with DS9 regions
 + This could also be used on areas where the Bally field has geometric distortions that lead to double stars when combining
@@ -1269,6 +1269,7 @@ CLOSED: [2021-09-09 Thu 18:16]
 #+name: nw-subset
 | Robb-13 | 0r |
 
+#+name: reproject-acs
 #+header: :var INFILES=nw-subset NEWFIELD="NW-Field"
 #+begin_src python :results output :tangle reproject-images/test-reproject.py
   from pathlib import Path
@@ -1501,7 +1502,7 @@ time python smooth-sharp.py NW-Field-best-f658n.fits --width 20 --twopass --thre
 
 
 
-**** [10/11] The trapezium group
+**** [11/11] The trapezium group
 + We have lots of images to choose from here
   + The original PC mosaic in many filters
     + But unfortunately, the only one that is well aligned to Robberto frame is [O III]
@@ -1917,8 +1918,9 @@ CLOSED: [2021-09-14 Tue 19:45]
 [[file:reproject-images/Trap/Trap_field_oiii_1994_2004_sig10_proper_motions.jpg]]
 
 
-***** TODO Make an annotated figure for the paper
-
+***** DONE Make an annotated figure for the paper
+CLOSED: [2021-10-19 Tue 11:48]
+This is mainly done I think 
 ***** DONE [#C] Ratios between the ramp filters
 CLOSED: [2021-09-14 Tue 13:45]
 
@@ -1953,9 +1955,51 @@ Have to shift one of the images to align better
 : None
 
 But the alignment is not perfect and these are no use
+**** TODO [4/5] The south group (inner portion)
+***** DONE S near: Make the blank image of the field
+CLOSED: [2021-10-19 Tue 21:21]
+#+begin_src sh :dir reproject :results verbatim
+  python fits-image-from-ds9-box.py s-near-reproject-field.reg
+#+end_src
+***** DONE S near: Choose which images to use and reproject them
+CLOSED: [2021-10-19 Tue 22:22]
++ Robberto: 1l, 2l, 7l
++ Bally: 6, 7, 8, 13, 14, 15
+  + 15 and 13 do not have wcs versions currently,
+  + but maybe we could get away with not using them
+  + I don't recall how easy it was to do the wcs on these
 
+#+name: s-near-reproject-files
+| Robb-13  | 1l |
+| Robb-13  | 2l |
+| Robb-13  | 7l |
+| Bally-06 | 06 |
+| Bally-06 | 07 |
+| Bally-06 | 08 |
+| Bally-06 | 14 |
 
+#+call: reproject-acs[:dir reproject-images](INFILES=s-near-reproject-files, NEWFIELD="S-Near-Field")
 
+#+RESULTS:
+
+***** DONE S near: Stitch them together
+CLOSED: [2021-10-19 Tue 22:22]
+#+begin_src sh :dir reproject-images :eval no
+python make-best-image.py S-Near f435w 
+python make-best-image.py S-Near f555w 
+python make-best-image.py S-Near f658n 
+#+end_src
+***** DONE S near: High-pass filtering
+CLOSED: [2021-10-19 Tue 23:19]
+#+begin_src sh :dir reproject-images :eval no
+for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits --width 100 --twopass --threshold 3.0; done
+#+end_src
+***** TODO S near: Annotating
+**** TODO [0/4] The west group (outer portion)
+***** TODO W far: Choose which images to use
+***** TODO W far: Stitch them together
+***** TODO W far: High-pass filtering
+***** TODO W far: Annotating
 *** Earlier version from 2016 \to 2020
 + Plan is to use the Robberto images:
   + Red :: F658N
