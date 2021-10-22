@@ -1994,6 +1994,20 @@ CLOSED: [2021-10-19 Tue 23:19]
 #+begin_src sh :dir reproject-images :eval no
 for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits --width 100 --twopass --threshold 3.0; done
 #+end_src
+***** S near: Making image file
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py S-Near-best-f658n_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py S-Near-best-f555w_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py S-Near-best-f435w_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+  convert -verbose S-Near-best-f{658n,555w,435w}_sharp_100.png -channel RGB -combine S-Near-best-RGB_sharp_100.png
+#+end_sc
+
+#+RESULTS:
+: Saved S-Near-best-f658n_sharp_100.png
+: Saved S-Near-best-f555w_sharp_100.png
+: Saved S-Near-best-f435w_sharp_100.png
+: S-Near-best-f658n_sharp_100.png=>S-Near-best-RGB_sharp_100.png PNG 10058x6546 10058x6546+0+0 8-bit sRGB 97.5458MiB 26.390u 0:20.994
+
 ***** TODO S near: Annotating
 **** TODO [0/4] The west group (outer portion)
 ***** TODO W far: Choose which images to use
@@ -5645,24 +5659,26 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
 #+RESULTS:
 [[file:ricci-data.json]]
 
-**** Write ds9 region file for the LL objects
+**** TODO Write ds9 region file for the LL objects
 :PROPERTIES:
 :ID:       0552A67D-F467-4F41-BD5D-DF5212B4AB35
 :END:
 #+header: :var table=orion-ll-objects
-#+BEGIN_SRC python :results file
+#+BEGIN_SRC python :results file :tangle generate-ll-boxes-region-file.py
   region_hdr_lines = [
       "# Region file format: DS9 version 4.1",
       "global color=red dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1",
       "fk5",
-      ]
-  
+  ]
+
   def region_box_to_string(ra="5:34:40.800", dec="-5:22:43.00",
                            width=50, height=50, angle=0.0, text="LL2"):
       return "box({},{},{}\",{}\",{}) # text={{{}}}".format(ra, dec, width, height, angle, text)
-  
+
   boxes = []
-  for bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc in table:
+  for [bname, oname, sname, RA, Dec, Ref, Bally, Notes, Arc, Top40] in table[1:]:
+      if not oname:
+          continue
       if "LL" in bname:
           size = 30.0
       else:
@@ -5671,16 +5687,30 @@ CLOCK: [2013-11-14 Thu 16:34]--[2013-11-14 Thu 17:34] =>  1:00
           name = bname
       else:
           name = oname.split()[-1]
+
       boxes.append(region_box_to_string(RA, Dec, size, size, text=name))
-  
+
   region_file = "ll-boxes-new.reg"
   with open(region_file, "w") as f:
       f.writelines([s + "\n" for s in region_hdr_lines + boxes])
-  return region_file
+  print(region_file, end="")
 #+END_SRC
+
+#+begin_src sh :results file
+python generate-ll-boxes-region-file.py
+#+end_src
 
 #+RESULTS:
 [[file:ll-boxes-new.reg]]
+
+
+
+#+begin_src sh
+echo $SHELL
+#+end_src
+
+#+RESULTS:
+: /bin/zsh
 
 
 
