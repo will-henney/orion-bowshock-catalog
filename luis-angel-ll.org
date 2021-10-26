@@ -1955,7 +1955,8 @@ Have to shift one of the images to align better
 : None
 
 But the alignment is not perfect and these are no use
-**** TODO [4/5] The south group (inner portion)
+**** DONE [5/5] The south group (inner portion)
+CLOSED: [2021-10-23 Sat 13:54]
 ***** DONE S near: Make the blank image of the field
 CLOSED: [2021-10-19 Tue 21:21]
 #+begin_src sh :dir reproject :results verbatim
@@ -2008,7 +2009,9 @@ for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits -
 : Saved S-Near-best-f435w_sharp_100.png
 : S-Near-best-f658n_sharp_100.png=>S-Near-best-RGB_sharp_100.png PNG 10058x6546 10058x6546+0+0 8-bit sRGB 97.5458MiB 26.390u 0:20.994
 
-***** TODO S near: Annotating
+***** DONE S near: Annotating
+CLOSED: [2021-10-23 Sat 13:53]
++ Resultant figure is [[file:combo-highpass-s.pdf]]
 **** TODO [0/4] The west group (outer portion)
 ***** TODO W far: Choose which images to use
 ***** TODO W far: Stitch them together
