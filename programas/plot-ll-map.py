@@ -45,8 +45,17 @@ def plot_map(limits, figname, canvas_size, innerbox=None, arrowscale=1.0):
 
         name = label.split()[-1]
         if name in problem_sources:
+            plt.annotate(label, (xx, yy), alpha=0.8, size=5, color=labelcolor,
+                         xytext=xytext, textcoords='offset points',
+                         ha=ha, va=va,
+                         bbox={'facecolor': boxcolor, 
+                               'alpha': 0.5,
+                               'pad': 2,
+                               'linewidth': 0.1,
+                           },
+            )
             continue
-
+        
         nickname = nicknames.get(name, name)
         jsonfile = "{}-arcdata.json".format(name)
         jsonfilex = "{}-arcdata.json".format(nickname)
