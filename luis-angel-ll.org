@@ -2095,15 +2095,18 @@ CLOSED: [2021-11-22 Mon 22:04]
   #+end_src
   
   #+begin_src shell :dir reproject-images :results verbatim
-  python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 5.0 --verbose
+  python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 4.0 --verbose
   #+end_src
 
   #+RESULTS:
   : Saved W-Far-best-f658n.png
   
   #+begin_src shell :dir reproject-images :results verbatim
-  python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 4.0 --verbose
+  python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 3.0 --verbose
   #+end_src
+
+  #+RESULTS:
+  : Saved W-Far-best-f435w-and-f555w.png
   
   #+begin_src shell :dir reproject-images :results verbatim
   convert -verbose\
@@ -2114,7 +2117,7 @@ CLOSED: [2021-11-22 Mon 22:04]
 #+end_src
 
 #+RESULTS:
-: W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 67.3449MiB 84.240u 1:16.902
+: W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 73.9277MiB 82.350u 1:14.641
 
 ***** TODO W far: Annotating
 
