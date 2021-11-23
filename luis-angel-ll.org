@@ -1960,7 +1960,7 @@ But the alignment is not perfect and these are no use
 CLOSED: [2021-10-23 Sat 13:54]
 ***** DONE S near: Make the blank image of the field
 CLOSED: [2021-10-19 Tue 21:21]
-#+begin_src sh :dir reproject :results verbatim
+#+begin_src sh :dir reproject-images :results verbatim
   python fits-image-from-ds9-box.py s-near-reproject-field.reg
 #+end_src
 ***** DONE S near: Choose which images to use and reproject them
@@ -2013,11 +2013,114 @@ for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits -
 ***** DONE S near: Annotating
 CLOSED: [2021-10-23 Sat 13:53]
 + Resultant figure is [[file:combo-highpass-s.pdf]]
-**** TODO [0/4] The west group (outer portion)
-***** TODO W far: Choose which images to use
-***** TODO W far: Stitch them together
-***** TODO W far: High-pass filtering
+
+**** TODO [4/6] The west group (outer portion)
+This is 300 to 600 arcsec to the west of the Trapezium
+***** DONE W far: Make the blank image of the field
+CLOSED: [2021-11-22 Mon 12:20]
+
+First, we have selected a generous box around these sources in SAOImage. This is how we save it. Note that we need to explicitly set the coordinates to WCS first.
+#+begin_src sh :dir reproject-images : results verbatim
+  xpaset -p acs regions system wcs
+  xpaset -p acs regions save "$PWD/w-far-reproject-field.reg"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :dir reproject-images :results verbatim
+  python fits-image-from-ds9-box.py w-far-reproject-field.reg
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :dir reproject-images : results verbatim
+  xpaset -p acs file "$PWD/blank-W-Far-Field.fits"
+#+end_src
+
+#+RESULTS:
+
+That looks good
+
+***** DONE W far: Choose which images to use and reproject them 
+CLOSED: [2021-11-22 Mon 12:54]
++ Robberto: 0r, 1r, 2r, 1l
++ Bally: 09, 16, 17, 18, 24, 25
+  + 25 is missing the wcs version
+
+#+name: w-far-reproject-files
+| Robb-13  | 0r |
+| Robb-13  | 1l |
+| Robb-13  | 1r |
+| Robb-13  | 2r |
+| Bally-06 | 16 |
+| Bally-06 | 17 |
+| Bally-06 | 18 |
+| Bally-06 | 24 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=w-far-reproject-files, NEWFIELD="W-Far-Field")
+
+#+RESULTS:
+
+This took a long time (30 minutes) because the images are enormous.
+
+#+name: w-far-reproject-extras
+| Bally-06 | 09 |
+| Bally-06 | 25 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=w-far-reproject-extras, NEWFIELD="W-Far-Field")
+
+#+RESULTS:
+
+***** DONE W far: Stitch them together
+CLOSED: [2021-11-22 Mon 13:18]
+#+begin_src sh :dir reproject-images :eval no
+  python make-best-image.py W-Far f435w 
+  python make-best-image.py W-Far f555w
+  python make-best-image.py W-Far f658n 
+#+end_src
+
+We also do one that combines the f435w and f555w filters, which helps in the elimination of the cosmic rays
+
+#+begin_src sh :dir reproject-images :eval no
+  time python make-best-image-2filter.py W-Far f435w f555w
+#+end_src
+
+***** DONE W far: High-pass filtering
+CLOSED: [2021-11-22 Mon 22:04]
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n f435w-and-f555w; do time python smooth-sharp.py W-Far-best-$f.fits --width 500 --twopass --threshold 3.0; done
+#+end_src
+***** TODO W far: Making image file
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f658n_sharp_500.fits --vmin 0.6 --vmax 2.0 --verbose
+  #+end_src
+  
+  #+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 5.0 --verbose
+  #+end_src
+
+  #+RESULTS:
+  : Saved W-Far-best-f658n.png
+  
+  #+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 4.0 --verbose
+  #+end_src
+  
+  #+begin_src shell :dir reproject-images :results verbatim
+  convert -verbose\
+          W-Far-best-f658n.png\
+          W-Far-best-f435w-and-f555w.png\
+          W-Far-best-f435w-and-f555w.png\
+          -channel RGB -combine W-Far-best-RGB.png
+#+end_src
+
+#+RESULTS:
+: W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 67.3449MiB 84.240u 1:16.902
+
 ***** TODO W far: Annotating
+
+***** W far:  
+***** W far:  
 *** Earlier version from 2016 \to 2020
 + Plan is to use the Robberto images:
   + Red :: F658N
@@ -5274,7 +5377,7 @@ Este viene de [[id:AA16BA5A-46A2-4D21-A453-972F273FB962][llobjects.org]]
 |            |     4505-336 |          | 05:34:50.492 |  -5:23:35.28 |              |          17 |                        | x   |       |
 |            |      364-411 |          | 05:35:36.441 |  -5:34:11.08 |              |           - |                        | x   |       |
 |            |      102-021 |          |  05:35:10.19 | -05:20:20.99 |              |          03 |                        | x   |       |
-|            |      098-753 | LP Ori   |  5:35:09.8297| -5:27:52.905 |              |          15 |                        | x?  |       |
+|            |      098-753 | LP Ori   | 5:35:09.8297 | -5:27:52.905 |              |          15 |                        | x?  |       |
 |------------+--------------+----------+--------------+--------------+--------------+-------------+------------------------+-----+-------|
 |            |              |          |              |              |              |             |                        |     |    40 |
 #+TBLFM: @87$10=vsum(@I..@II)
