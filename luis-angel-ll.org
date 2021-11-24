@@ -2089,26 +2089,48 @@ CLOSED: [2021-11-22 Mon 22:04]
 #+begin_src sh :dir reproject-images :eval no
   for f in f658n f435w-and-f555w; do time python smooth-sharp.py W-Far-best-$f.fits --width 500 --twopass --threshold 3.0; done
 #+end_src
+
+And a finer scale one for H alpha
+
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n; do time python smooth-sharp.py W-Far-best-$f.fits --width 100 --twopass --threshold 3.0; done
+#+end_src
+
 ***** TODO W far: Making image file
 #+begin_src shell :dir reproject-images :results verbatim
   python fits2image.py W-Far-best-f658n_sharp_500.fits --vmin 0.6 --vmax 2.0 --verbose
-  #+end_src
+#+end_src
   
-  #+begin_src shell :dir reproject-images :results verbatim
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f658n_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+#+end_src
+
+#+RESULTS:
+: Saved W-Far-best-f658n_sharp_100.png
+
+#+begin_src shell :dir reproject-images :results verbatim
+  ln -sf W-Far-best-f658n_sharp_100.fits  W-Far-best-f658n_sharp_100_dark.fits
+  python fits2image.py W-Far-best-f658n_sharp_100_dark.fits --vmin 0.7 --vmax 1.2 --verbose
+#+end_src
+
+#+RESULTS:
+: Saved W-Far-best-f658n_sharp_100_dark.png
+
+#+begin_src shell :dir reproject-images :results verbatim
   python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 4.0 --verbose
-  #+end_src
+#+end_src
 
-  #+RESULTS:
-  : Saved W-Far-best-f658n.png
+#+RESULTS:
+: Saved W-Far-best-f658n.png
   
-  #+begin_src shell :dir reproject-images :results verbatim
+#+begin_src shell :dir reproject-images :results verbatim
   python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 3.0 --verbose
-  #+end_src
+#+end_src
 
-  #+RESULTS:
-  : Saved W-Far-best-f435w-and-f555w.png
+#+RESULTS:
+: Saved W-Far-best-f435w-and-f555w.png
   
-  #+begin_src shell :dir reproject-images :results verbatim
+#+begin_src shell :dir reproject-images :results verbatim
   convert -verbose\
           W-Far-best-f658n.png\
           W-Far-best-f435w-and-f555w.png\
