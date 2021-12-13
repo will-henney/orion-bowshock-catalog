@@ -2013,7 +2013,7 @@ for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits -
 CLOSED: [2021-10-23 Sat 13:53]
 + Resultant figure is [[file:combo-highpass-s.pdf]]
 
-**** TODO [4/6] The west group (outer portion)
+**** TODO [6/6] The west group (outer portion)
 This is 300 to 600 arcsec to the west of the Trapezium
 ***** DONE W far: Make the blank image of the field
 CLOSED: [2021-11-22 Mon 12:20]
@@ -2096,7 +2096,8 @@ And a finer scale one for H alpha
   for f in f658n; do time python smooth-sharp.py W-Far-best-$f.fits --width 100 --twopass --threshold 3.0; done
 #+end_src
 
-***** TODO W far: Making image file
+***** DONE W far: Making image file
+CLOSED: [2021-12-12 Sun 18:48]
 #+begin_src shell :dir reproject-images :results verbatim
   python fits2image.py W-Far-best-f658n_sharp_500.fits --vmin 0.6 --vmax 2.0 --verbose
 #+end_src
@@ -2141,7 +2142,8 @@ And a finer scale one for H alpha
 #+RESULTS:
 : W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 73.9277MiB 82.350u 1:14.641
 
-***** TODO W far: Annotating
+***** DONE W far: Annotating
+CLOSED: [2021-12-12 Sun 20:39]
 
 ***** W far:  
 ***** W far:  
