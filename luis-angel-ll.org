@@ -1347,6 +1347,7 @@ python test-reproject.py
   imlist = []
   for file in files:
       if "-best-" in str(file): continue
+      print("Using", file.stem)
       hdu = fits.open(file)[0]
       regfile = str(file).replace(".fits", "-exclude.reg")
       try:
@@ -1356,6 +1357,7 @@ python test-reproject.py
           shape = hdu.data.shape
           for reg in regs:
               m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+              print(f"Setting {m.sum()} pixels to NaN")
               hdu.data[m] = np.nan
       except:
           pass
@@ -2013,7 +2015,10 @@ for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits -
 CLOSED: [2021-10-23 Sat 13:53]
 + Resultant figure is [[file:combo-highpass-s.pdf]]
 
-**** TODO [6/6] The west group (outer portion)
+
+
+**** DONE [6/6] The west group (outer portion)
+CLOSED: [2021-12-13 Mon 08:17]
 This is 300 to 600 arcsec to the west of the Trapezium
 ***** DONE W far: Make the blank image of the field
 CLOSED: [2021-11-22 Mon 12:20]
@@ -2145,8 +2150,71 @@ CLOSED: [2021-12-12 Sun 18:48]
 ***** DONE W far: Annotating
 CLOSED: [2021-12-12 Sun 20:39]
 
-***** W far:  
-***** W far:  
+
+
+
+**** TODO [2/6] The N group
+
+***** DONE N group: Make blank image of field
+CLOSED: [2021-12-13 Mon 08:40]
+#+begin_src sh :dir reproject-images : results verbatim
+  xpaset -p acs regions system wcs
+  xpaset -p acs regions save "$PWD/n-reproject-field.reg"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :dir reproject-images :results verbatim
+  python fits-image-from-ds9-box.py n-reproject-field.reg
+#+end_src
+
+#+RESULTS:
+
+This makes the file ~blank-N-Field.fits~
+
+
+***** TODO N group: Choose images and reproject
++ Robberto: 0l, 5l
++ Bally: 01, 02
+
+#+name: n-reproject-files
+| Robb-13  | 0l |
+| Robb-13  | 5l |
+| Bally-06 | 01 |
+| Bally-06 | 02 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=n-reproject-files, NEWFIELD="N-Field")
+
+#+RESULTS:
+
+Whoops, I forgot the 02 Bally field:
+#+name: n-reproject-extras
+| Bally-06 | 02 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=n-reproject-extras, NEWFIELD="N-Field")
+
+#+RESULTS:
+
+
+***** DONE N group: Stitch images together
+CLOSED: [2021-12-13 Mon 10:06]
+#+begin_src sh :dir reproject-images :eval no
+  python make-best-image.py N f435w 
+  python make-best-image.py N f555w
+  python make-best-image.py N f658n 
+#+end_src
+
++ I had to make masks for the edges of the Bally fields.
++ Note that it is very important to make sure that the box width and height are positive
+  + Sometimes with DS9 it is easy to make them be negative without realizing it
+  + I now print out the number of masked out pixels so we can notice when this goes wrong
+
+***** TODO N group: High-pass filtering
+
+***** TODO N group: Make image file
+
+***** TODO N group: Annotate
+
 *** Earlier version from 2016 \to 2020
 + Plan is to use the Robberto images:
   + Red :: F658N
