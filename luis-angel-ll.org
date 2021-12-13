@@ -2153,7 +2153,7 @@ CLOSED: [2021-12-12 Sun 20:39]
 
 
 
-**** TODO [2/6] The N group
+**** TODO [4/6] The N group
 
 ***** DONE N group: Make blank image of field
 CLOSED: [2021-12-13 Mon 08:40]
@@ -2209,9 +2209,47 @@ CLOSED: [2021-12-13 Mon 10:06]
   + Sometimes with DS9 it is easy to make them be negative without realizing it
   + I now print out the number of masked out pixels so we can notice when this goes wrong
 
-***** TODO N group: High-pass filtering
+***** DONE N group: High-pass filtering
+CLOSED: [2021-12-13 Mon 11:54]
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n f435w f555w; do time python smooth-sharp.py N-best-$f.fits --width 20 --twopass --threshold 3.0; done
+#+end_src
 
-***** TODO N group: Make image file
+This seems to have worked fine, but try the 100 pixel smoothing as well
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n f435w f555w; do time python smooth-sharp.py N-best-$f.fits --width 100 --twopass --threshold 10.0; done
+#+end_src
+
+***** DONE N group: Make image file
+CLOSED: [2021-12-13 Mon 12:56]
+
+For the 20 arcsec smoothing we use the standard brightness range
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py N-best-f658n_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py N-best-f555w_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py N-best-f435w_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  convert -verbose N-best-f{658n,555w,435w}_sharp_20.png -channel RGB -combine N-best-RGB_sharp_20.png
+#+end_src
+
+#+RESULTS:
+: Saved N-best-f658n_sharp_20.png
+: Saved N-best-f555w_sharp_20.png
+: Saved N-best-f435w_sharp_20.png
+: N-best-f658n_sharp_20.png=>N-best-RGB_sharp_20.png PNG 1892x1782 1892x1782+0+0 8-bit sRGB 3.06223MiB 5.220u 0:01.964
+
+For the 100 arcsec smoothing I use a wider brightness range since the fluctuations have a larger amplitude.
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py N-best-f658n_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  python fits2image.py N-best-f555w_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  python fits2image.py N-best-f435w_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  convert -verbose N-best-f{658n,555w,435w}_sharp_100.png -channel RGB -combine N-best-RGB_sharp_100.png
+#+end_src
+
+#+RESULTS:
+: Saved N-best-f658n_sharp_100.png
+: Saved N-best-f555w_sharp_100.png
+: Saved N-best-f435w_sharp_100.png
+: N-best-f658n_sharp_100.png=>N-best-RGB_sharp_100.png PNG 1892x1782 1892x1782+0+0 8-bit sRGB 2.18975MiB 6.740u 0:03.488
 
 ***** TODO N group: Annotate
 
