@@ -2252,7 +2252,27 @@ For the 100 arcsec smoothing I use a wider brightness range since the fluctuatio
 : N-best-f658n_sharp_100.png=>N-best-RGB_sharp_100.png PNG 1892x1782 1892x1782+0+0 8-bit sRGB 2.18975MiB 6.740u 0:03.488
 
 ***** TODO N group: Annotate
+Many supposed arcs are probably not really there. Here is my current assessment of all the ones that are currently listed for the N group:
++ 154-225 - the apparent arc is just a gap between extinction filaments
++ [X] 154-240 - definitely a cavity there but evidence for a shell is ambiguous
+  + There is a fat shell that is probably unrelated
+  + But also a thin inner rim that is bright in [O III]
++ 159-221 - This has an Ha filament that could be an arc, but there are other similar ones nearby
+  + And the cavity looks more like an extinction feature
+  + There is a dark filament that crosses the field from E to W
++ 163-222 - close to 159-221 and could also be an illusion
+  + Again, a weak extinction filament produces the illusion of an arc
++ 165-235 - this has an E-W jet
+  + But the putative arc does not look convincing at all
++ [X] 170-249
+  + This one might even be real
++ 178-258
+  + Shows a possible low-ionization arc
+  + But there are several similar emission filaments that run parallel but further from the source.
 
+Other sources that were already classified as ambiguous:
++ 142-301 - has a thin straight filament in front of it (runs N-S) but this seems to be part of a larger structure.
++ 173-236 - looks like an HH bow shock
 *** Earlier version from 2016 \to 2020
 + Plan is to use the Robberto images:
   + Red :: F658N
