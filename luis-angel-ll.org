@@ -1348,6 +1348,7 @@ python test-reproject.py
   imlist = []
   for file in files:
       if "-best-" in str(file): continue
+      print("Using", file.stem)
       hdu = fits.open(file)[0]
       regfile = str(file).replace(".fits", "-exclude.reg")
       try:
@@ -1357,6 +1358,7 @@ python test-reproject.py
           shape = hdu.data.shape
           for reg in regs:
               m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+              print(f"Setting {m.sum()} pixels to NaN")
               hdu.data[m] = np.nan
       except:
           pass
@@ -2014,7 +2016,10 @@ for f in f658n f555w f435w; do time python smooth-sharp.py S-Near-best-$f.fits -
 CLOSED: [2021-10-23 Sat 13:53]
 + Resultant figure is [[file:combo-highpass-s.pdf]]
 
-**** TODO [4/6] The west group (outer portion)
+
+
+**** DONE [6/6] The west group (outer portion)
+CLOSED: [2021-12-13 Mon 08:17]
 This is 300 to 600 arcsec to the west of the Trapezium
 ***** DONE W far: Make the blank image of the field
 CLOSED: [2021-11-22 Mon 12:20]
@@ -2090,23 +2095,49 @@ CLOSED: [2021-11-22 Mon 22:04]
 #+begin_src sh :dir reproject-images :eval no
   for f in f658n f435w-and-f555w; do time python smooth-sharp.py W-Far-best-$f.fits --width 500 --twopass --threshold 3.0; done
 #+end_src
-***** TODO W far: Making image file
+
+And a finer scale one for H alpha
+
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n; do time python smooth-sharp.py W-Far-best-$f.fits --width 100 --twopass --threshold 3.0; done
+#+end_src
+
+***** DONE W far: Making image file
+CLOSED: [2021-12-12 Sun 18:48]
 #+begin_src shell :dir reproject-images :results verbatim
   python fits2image.py W-Far-best-f658n_sharp_500.fits --vmin 0.6 --vmax 2.0 --verbose
-  #+end_src
+#+end_src
   
-  #+begin_src shell :dir reproject-images :results verbatim
-  python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 5.0 --verbose
-  #+end_src
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f658n_sharp_100.fits --vmin 0.9 --vmax 1.2 --verbose
+#+end_src
 
-  #+RESULTS:
-  : Saved W-Far-best-f658n.png
+#+RESULTS:
+: Saved W-Far-best-f658n_sharp_100.png
+
+#+begin_src shell :dir reproject-images :results verbatim
+  ln -sf W-Far-best-f658n_sharp_100.fits  W-Far-best-f658n_sharp_100_dark.fits
+  python fits2image.py W-Far-best-f658n_sharp_100_dark.fits --vmin 0.7 --vmax 1.2 --verbose
+#+end_src
+
+#+RESULTS:
+: Saved W-Far-best-f658n_sharp_100_dark.png
+
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f658n.fits --vmin 0.4 --vmax 4.0 --verbose
+#+end_src
+
+#+RESULTS:
+: Saved W-Far-best-f658n.png
   
-  #+begin_src shell :dir reproject-images :results verbatim
-  python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 4.0 --verbose
-  #+end_src
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py W-Far-best-f435w-and-f555w.fits --vmin 0.2 --vmax 3.0 --verbose
+#+end_src
+
+#+RESULTS:
+: Saved W-Far-best-f435w-and-f555w.png
   
-  #+begin_src shell :dir reproject-images :results verbatim
+#+begin_src shell :dir reproject-images :results verbatim
   convert -verbose\
           W-Far-best-f658n.png\
           W-Far-best-f435w-and-f555w.png\
@@ -2115,12 +2146,134 @@ CLOSED: [2021-11-22 Mon 22:04]
 #+end_src
 
 #+RESULTS:
-: W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 67.3449MiB 84.240u 1:16.902
+: W-Far-best-f658n.png=>W-Far-best-RGB.png PNG 11862x9679 11862x9679+0+0 8-bit sRGB 73.9277MiB 82.350u 1:14.641
 
-***** TODO W far: Annotating
+***** DONE W far: Annotating
+CLOSED: [2021-12-12 Sun 20:39]
 
-***** W far:  
-***** W far:  
+
+
+
+**** TODO [4/6] The N group
+
+***** DONE N group: Make blank image of field
+CLOSED: [2021-12-13 Mon 08:40]
+#+begin_src sh :dir reproject-images : results verbatim
+  xpaset -p acs regions system wcs
+  xpaset -p acs regions save "$PWD/n-reproject-field.reg"
+#+end_src
+
+#+RESULTS:
+
+#+begin_src sh :dir reproject-images :results verbatim
+  python fits-image-from-ds9-box.py n-reproject-field.reg
+#+end_src
+
+#+RESULTS:
+
+This makes the file ~blank-N-Field.fits~
+
+
+***** TODO N group: Choose images and reproject
++ Robberto: 0l, 5l
++ Bally: 01, 02
+
+#+name: n-reproject-files
+| Robb-13  | 0l |
+| Robb-13  | 5l |
+| Bally-06 | 01 |
+| Bally-06 | 02 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=n-reproject-files, NEWFIELD="N-Field")
+
+#+RESULTS:
+
+Whoops, I forgot the 02 Bally field:
+#+name: n-reproject-extras
+| Bally-06 | 02 |
+
+#+call: reproject-acs[:dir reproject-images](INFILES=n-reproject-extras, NEWFIELD="N-Field")
+
+#+RESULTS:
+
+
+***** DONE N group: Stitch images together
+CLOSED: [2021-12-13 Mon 10:06]
+#+begin_src sh :dir reproject-images :eval no
+  python make-best-image.py N f435w 
+  python make-best-image.py N f555w
+  python make-best-image.py N f658n 
+#+end_src
+
++ I had to make masks for the edges of the Bally fields.
++ Note that it is very important to make sure that the box width and height are positive
+  + Sometimes with DS9 it is easy to make them be negative without realizing it
+  + I now print out the number of masked out pixels so we can notice when this goes wrong
+
+***** DONE N group: High-pass filtering
+CLOSED: [2021-12-13 Mon 11:54]
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n f435w f555w; do time python smooth-sharp.py N-best-$f.fits --width 20 --twopass --threshold 3.0; done
+#+end_src
+
+This seems to have worked fine, but try the 100 pixel smoothing as well
+#+begin_src sh :dir reproject-images :eval no
+  for f in f658n f435w f555w; do time python smooth-sharp.py N-best-$f.fits --width 100 --twopass --threshold 10.0; done
+#+end_src
+
+***** DONE N group: Make image file
+CLOSED: [2021-12-13 Mon 12:56]
+
+For the 20 arcsec smoothing we use the standard brightness range
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py N-best-f658n_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py N-best-f555w_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  python fits2image.py N-best-f435w_sharp_20.fits --vmin 0.9 --vmax 1.2 --verbose
+  convert -verbose N-best-f{658n,555w,435w}_sharp_20.png -channel RGB -combine N-best-RGB_sharp_20.png
+#+end_src
+
+#+RESULTS:
+: Saved N-best-f658n_sharp_20.png
+: Saved N-best-f555w_sharp_20.png
+: Saved N-best-f435w_sharp_20.png
+: N-best-f658n_sharp_20.png=>N-best-RGB_sharp_20.png PNG 1892x1782 1892x1782+0+0 8-bit sRGB 3.06223MiB 5.220u 0:01.964
+
+For the 100 arcsec smoothing I use a wider brightness range since the fluctuations have a larger amplitude.
+#+begin_src shell :dir reproject-images :results verbatim
+  python fits2image.py N-best-f658n_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  python fits2image.py N-best-f555w_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  python fits2image.py N-best-f435w_sharp_100.fits --vmin 0.7 --vmax 1.5 --verbose
+  convert -verbose N-best-f{658n,555w,435w}_sharp_100.png -channel RGB -combine N-best-RGB_sharp_100.png
+#+end_src
+
+#+RESULTS:
+: Saved N-best-f658n_sharp_100.png
+: Saved N-best-f555w_sharp_100.png
+: Saved N-best-f435w_sharp_100.png
+: N-best-f658n_sharp_100.png=>N-best-RGB_sharp_100.png PNG 1892x1782 1892x1782+0+0 8-bit sRGB 2.18975MiB 6.740u 0:03.488
+
+***** TODO N group: Annotate
+Many supposed arcs are probably not really there. Here is my current assessment of all the ones that are currently listed for the N group:
++ 154-225 - the apparent arc is just a gap between extinction filaments
++ [X] 154-240 - definitely a cavity there but evidence for a shell is ambiguous
+  + There is a fat shell that is probably unrelated
+  + But also a thin inner rim that is bright in [O III]
++ 159-221 - This has an Ha filament that could be an arc, but there are other similar ones nearby
+  + And the cavity looks more like an extinction feature
+  + There is a dark filament that crosses the field from E to W
++ 163-222 - close to 159-221 and could also be an illusion
+  + Again, a weak extinction filament produces the illusion of an arc
++ 165-235 - this has an E-W jet
+  + But the putative arc does not look convincing at all
++ [X] 170-249
+  + This one might even be real
++ 178-258
+  + Shows a possible low-ionization arc
+  + But there are several similar emission filaments that run parallel but further from the source.
+
+Other sources that were already classified as ambiguous:
++ 142-301 - has a thin straight filament in front of it (runs N-S) but this seems to be part of a larger structure.
++ 173-236 - looks like an HH bow shock
 *** Earlier version from 2016 \to 2020
 + Plan is to use the Robberto images:
   + Red :: F658N

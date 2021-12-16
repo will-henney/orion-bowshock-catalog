@@ -14,6 +14,7 @@ files = Path(".").glob(f"{field}-*-{filter}.fits")
 imlist = []
 for file in files:
     if "-best-" in str(file): continue
+    print("Using", file.stem)
     hdu = fits.open(file)[0]
     regfile = str(file).replace(".fits", "-exclude.reg")
     try:
@@ -23,6 +24,7 @@ for file in files:
         shape = hdu.data.shape
         for reg in regs:
             m = reg.to_pixel(w).to_mask().to_image(shape).astype(bool)
+            print(f"Setting {m.sum()} pixels to NaN")
             hdu.data[m] = np.nan
     except:
         pass
