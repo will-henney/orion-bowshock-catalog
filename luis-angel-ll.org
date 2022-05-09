@@ -996,6 +996,7 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
 #+END_SRC
 
 #+RESULTS: table-write-setup
+: None
 
 #+BEGIN_SRC python :return table_filename :results file
   <<table-write-setup>>
