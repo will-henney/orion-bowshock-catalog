@@ -221,7 +221,7 @@ if __name__ == "__main__":
     fullbox = [-325, 775, -725, 275]
     plot_map(fullbox, "ll-positions-2020.pdf", (10, 10), innerbox=zoombox, arrowscale=2.0)
     plot_map(zoombox, "ll-positions-zoom-2020.pdf", (10, 10), arrowscale=0.7)
-
+    print("luis")
 
 
 
