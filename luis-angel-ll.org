@@ -354,7 +354,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
       table.remove_rows(idups)
 
   newtabfile = "luis-programas/arcs-summary-unique.ecsv"
-  table.write(newtabfile, format="ascii.ecsv")
+  table.write(newtabfile, format="ascii.ecsv", overwrite=True)
 
 #+END_SRC
 
@@ -483,7 +483,7 @@ We present a complete catalog of all the stationary emission line arcs (LL objec
   table["Group"][interprop_mask] = '*I'
 
   newtabfile = "luis-programas/arcs-summary-classify.ecsv"
-  table.write(newtabfile, format="ascii.ecsv")
+  table.write(newtabfile, format="ascii.ecsv", overwrite=True)
 
 #+END_SRC
 
@@ -1002,15 +1002,16 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
 : None
 
 #+BEGIN_SRC python :return table_filename :results file
-  <<table-write-setup>>
-  table_filename = 'catalog-paper/table-sort-full.tex'
-  arctab[selected_columns].write(
-      table_filename,
-      format = "ascii.aastex",
-      names=latex_columns,
-      formats=column_formats,
-      col_align='r'*len(latex_columns),
-      fill_values=[('nan', r''), ('0.00', r'')]) 
+    <<table-write-setup>>
+    table_filename = 'catalog-paper/table-sort-full.tex'
+    arctab[selected_columns].write(
+	table_filename,
+	format = "ascii.aastex",
+	names=latex_columns,
+	formats=column_formats,
+	col_align='r'*len(latex_columns),
+	fill_values=[('nan', r''), ('0.00', r'')],
+        overwrite=True) 
 #+END_SRC 
 
 #+RESULTS:
@@ -1018,32 +1019,33 @@ CLOCK: [2014-12-04 Thu 10:10]--[2014-12-04 Thu 13:20] =>  3:10
 
 But what we really want is a separate table for each spatial group.  This is what I do next:
 #+BEGIN_SRC python
-  <<table-write-setup>>
-  groupdict = {
-      "LV": ("01-LV", "LV knots"),
-      "SE": ("02-southeast", "Southeast group"),
-      "N": ("03-north", "North group"),
-      "NW": ("04-northwest", "Northwest group"),
-      "W": ("06-west", "West group"),
-      "S": ("07-south", "South group"),
-      "*P": ("XX-problematic", "Problematic objects"),
-      "*I": ("00-interproplyd", "Interproplyd shells"),
-  }
-  selected_columns.remove('Group')
-  latex_columns.remove('Group')
-  for group, (label, cap) in groupdict.items():
-      table_filename = 'catalog-paper/table-sort-{}.tex'.format(label)
-      m = arctab['Group'] == group
-      arctab[m][selected_columns].write(
-          table_filename,
-          format = "ascii.aastex",
-          latexdict=dict(tabletype='deluxetable*'),
-          names=latex_columns,
-          formats=column_formats,
-          col_align='r'*len(latex_columns),
-          caption='Shell geometric parameters of {}'.format(cap.lower()),
-          fill_values=[('nan', r''), ('0.00', r'')])
-      
+    <<table-write-setup>>
+    groupdict = {
+	"LV": ("01-LV", "LV knots"),
+	"SE": ("02-southeast", "Southeast group"),
+	"N": ("03-north", "North group"),
+	"NW": ("04-northwest", "Northwest group"),
+	"W": ("06-west", "West group"),
+	"S": ("07-south", "South group"),
+	"*P": ("XX-problematic", "Problematic objects"),
+	"*I": ("00-interproplyd", "Interproplyd shells"),
+    }
+    selected_columns.remove('Group')
+    latex_columns.remove('Group')
+    for group, (label, cap) in groupdict.items():
+	table_filename = 'catalog-paper/table-sort-{}.tex'.format(label)
+	m = arctab['Group'] == group
+	arctab[m][selected_columns].write(
+	    table_filename,
+	    format = "ascii.aastex",
+	    latexdict=dict(tabletype='deluxetable*'),
+	    names=latex_columns,
+	    formats=column_formats,
+	    col_align='r'*len(latex_columns),
+	    caption='Shell geometric parameters of {}'.format(cap.lower()),
+	    fill_values=[('nan', r''), ('0.00', r'')],
+	    overwrite=True)
+	
 #+END_SRC
 
 #+RESULTS:
@@ -4089,9 +4091,9 @@ python arcs-summary.py
 
     ## Third, write out the merged table
     mtab.write("arcs-summary-merge.tab",
-               format="ascii.commented_header",
+               format="ascii.commented_header", overwrite=True,
                delimiter="\t")
-    mtab.write("arcs-summary-merge.ecsv",
+    mtab.write("arcs-summary-merge.ecsv", overwrite=True,
                format="ascii.ecsv")
 
   #+END_SRC
