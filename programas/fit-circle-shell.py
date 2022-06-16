@@ -70,10 +70,16 @@ def fit_circle(x, y, xc=0.0, yc=0.0):
     params = lmfit.Parameters()
     params.add("xc", value=xc)
     params.add("yc", value=yc)
-    lmfit.minimize(model_minus_data, params, args=(x, y))
-    lmfit.report_errors(params)
-    xc = params["xc"].value
-    yc = params["yc"].value
+    out = lmfit.minimize(model_minus_data, params, args=(x, y))
+    lmfit.report_fit(out)
+    try:
+        # new version for lmfit
+        xc = out.params["xc"].value
+        yc = out.params["yc"].value
+    except:
+        # old version for lmfit
+        xc = params["xc"].value
+        yc = params["yc"].value
     Rc = Rc_from_data(x, y, xc, yc)
     return Rc, xc, yc
 
