@@ -39,6 +39,10 @@ reproject-images/*.fits
 !Robberto2005
 !Smith2005
 !Radial-Distribution/*
+!HST
+HST/*
+!HST/3f502.fits
+!HST/3f502-align-Robberto.wcs
 !*.tex
 !*.org
 !*.org_archive
@@ -73,3 +77,4 @@ reproject-images/*.fits
 /reproject-images/*.fits
 /reproject-images/*.png
 /kinematics/vcube*.fits
+
